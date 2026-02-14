@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import "./QuantitySelector.css";
 
 interface QuantitySelectorProps {
   value: number;

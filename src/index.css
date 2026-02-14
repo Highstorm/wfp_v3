@@ -106,6 +106,17 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
+  /* Hide number input spinners */
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  input[type="number"] {
+    -moz-appearance: textfield;
+  }
+
   /* Reduced motion support */
   @media (prefers-reduced-motion: reduce) {
     *,
@@ -120,6 +131,33 @@
 }
 
 @layer components {
+  /* Card utility - Tailwind @apply shorthand for consistent card surfaces */
+  .card {
+    @apply bg-card text-card-foreground rounded-lg border border-border shadow-soft;
+  }
+
+  /* Button utilities - Tailwind @apply shorthands */
+  .btn {
+    @apply inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors duration-fast focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 cursor-pointer h-10 px-4 py-2;
+  }
+
+  .btn-primary {
+    @apply btn bg-primary text-primary-foreground hover:bg-primary/90;
+  }
+
+  .btn-secondary {
+    @apply btn bg-secondary text-secondary-foreground hover:bg-secondary/80;
+  }
+
+  .btn-ghost {
+    @apply btn bg-transparent hover:bg-accent hover:text-accent-foreground;
+  }
+
+  /* Input utility */
+  .input {
+    @apply w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2;
+  }
+
   /* Slider styles for StomachPainTracker */
   .slider {
     -webkit-appearance: none;

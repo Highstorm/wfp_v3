@@ -25,10 +25,7 @@ export default defineConfig({
             "firebase/ai",
           ],
           "ui-vendor": [
-            "@mui/material",
-            "@mui/icons-material",
-            "@emotion/react",
-            "@emotion/styled",
+            "@headlessui/react",
           ],
         },
       },

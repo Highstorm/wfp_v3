@@ -1,5 +1,5 @@
-import { getAuth } from 'firebase/auth';
-import { doc, getDoc, getFirestore } from 'firebase/firestore';
+import { doc, getDoc } from 'firebase/firestore';
+import { db, auth } from '../lib/firebase';
 
 interface IntervalsActivity {
   id: string;
@@ -14,10 +14,8 @@ interface IntervalsActivityDetail {
 
 export class IntervalsService {
   private static async getCredentials(): Promise<{ athleteId: string; apiKey: string } | null> {
-    const auth = getAuth();
     if (!auth.currentUser?.email) return null;
 
-    const db = getFirestore();
     const profileRef = doc(db, "profiles", auth.currentUser.email);
     const profileSnap = await getDoc(profileRef);
 

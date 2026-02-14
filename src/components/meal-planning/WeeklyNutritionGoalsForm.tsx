@@ -1,5 +1,5 @@
 import { useState, useEffect, FormEvent } from "react";
-import { getAuth } from "firebase/auth";
+import { auth } from "../../lib/firebase";
 import {
   useWeeklyNutritionGoals,
   useCreateWeeklyNutritionGoals,
@@ -22,7 +22,6 @@ export const WeeklyNutritionGoalsForm = ({
   const [fat, setFat] = useState<string>("");
   const [message, setMessage] = useState({ text: "", type: "" });
 
-  const auth = getAuth();
   const { data: weeklyGoals, isLoading } =
     useWeeklyNutritionGoals(weekStartDate);
   const { mutate: createWeeklyGoals, isPending: isCreating } =

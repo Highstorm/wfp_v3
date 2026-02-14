@@ -1,5 +1,4 @@
 import { useState, useEffect, useMemo } from "react";
-import { getAuth } from "firebase/auth";
 import { WeekCalendar } from "./WeekCalendar";
 import { DeleteConfirmDialog } from "../shared/DeleteConfirmDialog";
 import { ResetConfirmDialog } from "../shared/ResetConfirmDialog";
@@ -23,7 +22,8 @@ import {
   type TemporaryMeal,
   type NutritionGoals,
 } from "../../lib/firestore";
-import { getFirestore, doc, getDoc } from "firebase/firestore";
+import { doc, getDoc } from "firebase/firestore";
+import { db, auth } from "../../lib/firebase";
 import { IntervalsService } from "../../services/intervals.service";
 
 interface DeleteConfirmDialog {
@@ -98,8 +98,6 @@ export const MealPlanForm = () => {
   const [dailyNoteEnabled, setDailyNoteEnabled] = useState<boolean>(true);
   const [sportEnabled, setSportEnabled] = useState<boolean>(true);
 
-  const auth = getAuth();
-
   // React Query Hooks mit optimierten Optionen
   const { data: dishes = [], isLoading: isDishesLoading } = useDishes();
   const {
@@ -154,7 +152,6 @@ export const MealPlanForm = () => {
     const loadUserSettings = async () => {
       if (auth.currentUser?.email) {
         try {
-          const db = getFirestore();
           const profileRef = doc(db, "profiles", auth.currentUser.email);
           const profileSnap = await getDoc(profileRef);
 

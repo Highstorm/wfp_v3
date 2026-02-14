@@ -1,12 +1,11 @@
 import { useState, useEffect } from "react";
-import { getAuth } from "firebase/auth";
 import {
-  getFirestore,
   collection,
   query,
   where,
   getDocs,
 } from "firebase/firestore";
+import { db, auth } from "../../lib/firebase";
 
 interface WeekCalendarProps {
   selectedDate: string;
@@ -25,8 +24,6 @@ export const WeekCalendar = ({
   });
 
   const [daysWithPlan, setDaysWithPlan] = useState<string[]>([]);
-  const auth = getAuth();
-  const db = getFirestore();
 
   // Berechne den Montag der aktuellen Woche
   const getWeekDates = (startDate: Date) => {

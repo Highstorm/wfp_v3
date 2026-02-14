@@ -1,12 +1,11 @@
 import { useState, useEffect } from "react";
-import { getAuth } from "firebase/auth";
 import {
-  getFirestore,
   collection,
   query,
   where,
   getDocs,
 } from "firebase/firestore";
+import { db, auth } from "../../lib/firebase";
 
 interface MonthCalendarProps {
   selectedDate: string;
@@ -19,9 +18,6 @@ export const MonthCalendar = ({
 }: MonthCalendarProps) => {
   const [currentDate, setCurrentDate] = useState(new Date(selectedDate));
   const [daysWithPlan, setDaysWithPlan] = useState<string[]>([]);
-
-  const auth = getAuth();
-  const db = getFirestore();
 
   const loadMonthPlans = async () => {
     if (!auth.currentUser?.uid) return;

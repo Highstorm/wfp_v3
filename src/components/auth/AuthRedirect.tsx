@@ -1,6 +1,7 @@
 import { ReactNode, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../../lib/firebase";
 
 interface AuthRedirectProps {
   children: ReactNode;
@@ -8,7 +9,6 @@ interface AuthRedirectProps {
 
 export const AuthRedirect = ({ children }: AuthRedirectProps) => {
   const navigate = useNavigate();
-  const auth = getAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 

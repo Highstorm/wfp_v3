@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
 import {
-  getAuth,
   updateProfile,
   updateEmail,
   updatePassword,
   EmailAuthProvider,
   reauthenticateWithCredential,
 } from "firebase/auth";
-import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import { db, auth } from "../../lib/firebase";
 import { hasEarlyAccess } from "../../config/earlyAccessFeatures";
 
 interface UserSettings {
@@ -41,8 +41,6 @@ export const UserSettingsForm = () => {
   const [isUpdatingUser, setIsUpdatingUser] = useState(false);
   const [userMessage, setUserMessage] = useState("");
 
-  const auth = getAuth();
-  
   // Prüfe Early Access für Porridge Calculator
   const hasPorridgeAccess = hasEarlyAccess(
     "porridgeCalculator",
@@ -62,7 +60,6 @@ export const UserSettingsForm = () => {
 
       // Lade die Intervals.icu-Daten aus dem Profil
       const loadIntervalsData = async () => {
-        const db = getFirestore();
         const profileRef = doc(db, "profiles", email);
         const profileSnap = await getDoc(profileRef);
 
@@ -134,7 +131,6 @@ export const UserSettingsForm = () => {
       }
 
       // Speichere die Intervals.icu-Daten und Feature-Toggle-Einstellungen im Profil
-      const db = getFirestore();
       await setDoc(
         doc(db, "profiles", email),
         {

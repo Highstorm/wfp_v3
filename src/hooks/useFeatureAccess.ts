@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { getAuth } from "firebase/auth";
-import { getFirestore, doc, onSnapshot } from "firebase/firestore";
+import { doc, onSnapshot } from "firebase/firestore";
+import { db, auth } from "../lib/firebase";
 import { hasEarlyAccess } from "../config/earlyAccessFeatures";
 
 interface FeatureAccess {
@@ -22,8 +22,6 @@ export const useFeatureAccess = (): FeatureAccess => {
     isLoading: true,
     reload: () => {},
   });
-
-  const auth = getAuth();
 
   useEffect(() => {
     if (!auth.currentUser?.email) {
@@ -52,7 +50,6 @@ export const useFeatureAccess = (): FeatureAccess => {
     }
 
     // Echtzeit-Listener für Profil-Änderungen
-    const db = getFirestore();
     const profileRef = doc(db, "profiles", email);
     
     const unsubscribe = onSnapshot(profileRef, (snapshot) => {

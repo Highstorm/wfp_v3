@@ -14,12 +14,12 @@ import {
     User,
     LogOut
 } from "lucide-react";
-import { getAuth, signOut } from "firebase/auth";
+import { signOut } from "firebase/auth";
+import { auth } from "../../lib/firebase";
 
 export const Sidebar = () => {
     const location = useLocation();
     const featureAccess = useFeatureAccess();
-    const auth = getAuth();
 
     const handleLogout = async () => {
         try {

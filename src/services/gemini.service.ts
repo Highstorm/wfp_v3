@@ -1,4 +1,4 @@
-import { app } from "../firebase";
+import { app } from "../lib/firebase";
 import { SearchableProduct } from "./openfoodfacts.service";
 
 /**

@@ -1,9 +1,8 @@
-import { getAuth } from "firebase/auth";
+import { auth } from "../../lib/firebase";
 import { NutritionGoalsForm } from "../meal-planning/NutritionGoalsForm";
 import { UserSettingsForm } from "./UserSettingsForm";
 
 export const ProfilePage = () => {
-  const auth = getAuth();
 
   if (!auth.currentUser) {
     return (

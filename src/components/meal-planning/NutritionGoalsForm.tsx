@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { getAuth } from "firebase/auth";
-import { doc, getDoc, setDoc, getFirestore } from "firebase/firestore";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import { db, auth } from "../../lib/firebase";
 
 interface NutritionGoals {
   baseCalories: number | null;
@@ -24,9 +24,6 @@ export const NutritionGoalsForm = () => {
   });
   const [isSaving, setIsSaving] = useState(false);
   const [message, setMessage] = useState("");
-
-  const auth = getAuth();
-  const db = getFirestore();
 
   useEffect(() => {
     const loadProfile = async () => {

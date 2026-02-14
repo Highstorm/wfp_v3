@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { getAuth, signOut } from "firebase/auth";
+import { signOut } from "firebase/auth";
+import { auth } from "../../lib/firebase";
 import { useFeatureAccess } from "../../hooks/useFeatureAccess";
 
 export const Header = () => {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const auth = getAuth();
   const featureAccess = useFeatureAccess();
 
   const handleLogout = async () => {

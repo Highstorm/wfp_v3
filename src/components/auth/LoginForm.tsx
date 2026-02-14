@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { signInWithEmailAndPassword, getAuth } from "firebase/auth";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../../lib/firebase";
 import { useAuthStore } from "../../stores/authStore";
 
 export const LoginForm = () => {
@@ -13,7 +14,6 @@ export const LoginForm = () => {
     setError("");
 
     try {
-      const auth = getAuth();
       await signInWithEmailAndPassword(auth, email, password);
       resetForm();
       navigate("/day-planning");

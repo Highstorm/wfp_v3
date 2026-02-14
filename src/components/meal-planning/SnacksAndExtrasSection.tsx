@@ -7,7 +7,7 @@ import {
   analyzeNutritionLabelWithAI,
 } from "../../services/gemini.service";
 import { SearchableProduct, debounce } from "../../services/openfoodfacts.service";
-import { getAuth } from "firebase/auth";
+import { auth } from "../../lib/firebase";
 
 interface SnacksAndExtrasSectionProps {
   dishes: Dish[];
@@ -97,8 +97,6 @@ export const SnacksAndExtrasSection = ({
       setIsAnalyzingImage(false);
     }
   };
-
-  const auth = getAuth();
 
   // Prüfe Gemini-Verfügbarkeit beim Mount
   useEffect(() => {

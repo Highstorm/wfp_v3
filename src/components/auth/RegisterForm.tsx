@@ -2,9 +2,9 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import {
   createUserWithEmailAndPassword,
-  getAuth,
   updateProfile,
 } from "firebase/auth";
+import { auth } from "../../lib/firebase";
 import { useAuthStore } from "../../stores/authStore";
 
 export const RegisterForm = () => {
@@ -18,7 +18,6 @@ export const RegisterForm = () => {
     setError("");
 
     try {
-      const auth = getAuth();
       const { user } = await createUserWithEmailAndPassword(
         auth,
         email,

@@ -1,20 +1,47 @@
+import { lazy, Suspense } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { DishesPage } from "./components/dishes/DishesPage";
-import { DishForm } from "./components/dishes/DishForm";
-import { CreateDishWithIngredients } from "./components/dishes/CreateDishWithIngredients";
-import { EditDishWithIngredients } from "./components/dishes/EditDishWithIngredients";
-import { ImportDishPage } from "./components/dishes/ImportDishPage";
 import { LoginForm } from "./components/auth/LoginForm";
 import { RegisterForm } from "./components/auth/RegisterForm";
-import { ProfilePage } from "./components/auth/ProfilePage";
 import { AuthRedirect } from "./components/auth/AuthRedirect";
 import { DayPlanningPage } from "./components/meal-planning/DayPlanningPage";
-import { Dashboard } from "./components/layout/Dashboard";
-import { PorridgeCalculator } from "./components/porridge/PorridgeCalculator";
 import { Toast } from "./components/shared/Toast";
 import { ProtectedLayout } from "./components/layout/ProtectedLayout.tsx";
 import { ErrorBoundary } from "./components/shared/ErrorBoundary";
 import { NotFound } from "./components/shared/NotFound";
+import { LoadingSpinner } from "./components/shared/LoadingSpinner";
+
+const DishesPage = lazy(() =>
+  import("./components/dishes/DishesPage").then((m) => ({ default: m.DishesPage }))
+);
+const DishForm = lazy(() =>
+  import("./components/dishes/DishForm").then((m) => ({ default: m.DishForm }))
+);
+const CreateDishWithIngredients = lazy(() =>
+  import("./components/dishes/CreateDishWithIngredients").then((m) => ({
+    default: m.CreateDishWithIngredients,
+  }))
+);
+const EditDishWithIngredients = lazy(() =>
+  import("./components/dishes/EditDishWithIngredients").then((m) => ({
+    default: m.EditDishWithIngredients,
+  }))
+);
+const ImportDishPage = lazy(() =>
+  import("./components/dishes/ImportDishPage").then((m) => ({
+    default: m.ImportDishPage,
+  }))
+);
+const ProfilePage = lazy(() =>
+  import("./components/auth/ProfilePage").then((m) => ({ default: m.ProfilePage }))
+);
+const Dashboard = lazy(() =>
+  import("./components/layout/Dashboard").then((m) => ({ default: m.Dashboard }))
+);
+const PorridgeCalculator = lazy(() =>
+  import("./components/porridge/PorridgeCalculator").then((m) => ({
+    default: m.PorridgeCalculator,
+  }))
+);
 
 function App() {
   return (
@@ -40,7 +67,14 @@ function App() {
                 </ErrorBoundary>
               }
             />
-            <Route path="/dashboard" element={<Dashboard />} />
+            <Route
+              path="/dashboard"
+              element={
+                <Suspense fallback={<LoadingSpinner />}>
+                  <Dashboard />
+                </Suspense>
+              }
+            />
             <Route
               path="/day-planning"
               element={
@@ -49,12 +83,21 @@ function App() {
                 </ErrorBoundary>
               }
             />
-            <Route path="/dishes" element={<DishesPage />} />
+            <Route
+              path="/dishes"
+              element={
+                <Suspense fallback={<LoadingSpinner />}>
+                  <DishesPage />
+                </Suspense>
+              }
+            />
             <Route
               path="/dishes/new"
               element={
                 <ErrorBoundary>
-                  <DishForm />
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <DishForm />
+                  </Suspense>
                 </ErrorBoundary>
               }
             />
@@ -62,7 +105,9 @@ function App() {
               path="/dishes/:id/edit"
               element={
                 <ErrorBoundary>
-                  <DishForm />
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <DishForm />
+                  </Suspense>
                 </ErrorBoundary>
               }
             />
@@ -70,7 +115,9 @@ function App() {
               path="/dishes/create-with-ingredients"
               element={
                 <ErrorBoundary>
-                  <CreateDishWithIngredients />
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <CreateDishWithIngredients />
+                  </Suspense>
                 </ErrorBoundary>
               }
             />
@@ -78,24 +125,46 @@ function App() {
               path="/dishes/:id/edit-ingredients"
               element={
                 <ErrorBoundary>
-                  <EditDishWithIngredients />
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <EditDishWithIngredients />
+                  </Suspense>
                 </ErrorBoundary>
               }
             />
-            <Route path="/dishes/import" element={<ImportDishPage />} />
+            <Route
+              path="/dishes/import"
+              element={
+                <Suspense fallback={<LoadingSpinner />}>
+                  <ImportDishPage />
+                </Suspense>
+              }
+            />
             <Route
               path="/shared-dish/:shareCode"
-              element={<ImportDishPage />}
+              element={
+                <Suspense fallback={<LoadingSpinner />}>
+                  <ImportDishPage />
+                </Suspense>
+              }
             />
             <Route
               path="/porridge"
               element={
                 <ErrorBoundary>
-                  <PorridgeCalculator />
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <PorridgeCalculator />
+                  </Suspense>
                 </ErrorBoundary>
               }
             />
-            <Route path="/profile" element={<ProfilePage />} />
+            <Route
+              path="/profile"
+              element={
+                <Suspense fallback={<LoadingSpinner />}>
+                  <ProfilePage />
+                </Suspense>
+              }
+            />
           </Route>
 
           <Route path="*" element={<NotFound />} />

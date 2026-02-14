@@ -50,16 +50,19 @@ export const NutritionSummary = ({
           title="Protein"
           currentValue={currentNutrition.protein}
           targetValue={nutritionGoals.protein}
+          colorVar="--color-protein"
         />
         <NutrientCard
           title="Kohlenhydrate"
           currentValue={currentNutrition.carbs}
           targetValue={nutritionGoals.carbs}
+          colorVar="--color-carbs"
         />
         <NutrientCard
           title="Fette"
           currentValue={currentNutrition.fat}
           targetValue={nutritionGoals.fat}
+          colorVar="--color-fat"
         />
       </div>
 

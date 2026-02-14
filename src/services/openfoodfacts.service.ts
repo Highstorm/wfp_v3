@@ -1,4 +1,4 @@
-import { DishIngredient } from "../lib/firestore";
+import type { DishIngredient } from "../types";
 
 /**
  * OpenFoodFacts Product Types (kompatibel mit beiden APIs)
@@ -287,7 +287,7 @@ export function productToIngredient(
 /**
  * Debounce-Funktion für die Suche
  */
-export function debounce<T extends (...args: any[]) => any>(
+export function debounce<T extends (...args: never[]) => unknown>(
   func: T,
   wait: number
 ): (...args: Parameters<T>) => void {

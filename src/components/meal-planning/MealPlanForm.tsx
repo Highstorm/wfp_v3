@@ -24,7 +24,7 @@ import {
 } from "../../lib/firestore";
 import { doc, getDoc } from "firebase/firestore";
 import { db, auth } from "../../lib/firebase";
-import { IntervalsService } from "../../services/intervals.service";
+import { IntervalsService, type IntervalsCredentials } from "../../services/intervals.service";
 
 interface DeleteConfirmDialog {
   isOpen: boolean;
@@ -200,17 +200,26 @@ export const MealPlanForm = () => {
     }
   }, [existingMealPlan, isMealPlanLoading]);
 
+  const getIntervalsCredentials = async (): Promise<IntervalsCredentials | null> => {
+    if (!auth.currentUser?.email) return null;
+    const profileRef = doc(db, "profiles", auth.currentUser.email);
+    const profileSnap = await getDoc(profileRef);
+    if (!profileSnap.exists()) return null;
+    const data = profileSnap.data();
+    const athleteId = data["intervals.icu-AthleteID"];
+    const apiKey = data["intervals.icu-API-KEY"];
+    if (!athleteId || !apiKey) return null;
+    return { athleteId, apiKey };
+  };
+
   const handleLoadIntervalsActivities = async () => {
     try {
-      const activities = await IntervalsService.getActivitiesForDate(date);
-      console.log(
-        `Intervals.icu: ${activities.length} Aktivitäten (Details) empfangen:`,
-        activities
-      );
-      console.log(
-        `MealPlan: Aktuelle Anzahl Sporteinträge vor Import:`,
-        mealPlan?.sports?.length || 0
-      );
+      const credentials = await getIntervalsCredentials();
+      if (!credentials) {
+        setMessage({ text: "Keine Intervals.icu Credentials gefunden.", type: "error" });
+        return;
+      }
+      const activities = await IntervalsService.getActivitiesForDate(date, credentials);
       let newActivitiesAdded = false;
 
       // Für jede Aktivität prüfen, ob sie bereits im Plan existiert
@@ -466,11 +475,13 @@ export const MealPlanForm = () => {
 
       // Übertrage Wellness-Daten an intervals.icu
       try {
-        const nutrition = calculateTotalNutrition();
-        await IntervalsService.updateWellnessForDate(date, nutrition.calories);
-        console.log("Wellness-Daten erfolgreich übertragen.");
-      } catch (error) {
-        console.error("Fehler beim Übertragen der Wellness-Daten", error);
+        const credentials = await getIntervalsCredentials();
+        if (credentials) {
+          const nutrition = calculateTotalNutrition();
+          await IntervalsService.updateWellnessForDate(date, nutrition.calories, credentials);
+        }
+      } catch {
+        // TODO: logger.error("Error syncing wellness data to Intervals.icu")
       }
     } catch (err: unknown) {
       if (err instanceof Error) {

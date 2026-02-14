@@ -122,19 +122,19 @@ export const SportSection = ({
           {activities.map((activity, index) => (
             <div
               key={index}
-              className="flex items-center justify-between bg-gray-50 rounded-lg px-3 sm:px-4 py-2.5 sm:py-3 gap-2"
+              className="flex items-center justify-between bg-muted rounded-lg px-3 sm:px-4 py-2.5 sm:py-3 gap-2"
             >
               <div className="flex-1 min-w-0">
                 <div className="font-medium text-base sm:text-base">{activity.calories} kcal</div>
                 {activity.description && (
-                  <div className="text-sm sm:text-sm text-gray-600 mt-0.5">
+                  <div className="text-sm sm:text-sm text-muted-foreground mt-0.5">
                     {activity.description}
                   </div>
                 )}
               </div>
               <button
                 onClick={() => onRemoveActivity(index)}
-                className="text-gray-400 hover:text-red-600 active:text-red-600 p-2 sm:p-1 rounded-lg hover:bg-gray-100 active:bg-gray-100 transition-colors touch-manipulation min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 flex items-center justify-center flex-shrink-0"
+                className="text-muted-foreground hover:text-destructive active:text-destructive p-2 sm:p-1 rounded-lg hover:bg-accent active:bg-accent transition-colors touch-manipulation min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 flex items-center justify-center flex-shrink-0"
                 aria-label="Aktivität entfernen"
               >
                 <svg

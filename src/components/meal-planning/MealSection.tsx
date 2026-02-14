@@ -68,7 +68,7 @@ export const MealSection = ({
               filteredDishes.map((dish) => (
                 <button
                   key={dish.id}
-                  className="w-full text-left px-4 py-2 hover:bg-gray-50 focus:outline-none focus:bg-gray-50 dish-list-item"
+                  className="w-full text-left px-4 py-2 hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dish-list-item"
                   onClick={() => {
                     onAddDish(dish);
                   }}

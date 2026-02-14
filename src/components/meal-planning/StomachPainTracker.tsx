@@ -77,7 +77,7 @@ export const StomachPainTracker: React.FC<StomachPainTrackerProps> = ({
             step="1"
             value={stomachPainLevel}
             onChange={(e) => onStomachPainChange(parseInt(e.target.value))}
-            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+            className="w-full h-2 bg-secondary rounded-lg appearance-none cursor-pointer slider"
             style={{
               background: `linear-gradient(to right, #10b981 0%, #f59e0b 50%, #ef4444 100%)`
             }}

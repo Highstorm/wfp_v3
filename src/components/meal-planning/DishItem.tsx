@@ -19,13 +19,13 @@ export const DishItem = ({
   onToggleRecipe,
 }: DishItemProps) => {
   return (
-    <div className="dish-item bg-gray-50 rounded-lg px-3 sm:px-4 py-2.5 sm:py-3 relative">
+    <div className="dish-item bg-muted rounded-lg px-3 sm:px-4 py-2.5 sm:py-3 relative">
       {/* Name and Nutrition - Full Width */}
       <div className="dish-item-content mb-2 sm:mb-0 pr-0 sm:pr-24">
-        <div className="dish-item-name font-medium text-base sm:text-base text-gray-900 mb-1">
+        <div className="dish-item-name font-medium text-base sm:text-base text-foreground mb-1">
           {dish.name}
         </div>
-        <div className="dish-item-nutrition text-sm sm:text-sm text-gray-600 leading-relaxed">
+        <div className="dish-item-nutrition text-sm sm:text-sm text-muted-foreground leading-relaxed">
           {Math.round((dish.calories || 0) * quantity)} kcal |{" "}
           {Math.round((dish.protein || 0) * quantity * 10) / 10}g Protein |{" "}
           {Math.round((dish.carbs || 0) * quantity * 10) / 10}g Kohlenhydrate |{" "}
@@ -39,7 +39,7 @@ export const DishItem = ({
           <QuantitySelector value={quantity} onChange={onUpdateQuantity} />
           <button
             onClick={onRemove}
-            className="dish-item-remove-btn rounded-lg p-2 sm:p-1 text-gray-400 hover:text-red-600 active:text-red-600 transition-colors hover:bg-gray-100 active:bg-gray-100 touch-manipulation min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 flex items-center justify-center"
+            className="dish-item-remove-btn rounded-lg p-2 sm:p-1 text-muted-foreground hover:text-destructive active:text-destructive transition-colors hover:bg-accent active:bg-accent touch-manipulation min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 flex items-center justify-center"
             aria-label="Gericht entfernen"
           >
             <svg
@@ -71,7 +71,7 @@ export const DishItem = ({
           {isRecipeExpanded && (
             <div className="dish-item-recipe-content mt-2 text-sm sm:text-sm">
               {dish.recipe && (
-                <div className="dish-item-recipe-text mb-2 whitespace-pre-wrap text-gray-700 leading-relaxed">
+                <div className="dish-item-recipe-text mb-2 whitespace-pre-wrap text-foreground leading-relaxed">
                   {dish.recipe}
                 </div>
               )}

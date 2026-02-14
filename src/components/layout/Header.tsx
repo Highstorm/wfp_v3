@@ -57,7 +57,7 @@ export const Header = () => {
                 leaveFrom="transform opacity-100 scale-100"
                 leaveTo="transform opacity-0 scale-95"
               >
-                <MenuItems className="absolute right-0 top-full mt-2 w-56 origin-top-right rounded-lg border border-border bg-card p-1.5 shadow-glass focus:outline-none">
+                <MenuItems className="absolute right-0 top-full mt-2 w-56 origin-top-right rounded-lg border border-border bg-card p-1.5 shadow-glass focus-visible:outline-none">
                   <MenuItem>
                     <Link
                       to="/day-planning"

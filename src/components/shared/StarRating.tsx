@@ -37,7 +37,7 @@ export const StarRating: React.FC<StarRatingProps> = ({
         type="button"
         className={`${touchPadding} ${
           readOnly ? "cursor-default" : "cursor-pointer"
-        } focus:outline-none transition-colors rounded-full`}
+        } focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 transition-colors rounded-full`}
         onClick={() => {
           if (!readOnly) {
             // Wenn auf den gleichen Stern erneut geklickt wird, setze die Bewertung zurück
@@ -56,7 +56,7 @@ export const StarRating: React.FC<StarRatingProps> = ({
           stroke="currentColor"
           strokeWidth={isFilled ? "0" : "1.5"}
           className={`${starSize} ${
-            isFilled ? "text-yellow-400" : "text-gray-300 hover:text-yellow-200"
+            isFilled ? "text-yellow-400" : "text-muted-foreground/50 hover:text-yellow-200"
           } transition-colors`}
         >
           <path

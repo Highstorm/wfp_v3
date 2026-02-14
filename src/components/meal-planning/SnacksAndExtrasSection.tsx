@@ -467,7 +467,7 @@ export const SnacksAndExtrasSection = ({
               <div>
                 <label
                   htmlFor="description"
-                  className="block text-sm font-medium text-gray-700 mb-1"
+                  className="block text-sm font-medium text-muted-foreground mb-1"
                 >
                   Beschreibung
                 </label>
@@ -483,7 +483,7 @@ export const SnacksAndExtrasSection = ({
               <div>
                 <label
                   htmlFor="calories"
-                  className="block text-sm font-medium text-gray-700 mb-1"
+                  className="block text-sm font-medium text-muted-foreground mb-1"
                 >
                   Kalorien
                 </label>
@@ -500,7 +500,7 @@ export const SnacksAndExtrasSection = ({
               <div>
                 <label
                   htmlFor="protein"
-                  className="block text-sm font-medium text-gray-700 mb-1"
+                  className="block text-sm font-medium text-muted-foreground mb-1"
                 >
                   Protein (g)
                 </label>
@@ -517,7 +517,7 @@ export const SnacksAndExtrasSection = ({
               <div>
                 <label
                   htmlFor="carbs"
-                  className="block text-sm font-medium text-gray-700 mb-1"
+                  className="block text-sm font-medium text-muted-foreground mb-1"
                 >
                   Kohlenhydrate (g)
                 </label>
@@ -534,7 +534,7 @@ export const SnacksAndExtrasSection = ({
               <div>
                 <label
                   htmlFor="fat"
-                  className="block text-sm font-medium text-gray-700 mb-1"
+                  className="block text-sm font-medium text-muted-foreground mb-1"
                 >
                   Fett (g)
                 </label>
@@ -568,14 +568,14 @@ export const SnacksAndExtrasSection = ({
             return (
               <div
                 key={`${dish.id}-${index}`}
-                className="bg-gray-50 rounded-lg px-3 sm:px-4 py-2.5 sm:py-3 relative"
+                className="bg-muted rounded-lg px-3 sm:px-4 py-2.5 sm:py-3 relative"
               >
                 {/* Name and Nutrition - Full Width */}
                 <div className="mb-2 sm:mb-0 pr-0 sm:pr-24">
-                  <div className="font-medium text-base sm:text-base text-gray-900 mb-1">
+                  <div className="font-medium text-base sm:text-base text-foreground mb-1">
                     {dish.name}
                   </div>
-                  <div className="text-sm sm:text-sm text-gray-600 leading-relaxed">
+                  <div className="text-sm sm:text-sm text-muted-foreground leading-relaxed">
                     {(dish.calories ?? 0) * quantity} kcal |{" "}
                     {(dish.protein ?? 0) * quantity}g Protein |{" "}
                     {(dish.carbs ?? 0) * quantity}g Kohlenhydrate |{" "}
@@ -592,7 +592,7 @@ export const SnacksAndExtrasSection = ({
                     />
                     <button
                       onClick={() => onRemoveDish(dish.id)}
-                      className="text-gray-400 hover:text-red-600 active:text-red-600 p-2 sm:p-1 rounded-lg hover:bg-gray-100 active:bg-gray-100 transition-colors touch-manipulation min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 flex items-center justify-center"
+                      className="text-muted-foreground hover:text-destructive active:text-destructive p-2 sm:p-1 rounded-lg hover:bg-accent active:bg-accent transition-colors touch-manipulation min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 flex items-center justify-center"
                     >
                       <svg
                         className="w-5 h-5"
@@ -616,7 +616,7 @@ export const SnacksAndExtrasSection = ({
                   <>
                     <button
                       onClick={() => onToggleRecipe(dish.id)}
-                      className="w-full text-left text-primary hover:text-primary/80 focus:outline-none -mx-1 sm:-mx-2 mt-2 sm:mt-2 rounded-lg px-2 py-1.5 sm:px-2 sm:py-2 hover:bg-primary/10 active:bg-primary/10 transition-colors text-sm sm:text-sm touch-manipulation"
+                      className="w-full text-left text-primary hover:text-primary/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 -mx-1 sm:-mx-2 mt-2 sm:mt-2 rounded-lg px-2 py-1.5 sm:px-2 sm:py-2 hover:bg-primary/10 active:bg-primary/10 transition-colors text-sm sm:text-sm touch-manipulation"
                     >
                       {expandedRecipes.has(dish.id)
                         ? "Rezept ausblenden ↑"
@@ -625,7 +625,7 @@ export const SnacksAndExtrasSection = ({
                     {expandedRecipes.has(dish.id) && (
                       <div className="mt-2 text-sm sm:text-sm">
                         {dish.recipe && (
-                          <div className="whitespace-pre-wrap text-gray-700 mb-2 leading-relaxed">
+                          <div className="whitespace-pre-wrap text-foreground mb-2 leading-relaxed">
                             {dish.recipe}
                           </div>
                         )}
@@ -651,13 +651,13 @@ export const SnacksAndExtrasSection = ({
           {temporaryMeals.map((meal, index) => (
             <div
               key={index}
-              className="bg-gray-50 rounded-lg px-3 sm:px-4 py-2.5 sm:py-3 relative"
+              className="bg-muted rounded-lg px-3 sm:px-4 py-2.5 sm:py-3 relative"
             >
               <div className="mb-2 sm:mb-0 pr-0 sm:pr-16">
-                <div className="font-medium text-base sm:text-base text-gray-900 mb-1">
+                <div className="font-medium text-base sm:text-base text-foreground mb-1">
                   {meal.description}
                 </div>
-                <div className="text-sm sm:text-sm text-gray-600 leading-relaxed">
+                <div className="text-sm sm:text-sm text-muted-foreground leading-relaxed">
                   {meal.calories} kcal | {meal.protein}g Protein | {meal.carbs}g
                   Kohlenhydrate | {meal.fat}g Fett
                 </div>
@@ -665,7 +665,7 @@ export const SnacksAndExtrasSection = ({
               <div className="flex items-center justify-end sm:absolute sm:top-2 sm:right-3">
                 <button
                   onClick={() => onRemoveTemporaryMeal(index)}
-                  className="text-gray-400 hover:text-red-600 active:text-red-600 p-2 sm:p-1 rounded-lg hover:bg-gray-100 active:bg-gray-100 transition-colors touch-manipulation min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 flex items-center justify-center"
+                  className="text-muted-foreground hover:text-destructive active:text-destructive p-2 sm:p-1 rounded-lg hover:bg-accent active:bg-accent transition-colors touch-manipulation min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 flex items-center justify-center"
                 >
                   <svg
                     className="w-5 h-5"

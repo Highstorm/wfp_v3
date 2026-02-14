@@ -1,12 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
-import { cn } from "@/lib/utils";
-// import { buttonVariants } from "@/components/ui/button"; // Removed unused import
-// Actually Button exports it implicitly if I structured it right? 
-// No I didn't export `buttonVariants` in my previous step. I should have. 
-// I will use manual classes for now or update Button later. Manual classes are safer for now to avoid breaking flow.
-// Wait, I can just use the standard button styling.
-
-import { useFeatureAccess } from "@/hooks/useFeatureAccess";
+import { cn } from "../../lib/utils";
+import { useFeatureAccess } from "../../hooks/useFeatureAccess";
 import {
     CalendarDays,
     ChefHat,

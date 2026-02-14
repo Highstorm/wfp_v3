@@ -10,13 +10,7 @@ import { WeeklyNutritionGoalsForm } from "./WeeklyNutritionGoalsForm";
 import { useMealPlanFormState } from "../../hooks/useMealPlanFormState";
 import { useMealPlanActions } from "../../hooks/useMealPlanActions";
 import { useIntervalsSync } from "../../hooks/useIntervalsSync";
-import type { SportActivity } from "../../types";
-
-const calculateTotalBurnedCalories = (
-  activities: SportActivity[] = []
-): number => {
-  return activities.reduce((total, activity) => total + activity.calories, 0);
-};
+import { calculateTotalBurnedCalories } from "../../utils/nutrition.utils";
 
 export const MealPlanForm = () => {
   const state = useMealPlanFormState();

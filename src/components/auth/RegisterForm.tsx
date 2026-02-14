@@ -5,7 +5,7 @@ import {
   updateProfile,
 } from "firebase/auth";
 import { auth } from "../../lib/firebase";
-import { useAuthStore } from "../../stores/authStore";
+import { useAuthStore } from "../../stores/auth.store";
 
 export const RegisterForm = () => {
   const navigate = useNavigate();

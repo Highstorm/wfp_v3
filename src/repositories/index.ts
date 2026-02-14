@@ -16,7 +16,7 @@ export {
   deleteMealPlan,
 } from "./mealplan.repository";
 
-export { getNutritionGoals } from "./profile.repository";
+export { getProfile, getNutritionGoals } from "./profile.repository";
 
 export {
   getWeeklyNutritionGoals,

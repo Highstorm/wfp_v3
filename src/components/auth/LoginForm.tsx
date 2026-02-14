@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../lib/firebase";
-import { useAuthStore } from "../../stores/authStore";
+import { useAuthStore } from "../../stores/auth.store";
 
 export const LoginForm = () => {
   const navigate = useNavigate();

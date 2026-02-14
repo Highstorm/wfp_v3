@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useImportSharedDish } from "../../hooks/useSharedDishes";
 import { DishCard } from "./DishCard";
 import type { Dish } from "../../types";
+import { logger } from "../../utils/logger";
 
 export const ImportDishPage: React.FC = () => {
   const navigate = useNavigate();
@@ -47,7 +48,7 @@ export const ImportDishPage: React.FC = () => {
         }
       },
       onError: (error) => {
-        console.error("Import failed:", error);
+        logger.error("Import failed:", error);
 
         // Prüfe, ob es sich um einen Firestore Index-Fehler handelt
         const errorMsg = error instanceof Error ? error.message : String(error);

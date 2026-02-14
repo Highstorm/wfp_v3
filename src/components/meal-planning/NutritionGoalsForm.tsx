@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db, auth } from "../../lib/firebase";
+import { logger } from "../../utils/logger";
 
 interface NutritionGoals {
   baseCalories: number | null;
@@ -69,7 +70,7 @@ export const NutritionGoalsForm = () => {
       setMessage("Profil erfolgreich gespeichert!");
     } catch (error) {
       setMessage("Fehler beim Speichern des Profils.");
-      console.error(error);
+      logger.error("Error saving nutrition goals:", error);
     } finally {
       setIsSaving(false);
     }

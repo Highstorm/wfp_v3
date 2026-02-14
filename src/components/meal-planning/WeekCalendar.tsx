@@ -6,6 +6,7 @@ import {
   getDocs,
 } from "firebase/firestore";
 import { db, auth } from "../../lib/firebase";
+import { logger } from "../../utils/logger";
 
 interface WeekCalendarProps {
   selectedDate: string;
@@ -53,7 +54,7 @@ export const WeekCalendar = ({
       const dates = querySnapshot.docs.map((doc) => doc.data().date);
       setDaysWithPlan(dates);
     } catch (error) {
-      console.error("Fehler beim Laden der Tagespläne:", error);
+      logger.error("Error loading meal plans:", error);
     }
   };
 

@@ -1,5 +1,6 @@
 import { app } from "../lib/firebase";
 import { SearchableProduct } from "./openfoodfacts.service";
+import { logger } from "../utils/logger";
 
 const GEMINI_MODEL = "gemini-2.5-flash";
 const THINKING_BUDGET = 0;
@@ -28,12 +29,12 @@ interface GeminiNutritionResponse {
 
 async function getFirebaseAIModule() {
   try {
-    // TODO: logger.debug("[Gemini] Loading Firebase AI SDK...")
+    logger.debug("[Gemini] Loading Firebase AI SDK...");
     // @ts-ignore - Module may not exist in older Firebase versions
     const aiModule = await import("firebase/ai");
     return aiModule;
   } catch {
-    // TODO: logger.warn("[Gemini] Firebase AI SDK not available")
+    logger.warn("[Gemini] Firebase AI SDK not available");
     return null;
   }
 }
@@ -43,10 +44,10 @@ let modelInstance: GenerativeModelInstance | null = null;
 async function getModel(): Promise<GenerativeModelInstance | null> {
   if (!modelInstance) {
     try {
-      // TODO: logger.debug(`[Gemini] Initializing model: ${GEMINI_MODEL}`)
+      logger.debug(`[Gemini] Initializing model: ${GEMINI_MODEL}`);
       const aiModule = await getFirebaseAIModule();
       if (!aiModule) {
-        // TODO: logger.warn("[Gemini] Firebase AI module not available")
+        logger.warn("[Gemini] Firebase AI module not available");
         return null;
       }
 
@@ -55,7 +56,7 @@ async function getModel(): Promise<GenerativeModelInstance | null> {
       modelInstance = getGenerativeModel(ai, { model: GEMINI_MODEL }) as GenerativeModelInstance;
       return modelInstance;
     } catch {
-      // TODO: logger.error(`[Gemini] Error initializing model ${GEMINI_MODEL}`)
+      logger.error(`[Gemini] Error initializing model ${GEMINI_MODEL}`);
       return null;
     }
   }
@@ -67,7 +68,7 @@ export async function isGeminiAvailable(): Promise<boolean> {
     const model = await getModel();
     return model !== null;
   } catch {
-    // TODO: logger.error("[Gemini] Error checking availability")
+    logger.error("[Gemini] Error checking availability");
     return false;
   }
 }
@@ -83,7 +84,7 @@ export async function searchNutritionWithAI(
 
   const model = await getModel();
   if (!model) {
-    // TODO: logger.warn("[Gemini] Model not available, AI search disabled")
+    logger.warn("[Gemini] Model not available, AI search disabled");
     return null;
   }
 
@@ -117,7 +118,7 @@ export async function searchNutritionWithAI(
     const timeoutPromise = new Promise<null>((resolve) => {
       timeoutId = setTimeout(() => {
         isTimedOut = true;
-        // TODO: logger.warn(`[Gemini] Timeout for query: "${trimmedQuery}"`)
+        logger.warn(`[Gemini] Timeout for query: "${trimmedQuery}"`);
         resolve(null);
       }, 15000);
     });
@@ -137,7 +138,7 @@ export async function searchNutritionWithAI(
       const text = response.text()?.trim() || "";
 
       if (!text) {
-        // TODO: logger.warn("[Gemini] Empty response text")
+        logger.warn("[Gemini] Empty response text");
         return null;
       }
 
@@ -160,7 +161,7 @@ export async function searchNutritionWithAI(
       };
     }).catch((error: unknown) => {
       if (timeoutId) clearTimeout(timeoutId);
-      // TODO: logger.error("[Gemini] generateContent error", error)
+      logger.error("[Gemini] generateContent error", error);
       throw error;
     });
 
@@ -170,10 +171,10 @@ export async function searchNutritionWithAI(
       clearTimeout(timeoutId);
     }
 
-    // TODO: logger.debug("[Gemini] AI search completed")
+    logger.debug("[Gemini] AI search completed");
     return result;
   } catch {
-    // TODO: logger.error("[Gemini] AI search error")
+    logger.error("[Gemini] AI search error");
     return null;
   }
 }
@@ -185,7 +186,7 @@ export async function analyzeNutritionLabelWithAI(
   try {
     const model = await getModel();
     if (!model) {
-      // TODO: logger.warn("[Gemini] Model not available for image analysis")
+      logger.warn("[Gemini] Model not available for image analysis");
       return null;
     }
 
@@ -238,7 +239,7 @@ export async function analyzeNutritionLabelWithAI(
 
     return null;
   } catch {
-    // TODO: logger.error("[Gemini] Error during image analysis")
+    logger.error("[Gemini] Error during image analysis");
     return null;
   }
 }
@@ -254,7 +255,7 @@ function parseGeminiResponse(text: string): GeminiNutritionResponse | null {
     const parsed = JSON.parse(text) as Record<string, unknown>;
     return validateNutritionData(parsed);
   } catch {
-    // TODO: logger.warn("[Gemini] Error parsing response")
+    logger.warn("[Gemini] Error parsing response");
     return null;
   }
 }

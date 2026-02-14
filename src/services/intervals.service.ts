@@ -1,3 +1,5 @@
+import { logger } from "../utils/logger";
+
 export interface IntervalsCredentials {
   athleteId: string;
   apiKey: string;
@@ -27,7 +29,7 @@ export class IntervalsService {
     options?: RequestInit
   ): Promise<unknown> {
     const basicAuth = btoa(`API_KEY:${credentials.apiKey}`);
-    // TODO: logger.debug(`Intervals.icu: calling ${endpoint}`)
+    logger.debug(`Intervals.icu: calling ${endpoint}`);
 
     const response = await fetch(`https://intervals.icu/api/v1/${endpoint}`, {
       ...options,
@@ -38,7 +40,7 @@ export class IntervalsService {
     });
 
     if (!response.ok) {
-      // TODO: logger.error(`Intervals.icu: API error - status ${response.status}`)
+      logger.error(`Intervals.icu: API error - status ${response.status}`);
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
@@ -72,8 +74,8 @@ export class IntervalsService {
           name: activity.name || 'Aktivität',
           calories: activity.calories,
         }));
-    } catch {
-      // TODO: logger.error('Intervals.icu: error fetching activities', error)
+    } catch (error) {
+      logger.error("Intervals.icu: error fetching activities", error);
       return [];
     }
   }

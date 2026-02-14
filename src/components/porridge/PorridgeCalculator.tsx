@@ -7,6 +7,7 @@ import {
   useUpdateMealPlan,
 } from "../../hooks/useMealPlans";
 import { useToast } from "../../lib/toast";
+import { logger } from "../../utils/logger";
 
 interface FruitSelection {
   name: string;
@@ -210,7 +211,7 @@ export const PorridgeCalculator = () => {
               });
             },
             onError: (error) => {
-              console.error("Fehler beim Hinzufügen zum Tagesplan:", error);
+              logger.error("Error adding to meal plan:", error);
               showToast({
                 type: "error",
                 message: "Fehler beim Hinzufügen zum Tagesplan",
@@ -239,7 +240,7 @@ export const PorridgeCalculator = () => {
               });
             },
             onError: (error) => {
-              console.error("Fehler beim Erstellen des Tagesplans:", error);
+              logger.error("Error creating meal plan:", error);
               showToast({
                 type: "error",
                 message: "Fehler beim Erstellen des Tagesplans",
@@ -249,7 +250,7 @@ export const PorridgeCalculator = () => {
         }
       },
       onError: (error) => {
-        console.error("Fehler beim Erstellen des Porridge-Dishes:", error);
+        logger.error("Error creating porridge dish:", error);
         showToast({
           type: "error",
           message: "Fehler beim Erstellen des Porridge-Dishes",

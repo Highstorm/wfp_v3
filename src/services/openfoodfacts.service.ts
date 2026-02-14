@@ -1,4 +1,5 @@
 import type { DishIngredient } from "../types";
+import { logger } from "../utils/logger";
 
 /**
  * OpenFoodFacts Product Types (kompatibel mit beiden APIs)
@@ -217,13 +218,13 @@ export async function searchProducts(query: string): Promise<SearchableProduct[]
     // Prüfe auf ErrorSearchResponse
     if (!isSuccessSearchResponse(data)) {
       const errorMessages = data.errors.map((e) => e.title).join(", ");
-      console.error("Search-a-licious API Fehler:", errorMessages);
+      logger.error("Search-a-licious API error:", errorMessages);
       throw new Error(`API Error: ${errorMessages}`);
     }
     
     // Logge Warnings falls vorhanden
     if (data.warnings && data.warnings.length > 0) {
-      console.warn("Search-a-licious API Warnings:", data.warnings);
+      logger.warn("Search-a-licious API warnings:", data.warnings);
     }
     
     // Prüfe auf leere Ergebnisse
@@ -252,7 +253,7 @@ export async function searchProducts(query: string): Promise<SearchableProduct[]
         };
       });
   } catch (error) {
-    console.error("Fehler bei der OpenFoodFacts Suche:", error);
+    logger.error("OpenFoodFacts search error:", error);
     // Wirf den Fehler nicht weiter, damit die KI-Suche weiterhin funktionieren kann
     // Stattdessen geben wir ein leeres Array zurück
     return [];

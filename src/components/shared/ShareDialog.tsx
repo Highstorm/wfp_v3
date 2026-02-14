@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { logger } from "../../utils/logger";
 
 interface ShareDialogProps {
   isOpen: boolean;
@@ -62,7 +63,7 @@ export const ShareDialog: React.FC<ShareDialogProps> = ({
   };
 
   const handleShareClick = () => {
-    console.log("Share button clicked");
+    logger.debug("Share button clicked");
     if (onShare) {
       onShare();
     }

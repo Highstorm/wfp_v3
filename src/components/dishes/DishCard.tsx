@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { Dish } from "../../types";
+import { logger } from "../../utils/logger";
 import { StarRating } from "../shared/StarRating";
 import { useShareDish } from "../../hooks/useSharedDishes";
 import { ShareDialog } from "../shared/ShareDialog";
@@ -37,10 +38,10 @@ export const DishCard = ({
     setShareErrorMessage(null);
     shareDish(dish.id, {
       onSuccess: (data) => {
-        console.log("Gericht erfolgreich geteilt:", data);
+        logger.debug("Dish shared successfully:", data);
       },
       onError: (error) => {
-        console.error("Fehler beim Teilen des Gerichts:", error);
+        logger.error("Error sharing dish:", error);
         setShareErrorMessage(
           "Fehler beim Erstellen des Teilen-Links. Bitte versuche es später erneut."
         );

@@ -9,6 +9,7 @@ import { DishFilter } from "./DishFilter";
 import { DishCard } from "./DishCard";
 import { DeleteDialog } from "../shared/DeleteDialog";
 import { useFeatureAccess } from "../../hooks/useFeatureAccess";
+import { logger } from "../../utils/logger";
 
 interface FilterValues {
   name: string;
@@ -32,7 +33,7 @@ export const DishList = () => {
   const featureAccess = useFeatureAccess();
 
   if (error) {
-    console.error("DishList: Fehler beim Laden:", error);
+    logger.error("DishList: error loading dishes:", error);
   }
 
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
@@ -150,7 +151,7 @@ export const DishList = () => {
       setDeleteDialog({ isOpen: false, dishId: "", dishName: "" });
     } catch (err: unknown) {
       if (err instanceof Error) {
-        console.error("Fehler beim Löschen des Gerichts:", err.message);
+        logger.error("Error deleting dish:", err.message);
       }
     }
   };

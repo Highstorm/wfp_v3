@@ -133,7 +133,7 @@ export const CreateDishWithIngredients = () => {
         setAiSearchResult(result);
       }
     } catch (error) {
-      console.error("Fehler bei der KI-Suche:", error);
+      logger.error("AI search error:", error);
     } finally {
       setIsAISearching(false);
     }

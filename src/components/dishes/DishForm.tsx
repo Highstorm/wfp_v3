@@ -5,6 +5,7 @@ import {
   analyzeNutritionLabelWithAI,
   isGeminiAvailable,
 } from "../../services/gemini.service";
+import { logger } from "../../utils/logger";
 
 interface DishFormData {
   name: string;
@@ -89,7 +90,7 @@ export const DishForm = () => {
       };
       reader.readAsDataURL(file);
     } catch (error) {
-      console.error("Fehler beim Bild-Upload:", error);
+      logger.error("Image upload error:", error);
       setMessage("Fehler beim Verarbeiten des Bildes.");
       setIsAnalyzing(false);
     }
@@ -161,7 +162,7 @@ export const DishForm = () => {
         navigate("/dishes");
       }, 500);
     } catch (error) {
-      console.error("Fehler beim Speichern:", error);
+      logger.error("Error saving dish:", error);
       setMessage("Fehler beim Speichern des Gerichts.");
     }
   };

@@ -8,6 +8,7 @@ import {
 } from "../../services/gemini.service";
 import { SearchableProduct, debounce } from "../../services/openfoodfacts.service";
 import { auth } from "../../lib/firebase";
+import { logger } from "../../utils/logger";
 
 interface SnacksAndExtrasSectionProps {
   dishes: Dish[];
@@ -87,13 +88,13 @@ export const SnacksAndExtrasSection = ({
           setFat(Math.round(result.fatPerUnit).toString());
         } else {
           // Optional: Error Toast handling here if we had access to toast
-          console.warn("Keine Nährwerte erkannt");
+          logger.warn("No nutrition values detected");
         }
         setIsAnalyzingImage(false);
       };
       reader.readAsDataURL(file);
     } catch (error) {
-      console.error("Fehler beim Bild-Upload:", error);
+      logger.error("Image upload error:", error);
       setIsAnalyzingImage(false);
     }
   };
@@ -130,7 +131,7 @@ export const SnacksAndExtrasSection = ({
             setAiSearchResult(null);
           }
         } catch (error) {
-          console.error("Fehler bei der KI-Suche:", error);
+          logger.error("AI search error:", error);
           setAiSearchResult(null);
         } finally {
           setIsAISearching(false);
@@ -218,7 +219,7 @@ export const SnacksAndExtrasSection = ({
         setAiSearchResult(result);
       }
     } catch (error) {
-      console.error("Fehler bei der KI-Suche:", error);
+      logger.error("AI search error:", error);
     } finally {
       setIsAISearching(false);
     }

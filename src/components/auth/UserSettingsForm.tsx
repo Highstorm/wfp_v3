@@ -6,9 +6,11 @@ import {
   EmailAuthProvider,
   reauthenticateWithCredential,
 } from "firebase/auth";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, setDoc } from "firebase/firestore";
 import { db, auth } from "../../lib/firebase";
 import { hasEarlyAccess } from "../../config/earlyAccessFeatures";
+import { useProfile } from "../../hooks/useProfile";
+import { logger } from "../../utils/logger";
 
 interface UserSettings {
   displayName: string;
@@ -25,6 +27,7 @@ interface UserSettings {
 }
 
 export const UserSettingsForm = () => {
+  const { data: profile } = useProfile();
   const [userSettings, setUserSettings] = useState<UserSettings>({
     displayName: "",
     email: "",
@@ -47,51 +50,32 @@ export const UserSettingsForm = () => {
     auth.currentUser?.email
   );
 
+  // Sync auth user data into form state
   useEffect(() => {
-    if (auth.currentUser?.email) {
-      const email = auth.currentUser.email;
-      const currentUser = auth.currentUser;
-
+    if (auth.currentUser) {
       setUserSettings((prev) => ({
         ...prev,
-        displayName: currentUser.displayName || "",
-        email: email,
+        displayName: auth.currentUser?.displayName || "",
+        email: auth.currentUser?.email || "",
       }));
-
-      // Lade die Intervals.icu-Daten aus dem Profil
-      const loadIntervalsData = async () => {
-        const profileRef = doc(db, "profiles", email);
-        const profileSnap = await getDoc(profileRef);
-
-        if (profileSnap.exists()) {
-          const data = profileSnap.data();
-          setUserSettings((prev) => ({
-            ...prev,
-            "intervals.icu-API-KEY": data["intervals.icu-API-KEY"] || "",
-            "intervals.icu-AthleteID": data["intervals.icu-AthleteID"] || "",
-            stomachPainTrackingEnabled:
-              data.stomachPainTrackingEnabled || false,
-            weeklyNutritionGoalsEnabled:
-              data.weeklyNutritionGoalsEnabled !== undefined
-                ? data.weeklyNutritionGoalsEnabled
-                : true,
-            dailyNoteEnabled:
-              data.dailyNoteEnabled !== undefined
-                ? data.dailyNoteEnabled
-                : true,
-            sportEnabled:
-              data.sportEnabled !== undefined ? data.sportEnabled : true,
-            porridgeCalculatorEnabled:
-              data.porridgeCalculatorEnabled !== undefined
-                ? data.porridgeCalculatorEnabled
-                : true,
-          }));
-        }
-      };
-
-      loadIntervalsData();
     }
-  }, [auth.currentUser]);
+  }, []);
+
+  // Sync profile data from useProfile() hook into form state
+  useEffect(() => {
+    if (profile) {
+      setUserSettings((prev) => ({
+        ...prev,
+        "intervals.icu-API-KEY": profile["intervals.icu-API-KEY"] || "",
+        "intervals.icu-AthleteID": profile["intervals.icu-AthleteID"] || "",
+        stomachPainTrackingEnabled: profile.stomachPainTrackingEnabled ?? false,
+        weeklyNutritionGoalsEnabled: profile.weeklyNutritionGoalsEnabled ?? true,
+        dailyNoteEnabled: profile.dailyNoteEnabled ?? true,
+        sportEnabled: profile.sportEnabled ?? true,
+        porridgeCalculatorEnabled: profile.porridgeCalculatorEnabled ?? true,
+      }));
+    }
+  }, [profile]);
 
   const handleUserSettingsSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -153,7 +137,7 @@ export const UserSettingsForm = () => {
         newPassword: "",
       }));
     } catch (error: any) {
-      console.error(error);
+      logger.error("Error updating user settings:", error);
       switch (error.code) {
         case "auth/requires-recent-login":
           setUserMessage(

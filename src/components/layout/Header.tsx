@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { signOut } from "firebase/auth";
 import { auth } from "../../lib/firebase";
 import { useFeatureAccess } from "../../hooks/useFeatureAccess";
+import { logger } from "../../utils/logger";
 
 export const Header = () => {
   const navigate = useNavigate();
@@ -14,7 +15,7 @@ export const Header = () => {
       await signOut(auth);
       navigate("/login");
     } catch (error) {
-      console.error("Fehler beim Abmelden:", error);
+      logger.error("Error signing out:", error);
     }
   };
 

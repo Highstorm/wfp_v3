@@ -6,6 +6,7 @@ import {
   getDocs,
 } from "firebase/firestore";
 import { db, auth } from "../../lib/firebase";
+import { logger } from "../../utils/logger";
 
 interface MonthCalendarProps {
   selectedDate: string;
@@ -37,10 +38,10 @@ export const MonthCalendar = ({
 
       const querySnapshot = await getDocs(q);
       const dates = querySnapshot.docs.map((doc) => doc.data().date);
-      console.log("Gefundene Tagespläne:", dates);
+      logger.debug("Found meal plans:", dates);
       setDaysWithPlan(dates);
     } catch (error) {
-      console.error("Fehler beim Laden der Tagespläne:", error);
+      logger.error("Error loading meal plans:", error);
     }
   };
 

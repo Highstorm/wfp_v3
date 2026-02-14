@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { signOut } from "firebase/auth";
 import { auth } from "../../lib/firebase";
+import { logger } from "../../utils/logger";
 
 export const Sidebar = () => {
     const location = useLocation();
@@ -20,7 +21,7 @@ export const Sidebar = () => {
             await signOut(auth);
             // Navigate handling is usually done by auth listener but safe to have
         } catch (error) {
-            console.error("Fehler beim Abmelden:", error);
+            logger.error("Error signing out:", error);
         }
     };
 

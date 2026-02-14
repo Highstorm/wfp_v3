@@ -16,7 +16,7 @@ export {
   useDeleteMealPlan,
 } from "./useMealPlans";
 
-export { useNutritionGoals } from "./useProfile";
+export { useProfile, useNutritionGoals } from "./useProfile";
 
 export {
   useWeeklyNutritionGoals,

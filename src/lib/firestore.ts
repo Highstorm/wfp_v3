@@ -14,6 +14,27 @@ import {
 import { getAuth } from "firebase/auth";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
+// Re-export types for backward compatibility
+export type {
+  DishIngredient,
+  Dish,
+  SportActivity,
+  TemporaryMeal,
+  MealPlan,
+  NutritionGoals,
+  UserProfile,
+  WeeklyNutritionGoals,
+  SharedDish,
+} from "../types";
+
+import type {
+  Dish,
+  MealPlan,
+  NutritionGoals,
+  WeeklyNutritionGoals,
+  SharedDish,
+} from "../types";
+
 // Firebase-Konfiguration
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -28,101 +49,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
-
-// Typen
-export interface DishIngredient {
-  name: string;
-  barcode?: string;
-  quantity: number;
-  unit: string;
-  nutritionUnit: string;
-  caloriesPerUnit: number;
-  proteinPerUnit: number;
-  carbsPerUnit: number;
-  fatPerUnit: number;
-  sourceName?: string; // Name der Quelle (z.B. "Gemini AI", "OpenFoodFacts")
-  sourceUrl?: string; // URL zur Quelle für weitere Informationen
-}
-
-export interface Dish {
-  id: string;
-  originalId?: string;
-  name: string;
-  calories: number;
-  protein?: number;
-  carbs?: number;
-  fat?: number;
-  recipe?: string;
-  recipeUrl?: string;
-  createdBy: string;
-  quantity?: number;
-  category?: "breakfast" | "mainDish" | "snack"; // Kategorie: Frühstück, Mittag/Abendessen oder Snack/Sonstiges
-  rating?: number; // Bewertung: 1-5 Sterne (nur für Mittag/Abendessen)
-  ingredients?: DishIngredient[]; // Optional: Liste der Zutaten für ingredient-basierte Gerichte
-  isIngredientBased?: boolean; // Optional: Flag für zutatenbasierte Gerichte
-}
-
-export interface SportActivity {
-  calories: number;
-  description?: string;
-  intervalsId?: string;  // ID der Aktivität aus Intervals.icu
-}
-
-export interface TemporaryMeal {
-  description: string;
-  calories: number;
-  protein: number;
-  carbs: number;
-  fat: number;
-}
-
-export interface MealPlan {
-  id: string;
-  date: string;
-  breakfast: Dish[];
-  lunch: Dish[];
-  dinner: Dish[];
-  snacks: Dish[];
-  sports: SportActivity[];
-  temporaryMeals: TemporaryMeal[];
-  createdBy: string;
-  createdAt: Date;
-  updatedAt: Date;
-  dailyNote: string;
-  stomachPainLevel?: number; // 0-10 Skala für Bauchweh-Tracking
-}
-
-export interface NutritionGoals {
-  baseCalories: number | null;
-  targetCalories: number | null;
-  protein: number | null;
-  carbs: number | null;
-  fat: number | null;
-}
-
-export interface WeeklyNutritionGoals {
-  id?: string;
-  weekStartDate: string; // ISO-String des Montags der Woche
-  targetCalories: number | null;
-  protein: number | null;
-  carbs: number | null;
-  fat: number | null;
-  createdBy: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-// Sharing API - Neue API für das Teilen von Gerichten
-export interface SharedDish {
-  id: string;
-  dishId: string;
-  dish: Dish;
-  sharedBy: string;
-  sharedByName: string;
-  createdAt: Date;
-  expiresAt: Date;
-  shareCode: string;
-}
 
 // Dishes API
 const getDishes = async (): Promise<Dish[]> => {

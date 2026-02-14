@@ -1,4 +1,4 @@
-import { type Dish, type MealPlan } from "../../lib/firestore";
+import type { Dish, MealPlan } from "../../types";
 import { DishItem } from "./DishItem";
 
 type MealType = keyof Pick<

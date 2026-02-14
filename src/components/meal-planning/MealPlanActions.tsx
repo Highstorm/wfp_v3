@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { type MealPlan } from "../../lib/firestore";
+import type { MealPlan } from "../../types";
 import { StomachPainTracker } from "./StomachPainTracker";
 
 interface MealPlanActionsProps {

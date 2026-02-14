@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { type Dish } from "../../lib/firestore";
+import type { Dish } from "../../types";
 import { StarRating } from "../shared/StarRating";
-import { useShareDish } from "../../lib/firestore";
+import { useShareDish } from "../../hooks/useSharedDishes";
 import { ShareDialog } from "../shared/ShareDialog";
 
 interface DishCardProps {

@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { useCreateDish } from "../../lib/firestore";
-import { DishIngredient } from "../../lib/firestore";
+import { useCreateDish } from "../../hooks/useDishes";
+import type { DishIngredient } from "../../types";
 import {
   productToIngredient,
   debounce,

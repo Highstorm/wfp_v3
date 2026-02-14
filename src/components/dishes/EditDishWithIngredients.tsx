@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { useDishes, useUpdateDish } from "../../lib/firestore";
-import { DishIngredient } from "../../lib/firestore";
+import { useDishes, useUpdateDish } from "../../hooks/useDishes";
+import type { DishIngredient } from "../../types";
 import { productToIngredient, debounce, SearchableProduct } from "../../services/openfoodfacts.service";
 import { searchNutritionWithAI, isGeminiAvailable } from "../../services/gemini.service";
 import { useToast } from "../../lib/toast";

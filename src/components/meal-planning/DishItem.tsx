@@ -1,4 +1,4 @@
-import { type Dish } from "../../lib/firestore";
+import type { Dish } from "../../types";
 import { QuantitySelector } from "../QuantitySelector";
 
 interface DishItemProps {

@@ -5,8 +5,8 @@ import {
   useCreateWeeklyNutritionGoals,
   useUpdateWeeklyNutritionGoals,
   useDeleteWeeklyNutritionGoals,
-  type WeeklyNutritionGoals,
-} from "../../lib/firestore";
+} from "../../hooks/useWeeklyGoals";
+import type { WeeklyNutritionGoals } from "../../types";
 
 interface WeeklyNutritionGoalsFormProps {
   weekStartDate: string;

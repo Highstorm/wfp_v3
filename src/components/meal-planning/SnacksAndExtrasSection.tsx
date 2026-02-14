@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, type FocusEvent, type FormEvent } from "react";
-import { type Dish, type TemporaryMeal } from "../../lib/firestore";
+import type { Dish, TemporaryMeal } from "../../types";
 import { QuantitySelector } from "../QuantitySelector";
 import {
   searchNutritionWithAI,

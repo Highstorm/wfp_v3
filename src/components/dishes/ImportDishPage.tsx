@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useImportSharedDish } from "../../lib/firestore";
+import { useImportSharedDish } from "../../hooks/useSharedDishes";
 import { DishCard } from "./DishCard";
-import type { Dish } from "../../lib/firestore";
+import type { Dish } from "../../types";
 
 export const ImportDishPage: React.FC = () => {
   const navigate = useNavigate();

@@ -4,7 +4,7 @@ import {
   useDishes,
   useDeleteDish,
   useUpdateDishRating,
-} from "../../lib/firestore";
+} from "../../hooks/useDishes";
 import { DishFilter } from "./DishFilter";
 import { DishCard } from "./DishCard";
 import { DeleteDialog } from "../shared/DeleteDialog";

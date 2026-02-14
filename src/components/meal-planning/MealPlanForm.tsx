@@ -8,20 +8,16 @@ import { SportSection } from "./SportSection";
 import { SnacksAndExtrasSection } from "./SnacksAndExtrasSection";
 import { MealPlanActions } from "./MealPlanActions";
 import { WeeklyNutritionGoalsForm } from "./WeeklyNutritionGoalsForm";
+import { useDishes } from "../../hooks/useDishes";
 import {
-  useDishes,
   useMealPlanByDate,
   useCreateMealPlan,
   useUpdateMealPlan,
   useDeleteMealPlan,
-  useNutritionGoals,
-  useWeeklyNutritionGoals,
-  type Dish,
-  type MealPlan,
-  type SportActivity,
-  type TemporaryMeal,
-  type NutritionGoals,
-} from "../../lib/firestore";
+} from "../../hooks/useMealPlans";
+import { useNutritionGoals } from "../../hooks/useProfile";
+import { useWeeklyNutritionGoals } from "../../hooks/useWeeklyGoals";
+import type { Dish, MealPlan, SportActivity, TemporaryMeal, NutritionGoals } from "../../types";
 import { doc, getDoc } from "firebase/firestore";
 import { db, auth } from "../../lib/firebase";
 import { IntervalsService, type IntervalsCredentials } from "../../services/intervals.service";

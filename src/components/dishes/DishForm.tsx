@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { useDishes, useCreateDish, useUpdateDish } from "../../lib/firestore";
+import { useDishes, useCreateDish, useUpdateDish } from "../../hooks/useDishes";
 import {
   analyzeNutritionLabelWithAI,
   isGeminiAvailable,

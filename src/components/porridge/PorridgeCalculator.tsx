@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { porridgeConfig } from "../../lib/porridgeConfig";
+import { useCreateDish } from "../../hooks/useDishes";
 import {
   useCreateMealPlan,
   useMealPlanByDate,
-  useCreateDish,
   useUpdateMealPlan,
-} from "../../lib/firestore";
+} from "../../hooks/useMealPlans";
 import { useToast } from "../../lib/toast";
 
 interface FruitSelection {

@@ -13,6 +13,8 @@ import { Dashboard } from "./components/layout/Dashboard";
 import { PorridgeCalculator } from "./components/porridge/PorridgeCalculator";
 import { Toast } from "./components/shared/Toast";
 import { ProtectedLayout } from "./components/layout/ProtectedLayout.tsx";
+import { ErrorBoundary } from "./components/shared/ErrorBoundary";
+import { NotFound } from "./components/shared/NotFound";
 
 function App() {
   return (
@@ -30,22 +32,73 @@ function App() {
               </AuthRedirect>
             }
           >
-            <Route index element={<DayPlanningPage />} />
+            <Route
+              index
+              element={
+                <ErrorBoundary>
+                  <DayPlanningPage />
+                </ErrorBoundary>
+              }
+            />
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/day-planning" element={<DayPlanningPage />} />
+            <Route
+              path="/day-planning"
+              element={
+                <ErrorBoundary>
+                  <DayPlanningPage />
+                </ErrorBoundary>
+              }
+            />
             <Route path="/dishes" element={<DishesPage />} />
-            <Route path="/dishes/new" element={<DishForm />} />
-            <Route path="/dishes/:id/edit" element={<DishForm />} />
-            <Route path="/dishes/create-with-ingredients" element={<CreateDishWithIngredients />} />
-            <Route path="/dishes/:id/edit-ingredients" element={<EditDishWithIngredients />} />
+            <Route
+              path="/dishes/new"
+              element={
+                <ErrorBoundary>
+                  <DishForm />
+                </ErrorBoundary>
+              }
+            />
+            <Route
+              path="/dishes/:id/edit"
+              element={
+                <ErrorBoundary>
+                  <DishForm />
+                </ErrorBoundary>
+              }
+            />
+            <Route
+              path="/dishes/create-with-ingredients"
+              element={
+                <ErrorBoundary>
+                  <CreateDishWithIngredients />
+                </ErrorBoundary>
+              }
+            />
+            <Route
+              path="/dishes/:id/edit-ingredients"
+              element={
+                <ErrorBoundary>
+                  <EditDishWithIngredients />
+                </ErrorBoundary>
+              }
+            />
             <Route path="/dishes/import" element={<ImportDishPage />} />
             <Route
               path="/shared-dish/:shareCode"
               element={<ImportDishPage />}
             />
-            <Route path="/porridge" element={<PorridgeCalculator />} />
+            <Route
+              path="/porridge"
+              element={
+                <ErrorBoundary>
+                  <PorridgeCalculator />
+                </ErrorBoundary>
+              }
+            />
             <Route path="/profile" element={<ProfilePage />} />
           </Route>
+
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </div>
     </Router>

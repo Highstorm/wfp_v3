@@ -1,10 +1,5 @@
 import { test, expect } from "@playwright/test";
-
-const TEST_USER = {
-  email: "playwritght.test@example.com",
-  password: "playwright.test123!",
-  name: "Test User",
-};
+import { TEST_USER } from "./fixtures";
 
 test.describe("Authentication", () => {
   test.beforeEach(async ({ page }) => {
@@ -42,19 +37,12 @@ test.describe("Authentication", () => {
     await page.fill('input[type="email"]', TEST_USER.email);
     await page.fill('input[type="password"]', TEST_USER.password);
 
-    // Add debug logging
-    console.log("Submitting registration form with email:", TEST_USER.email);
-
     await page.click('button:has-text("Account erstellen")');
 
-    // Check for specific error message (class selectors may change after redesign)
     await expect(page.locator("text=Diese E-Mail-Adresse wird bereits verwendet.")).toBeVisible({ timeout: 10000 });
   });
 
   test("should successfully login and logout", async ({ page }) => {
-    // Add debug logging
-    console.log("Attempting login with:", TEST_USER.email);
-
     // Login with the test user
     await page.fill('input[type="email"]', TEST_USER.email);
     await page.fill('input[type="password"]', TEST_USER.password);

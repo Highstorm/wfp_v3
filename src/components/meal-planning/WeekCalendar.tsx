@@ -1,12 +1,5 @@
-import { useState, useEffect } from "react";
-import {
-  collection,
-  query,
-  where,
-  getDocs,
-} from "firebase/firestore";
-import { db, auth } from "../../lib/firebase";
-import { logger } from "../../utils/logger";
+import { useState, useMemo } from "react";
+import { useMealPlans } from "../../hooks/useMealPlans";
 
 interface WeekCalendarProps {
   selectedDate: string;
@@ -24,7 +17,7 @@ export const WeekCalendar = ({
     return new Date(date.setDate(diff));
   });
 
-  const [daysWithPlan, setDaysWithPlan] = useState<string[]>([]);
+  const { data: mealPlans } = useMealPlans();
 
   // Berechne den Montag der aktuellen Woche
   const getWeekDates = (startDate: Date) => {
@@ -39,40 +32,20 @@ export const WeekCalendar = ({
 
   const weekDays = getWeekDates(currentWeekStart);
 
-  const loadWeekPlans = async () => {
-    if (!auth.currentUser?.uid) return;
-
-    try {
-      const q = query(
-        collection(db, "mealPlans"),
-        where("createdBy", "==", auth.currentUser.uid),
-        where("date", ">=", weekDays[0].toISOString().split("T")[0]),
-        where("date", "<=", weekDays[6].toISOString().split("T")[0])
-      );
-
-      const querySnapshot = await getDocs(q);
-      const dates = querySnapshot.docs.map((doc) => doc.data().date);
-      setDaysWithPlan(dates);
-    } catch (error) {
-      logger.error("Error loading meal plans:", error);
-    }
-  };
-
-  useEffect(() => {
-    loadWeekPlans();
-  }, [auth.currentUser?.uid, currentWeekStart]);
-
-  // Exportiere die Funktion für externe Nutzung
-  useEffect(() => {
-    // @ts-ignore
-    window.refreshCalendar = loadWeekPlans;
-  }, []);
-
   const formatDate = (date: Date) => {
     const offset = date.getTimezoneOffset();
     const localDate = new Date(date.getTime() - offset * 60 * 1000);
     return localDate.toISOString().split("T")[0];
   };
+
+  const daysWithPlan = useMemo(() => {
+    if (!mealPlans) return [];
+    const firstDayStr = formatDate(weekDays[0]);
+    const lastDayStr = formatDate(weekDays[6]);
+    return mealPlans
+      .map((p) => p.date)
+      .filter((d) => d >= firstDayStr && d <= lastDayStr);
+  }, [mealPlans, currentWeekStart]);
 
   const formatDisplayDate = (date: Date) => {
     return date.toLocaleDateString("de-DE", {

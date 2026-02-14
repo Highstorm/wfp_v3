@@ -8,6 +8,7 @@ import {
 } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { db, auth } from "../../lib/firebase";
+import { FirebaseError } from "firebase/app";
 import { hasEarlyAccess } from "../../config/earlyAccessFeatures";
 import { useProfile } from "../../hooks/useProfile";
 import { logger } from "../../utils/logger";
@@ -136,9 +137,10 @@ export const UserSettingsForm = () => {
         currentPassword: "",
         newPassword: "",
       }));
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error("Error updating user settings:", error);
-      switch (error.code) {
+      const errorCode = error instanceof FirebaseError ? error.code : undefined;
+      switch (errorCode) {
         case "auth/requires-recent-login":
           setUserMessage(
             "Bitte melde dich erneut an, um diese Änderungen vorzunehmen."

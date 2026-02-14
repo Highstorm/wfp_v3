@@ -1,12 +1,5 @@
-import { useState, useEffect } from "react";
-import {
-  collection,
-  query,
-  where,
-  getDocs,
-} from "firebase/firestore";
-import { db, auth } from "../../lib/firebase";
-import { logger } from "../../utils/logger";
+import { useState, useMemo } from "react";
+import { useMealPlans } from "../../hooks/useMealPlans";
 
 interface MonthCalendarProps {
   selectedDate: string;
@@ -18,43 +11,20 @@ export const MonthCalendar = ({
   onDateSelect,
 }: MonthCalendarProps) => {
   const [currentDate, setCurrentDate] = useState(new Date(selectedDate));
-  const [daysWithPlan, setDaysWithPlan] = useState<string[]>([]);
+  const { data: mealPlans } = useMealPlans();
 
-  const loadMonthPlans = async () => {
-    if (!auth.currentUser?.uid) return;
-
+  const daysWithPlan = useMemo(() => {
+    if (!mealPlans) return [];
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
     const firstDay = new Date(year, month, 1);
     const lastDay = new Date(year, month + 1, 0);
-
-    try {
-      const q = query(
-        collection(db, "mealPlans"),
-        where("createdBy", "==", auth.currentUser.uid),
-        where("date", ">=", firstDay.toISOString().split("T")[0]),
-        where("date", "<=", lastDay.toISOString().split("T")[0])
-      );
-
-      const querySnapshot = await getDocs(q);
-      const dates = querySnapshot.docs.map((doc) => doc.data().date);
-      logger.debug("Found meal plans:", dates);
-      setDaysWithPlan(dates);
-    } catch (error) {
-      logger.error("Error loading meal plans:", error);
-    }
-  };
-
-  // Lade initial und bei Monatsänderung
-  useEffect(() => {
-    loadMonthPlans();
-  }, [auth.currentUser?.uid, currentDate, db]);
-
-  // Exportiere die Funktion für externe Nutzung
-  useEffect(() => {
-    // @ts-ignore
-    window.refreshCalendar = loadMonthPlans;
-  }, []);
+    const firstDayStr = firstDay.toISOString().split("T")[0];
+    const lastDayStr = lastDay.toISOString().split("T")[0];
+    return mealPlans
+      .map((p) => p.date)
+      .filter((d) => d >= firstDayStr && d <= lastDayStr);
+  }, [mealPlans, currentDate]);
 
   const getDaysInMonth = (date: Date) => {
     const year = date.getFullYear();

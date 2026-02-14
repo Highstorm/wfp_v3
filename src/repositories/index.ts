@@ -26,7 +26,6 @@ export {
 } from "./weekly-goals.repository";
 
 export {
-  generateShareCode,
   shareDish,
   getSharedDishByCode,
   importSharedDish,

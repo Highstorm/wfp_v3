@@ -11,6 +11,7 @@ import { useNutritionGoals, useProfile } from "./useProfile";
 import { useWeeklyNutritionGoals } from "./useWeeklyGoals";
 import type { Dish, MealPlan, NutritionGoals } from "../types";
 import type { IntervalsCredentials } from "../services/intervals.service";
+import { calculateTotalMealPlanNutrition } from "../utils/nutrition.utils";
 
 export type MealType = keyof Pick<
   MealPlan,
@@ -166,44 +167,7 @@ export function useMealPlanFormState() {
   }, [existingMealPlan, isMealPlanLoading]);
 
   // Calculate total nutrition across all meals
-  const calculateTotalNutrition = () => {
-    const allDishes = [
-      ...mealPlan.breakfast,
-      ...mealPlan.lunch,
-      ...mealPlan.dinner,
-      ...mealPlan.snacks,
-    ];
-
-    const dishNutrition = allDishes.reduce(
-      (total, dish) => {
-        const quantity = (dish as Dish & { quantity?: number }).quantity ?? 1;
-        return {
-          calories: total.calories + (dish.calories || 0) * quantity,
-          protein: total.protein + (dish.protein || 0) * quantity,
-          carbs: total.carbs + (dish.carbs || 0) * quantity,
-          fat: total.fat + (dish.fat || 0) * quantity,
-        };
-      },
-      { calories: 0, protein: 0, carbs: 0, fat: 0 }
-    );
-
-    const tempMealNutrition = (mealPlan.temporaryMeals || []).reduce(
-      (total, meal) => ({
-        calories: total.calories + meal.calories,
-        protein: total.protein + meal.protein,
-        carbs: total.carbs + meal.carbs,
-        fat: total.fat + meal.fat,
-      }),
-      { calories: 0, protein: 0, carbs: 0, fat: 0 }
-    );
-
-    return {
-      calories: dishNutrition.calories + tempMealNutrition.calories,
-      protein: dishNutrition.protein + tempMealNutrition.protein,
-      carbs: dishNutrition.carbs + tempMealNutrition.carbs,
-      fat: dishNutrition.fat + tempMealNutrition.fat,
-    };
-  };
+  const calculateTotalNutrition = () => calculateTotalMealPlanNutrition(mealPlan);
 
   // Filter dishes by meal-type category
   const getCategoryFilteredDishes = (mealType: MealType) => {

@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useCreateDish } from "../../hooks/useDishes";
 import type { DishIngredient } from "../../types";
+import { calculateIngredientNutrition } from "../../utils/nutrition.utils";
 import {
   productToIngredient,
   debounce,
@@ -9,6 +10,7 @@ import {
 } from "../../services/openfoodfacts.service";
 import { searchNutritionWithAI, isGeminiAvailable } from "../../services/gemini.service";
 import { useToast } from "../../lib/toast";
+import { logger } from "../../utils/logger";
 
 export const CreateDishWithIngredients = () => {
   const navigate = useNavigate();
@@ -61,7 +63,7 @@ export const CreateDishWithIngredients = () => {
             setAiSearchResult(null);
           }
         } catch (error) {
-          console.error("Fehler bei der KI-Suche:", error);
+          logger.error("AI search error:", error);
           setAiSearchResult(null);
         } finally {
           setIsAISearching(false);
@@ -151,23 +153,10 @@ export const CreateDishWithIngredients = () => {
   };
 
   // Berechne Gesamtnährwerte
-  const totalNutrition = useMemo(() => {
-    return ingredients.reduce(
-      (acc, ingredient) => {
-        const nutritionUnitValue =
-          parseFloat(ingredient.nutritionUnit.replace(/[^0-9.]/g, "")) || 100;
-        const factor = ingredient.quantity / nutritionUnitValue;
-
-        return {
-          calories: acc.calories + ingredient.caloriesPerUnit * factor,
-          protein: acc.protein + ingredient.proteinPerUnit * factor,
-          carbs: acc.carbs + ingredient.carbsPerUnit * factor,
-          fat: acc.fat + ingredient.fatPerUnit * factor,
-        };
-      },
-      { calories: 0, protein: 0, carbs: 0, fat: 0 }
-    );
-  }, [ingredients]);
+  const totalNutrition = useMemo(
+    () => calculateIngredientNutrition(ingredients),
+    [ingredients]
+  );
 
   const canSave =
     dishName.trim() !== "" && ingredients.length > 0 && category !== undefined;
@@ -202,7 +191,7 @@ export const CreateDishWithIngredients = () => {
         navigate("/dishes");
       }, 500);
     } catch (error) {
-      console.error("Fehler beim Speichern:", error);
+      logger.error("Error saving dish:", error);
       showToast({
         message: "Fehler beim Speichern des Gerichts.",
         type: "error",

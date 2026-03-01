@@ -79,28 +79,29 @@ export const MealPlanForm = () => {
   }
 
   return (
-    <div className="container mx-auto px-3 sm:px-4 py-1 sm:py-2 pb-20 md:pb-2">
-      <div className="py-1 sm:py-2">
+    <div className="container mx-auto px-4 py-2 pb-20 md:pb-4 max-w-lg md:max-w-none">
+      {/* Week Calendar */}
+      <div className="py-2">
         <WeekCalendar selectedDate={date} onDateSelect={handleDateChange} />
       </div>
 
+      {/* Weekly Nutrition Goals */}
       {weeklyNutritionGoalsEnabled && (
-        <div className="py-1 sm:py-2">
+        <div className="py-2">
           <WeeklyNutritionGoalsForm weekStartDate={weekStartDate} />
         </div>
       )}
 
-      <div className="py-1 sm:py-2">
-        <NutritionSummary
-          currentNutrition={calculateTotalNutrition()}
-          nutritionGoals={combinedNutritionGoals}
-          burnedCalories={calculateTotalBurnedCalories(mealPlan.sports || [])}
-        />
-      </div>
+      {/* Nutrition Hero + Macro Bar */}
+      <NutritionSummary
+        currentNutrition={calculateTotalNutrition()}
+        nutritionGoals={combinedNutritionGoals}
+        burnedCalories={calculateTotalBurnedCalories(mealPlan.sports || [])}
+      />
 
       {/* Meals */}
-      <div className="py-1 sm:py-2">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-4">
+      <div className="space-y-6 mt-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {mealSections.map((section, index) => (
             <div
               key={section.key}
@@ -138,47 +139,47 @@ export const MealPlanForm = () => {
             </div>
           ))}
         </div>
-      </div>
 
-      {/* Snacks & Extras */}
-      <div className="py-1 sm:py-2 relative z-40">
-        <SnacksAndExtrasSection
-          dishes={mealPlan.snacks || []}
-          temporaryMeals={mealPlan.temporaryMeals || []}
-          searchTerm={selectedMeal === "snacks" ? searchTerm : ""}
-          showDishList={showSnacksDishList}
-          availableDishes={getCategoryFilteredDishes("snacks")}
-          expandedRecipes={expandedRecipes}
-          onInputFocus={() => handleInputFocus("snacks")}
-          onInputBlur={handleInputBlur}
-          onSearchTermChange={state.setSearchTerm}
-          onAddDish={(dish) => {
-            handleAddDish(dish);
-            state.setSearchTerm("");
-            state.setShowSnacksDishList(false);
-          }}
-          onRemoveDish={(dishId) => handleRemoveDish("snacks", dishId)}
-          onToggleRecipe={toggleRecipe}
-          onAddTemporaryMeal={handleAddTemporaryMeal}
-          onRemoveTemporaryMeal={handleRemoveTemporaryMeal}
-          onUpdateDishQuantity={handleUpdateDishQuantity}
-        />
-      </div>
-
-      {/* Sport */}
-      {sportEnabled && (
-        <div className="py-1 sm:py-2 relative z-30">
-          <SportSection
-            activities={mealPlan.sports || []}
-            onAddActivity={handleAddSportActivity}
-            onRemoveActivity={handleRemoveSportActivity}
-            onLoadIntervalsActivities={handleLoadIntervalsActivities}
+        {/* Snacks & Extras */}
+        <div className="relative z-40">
+          <SnacksAndExtrasSection
+            dishes={mealPlan.snacks || []}
+            temporaryMeals={mealPlan.temporaryMeals || []}
+            searchTerm={selectedMeal === "snacks" ? searchTerm : ""}
+            showDishList={showSnacksDishList}
+            availableDishes={getCategoryFilteredDishes("snacks")}
+            expandedRecipes={expandedRecipes}
+            onInputFocus={() => handleInputFocus("snacks")}
+            onInputBlur={handleInputBlur}
+            onSearchTermChange={state.setSearchTerm}
+            onAddDish={(dish) => {
+              handleAddDish(dish);
+              state.setSearchTerm("");
+              state.setShowSnacksDishList(false);
+            }}
+            onRemoveDish={(dishId) => handleRemoveDish("snacks", dishId)}
+            onToggleRecipe={toggleRecipe}
+            onAddTemporaryMeal={handleAddTemporaryMeal}
+            onRemoveTemporaryMeal={handleRemoveTemporaryMeal}
+            onUpdateDishQuantity={handleUpdateDishQuantity}
           />
         </div>
-      )}
+
+        {/* Sport */}
+        {sportEnabled && (
+          <div className="relative z-30">
+            <SportSection
+              activities={mealPlan.sports || []}
+              onAddActivity={handleAddSportActivity}
+              onRemoveActivity={handleRemoveSportActivity}
+              onLoadIntervalsActivities={handleLoadIntervalsActivities}
+            />
+          </div>
+        )}
+      </div>
 
       {/* Actions */}
-      <div className="py-1 sm:py-2">
+      <div className="mt-6">
         <MealPlanActions
           mealPlan={mealPlan}
           isCreating={isCreating}

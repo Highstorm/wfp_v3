@@ -32,7 +32,7 @@ export const Header = () => {
         <div className="flex items-center justify-between">
           <Link
             to="/day-planning"
-            className="font-heading text-lg font-bold tracking-tight text-foreground"
+            className="font-display text-lg font-bold tracking-tight text-foreground"
           >
             Weekly Food Planner
           </Link>

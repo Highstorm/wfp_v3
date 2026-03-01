@@ -203,58 +203,52 @@ export const DishList = () => {
         }
       />
 
-      <div className="container mx-auto px-3 sm:px-4">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6">
-          <h1 className="hidden sm:block text-xl sm:text-2xl font-bold mb-3 sm:mb-0">
-            Meine Gerichte
-          </h1>
-          <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 w-full sm:w-auto">
+      <div className="container mx-auto px-4 pb-20 md:pb-4 max-w-lg md:max-w-none">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-4">
+          <h1 className="font-display font-extrabold text-2xl">Gerichte</h1>
+          <div className="flex gap-2">
             <button
               onClick={toggleSortDirection}
-              className="btn-secondary flex items-center justify-center gap-2 text-sm sm:text-base py-2.5 sm:py-2 min-h-[44px] sm:min-h-0"
+              className="p-2 rounded-full bg-zinc-100 dark:bg-zinc-800/50 text-muted-foreground hover:text-foreground transition-colors touch-manipulation"
+              title={`Sortierung ${sortDirection === "asc" ? "aufsteigend" : "absteigend"}`}
             >
-              Sortierung {sortDirection === "asc" ? "↓" : "↑"}
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                {sortDirection === "asc" ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4" />
+                )}
+              </svg>
             </button>
             <button
               onClick={() => navigate("/dishes/import")}
-              className="btn-secondary inline-flex items-center justify-center text-sm sm:text-base py-2.5 sm:py-2 min-h-[44px] sm:min-h-0"
+              className="p-2 rounded-full bg-zinc-100 dark:bg-zinc-800/50 text-muted-foreground hover:text-foreground transition-colors touch-manipulation"
+              title="Importieren"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                className="w-5 h-5 mr-2"
-              >
-                <path d="M10.75 2.75a.75.75 0 00-1.5 0v8.614L6.295 8.235a.75.75 0 10-1.09 1.03l4.25 4.5a.75.75 0 001.09 0l4.25-4.5a.75.75 0 00-1.09-1.03l-2.955 3.129V2.75z" />
-                <path d="M3.5 12.75a.75.75 0 00-1.5 0v2.5A2.75 2.75 0 004.75 18h10.5A2.75 2.75 0 0018 15.25v-2.5a.75.75 0 00-1.5 0v2.5c0 .69-.56 1.25-1.25 1.25H4.75c-.69 0-1.25-.56-1.25-1.25v-2.5z" />
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
               </svg>
-              Gericht importieren
             </button>
             {featureAccess.dishIngredientBuilder && (
               <button
                 onClick={() => navigate("/dishes/create-with-ingredients")}
-                className="btn-primary inline-flex items-center justify-center gap-2 shadow-md text-sm sm:text-base py-2.5 sm:py-2 min-h-[44px] sm:min-h-0"
+                className="p-2 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 transition-colors touch-manipulation"
+                title="Aus Zutaten erstellen"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                  className="w-5 h-5 flex-shrink-0"
-                >
-                  <path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.66L18.75 10l-.491 1.34a2.25 2.25 0 01-1.545 1.545L15.25 13.5l-1.34-.491a2.25 2.25 0 01-1.545-1.545L12 11.25l.491-1.34a2.25 2.25 0 011.545-1.545L15.25 8.5l1.34.491a2.25 2.25 0 011.545 1.545zM16.894 20.405L17.25 21.5l-.356-1.095a2.25 2.25 0 00-1.545-1.545L14.25 18.5l-1.095-.356a2.25 2.25 0 00-1.545-1.545L11.25 16.5l.356-1.095a2.25 2.25 0 001.545-1.545L14.25 13.5l1.095.356a2.25 2.25 0 001.545 1.545L18.25 15.5l-.356 1.095a2.25 2.25 0 00-1.545 1.545L16.25 18.5l-1.095.356a2.25 2.25 0 00-1.545 1.545z" />
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
                 </svg>
-                <span className="hidden sm:inline">Gericht aus Zutaten</span>
-                <span className="sm:hidden">Aus Zutaten</span>
-                <span className="px-2 py-0.5 text-xs bg-white/20 text-white rounded font-medium border border-white/30">
-                  KI
-                </span>
               </button>
             )}
             <button
               onClick={() => navigate("/dishes/new")}
-              className="btn-primary inline-flex items-center justify-center text-sm sm:text-base py-2.5 sm:py-2 min-h-[44px] sm:min-h-0"
+              className="p-2 rounded-full bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors touch-manipulation"
+              title="Neues Gericht"
             >
-              Neues Gericht
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+              </svg>
             </button>
           </div>
         </div>
@@ -262,11 +256,11 @@ export const DishList = () => {
         <DishFilter filters={filters} onFilterChange={handleFilterChange} />
 
         {filteredDishes.length === 0 ? (
-          <div className="text-muted-foreground text-center py-8">
+          <div className="text-muted-foreground text-center py-12">
             Keine Gerichte gefunden.
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 auto-rows-min py-3 sm:py-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 auto-rows-min">
             {filteredDishes.map((dish) => (
               <DishCard
                 key={dish.id}

@@ -248,21 +248,25 @@ export const SnacksAndExtrasSection = ({
     setFat("");
   };
 
+  // Berechne Gesamt-kcal der Sektion
+  const totalSnackCalories = [...dishes, ...temporaryMeals].reduce((sum, item) => {
+    const qty = (item as { quantity?: number }).quantity ?? 1;
+    return sum + Math.round((item.calories || 0) * qty);
+  }, 0);
+
   return (
-    <div className="card p-3 sm:p-4">
-      <div className="flex justify-between items-center mb-2 sm:mb-3 gap-2">
-        <h3 className="text-base sm:text-lg font-medium">Snacks & Zusätzliches</h3>
-        <button
-          onClick={() => setIsFormVisible(!isFormVisible)}
-          className="rounded-lg px-2 py-1.5 sm:px-2 sm:py-2 text-xs sm:text-sm text-primary hover:bg-accent active:bg-accent touch-manipulation flex-shrink-0"
-        >
-          {isFormVisible
-            ? "Ausblenden ↑"
-            : "Eigene Mahlzeit ↓"}
-        </button>
+    <div>
+      {/* Header */}
+      <div className="flex items-baseline justify-between mb-2">
+        <h3 className="font-display font-extrabold text-base">Snacks & Zusätzliches</h3>
+        {totalSnackCalories > 0 && (
+          <span className="text-sm text-muted-foreground tabular-nums">
+            {totalSnackCalories} kcal
+          </span>
+        )}
       </div>
 
-      <div className="space-y-2 sm:space-y-3">
+      <div className="space-y-2">
         {/* Snacks Suchfeld */}
         <div className="relative snacks-search-container">
           <div className="relative">
@@ -271,13 +275,13 @@ export const SnacksAndExtrasSection = ({
                 type="button"
                 onClick={handleAISearch}
                 disabled={!canTriggerAI || isAISearching}
-                className="absolute left-1 sm:left-2 top-1/2 -translate-y-1/2 p-2.5 sm:p-2 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 flex items-center justify-center text-primary hover:text-primary/80 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed transition-all touch-manipulation"
+                className="absolute left-3 top-1/2 -translate-y-1/2 p-1 flex items-center justify-center text-muted-foreground hover:text-foreground active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed transition-all touch-manipulation"
                 aria-label="KI-Suche"
                 title="Mit KI nach Nährwerten suchen"
               >
                 {isAISearching ? (
                   <svg
-                    className="animate-spin h-5 w-5 sm:h-5 sm:w-5"
+                    className="animate-spin h-4 w-4"
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
@@ -301,7 +305,7 @@ export const SnacksAndExtrasSection = ({
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 20 20"
                     fill="currentColor"
-                    className="w-5 h-5 sm:w-5 sm:h-5 flex-shrink-0"
+                    className="w-4 h-4 flex-shrink-0"
                   >
                     <path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.66L18.75 10l-.491 1.34a2.25 2.25 0 01-1.545 1.545L15.25 13.5l-1.34-.491a2.25 2.25 0 01-1.545-1.545L12 11.25l.491-1.34a2.25 2.25 0 011.545-1.545L15.25 8.5l1.34.491a2.25 2.25 0 011.545 1.545zM16.894 20.405L17.25 21.5l-.356-1.095a2.25 2.25 0 00-1.545-1.545L14.25 18.5l-1.095-.356a2.25 2.25 0 00-1.545-1.545L11.25 16.5l.356-1.095a2.25 2.25 0 001.545-1.545L14.25 13.5l1.095.356a2.25 2.25 0 001.545 1.545L18.25 15.5l-.356 1.095a2.25 2.25 0 00-1.545 1.545L16.25 18.5l-1.095.356a2.25 2.25 0 00-1.545 1.545z" />
                   </svg>
@@ -310,8 +314,8 @@ export const SnacksAndExtrasSection = ({
             )}
             <input
               type="text"
-              placeholder="Snack aus der Datenbank hinzufügen..."
-              className={`input w-full text-base sm:text-sm py-2.5 sm:py-2 ${hasGeminiAPIKey ? "pl-12 sm:pl-11" : ""}`}
+              placeholder="+ Snack hinzufügen"
+              className={`w-full border-2 border-dashed border-zinc-300 dark:border-zinc-600 rounded-xl px-4 py-3 bg-transparent text-sm placeholder:text-muted-foreground focus:border-primary focus:border-solid focus:outline-none focus:ring-0 transition-colors ${hasGeminiAPIKey ? "pl-10" : ""}`}
               value={searchTerm}
               onChange={(e) => onSearchTermChange(e.target.value)}
               onFocus={onInputFocus}
@@ -321,7 +325,7 @@ export const SnacksAndExtrasSection = ({
 
           {(showDishList || aiSearchResult || isAISearching) && (
             <div
-              className="absolute z-[9998] mt-1 w-full max-h-[60vh] sm:max-h-60 overflow-y-auto rounded-lg border border-border bg-background shadow-glass"
+              className="absolute z-[9998] mt-1 w-full max-h-60 overflow-y-auto rounded-xl border border-border bg-background shadow-glass"
               style={{
                 WebkitOverflowScrolling: "touch",
               }}
@@ -336,33 +340,33 @@ export const SnacksAndExtrasSection = ({
             >
               {/* KI-Ergebnis als erstes Element */}
               {isAISearching && !aiSearchResult && (
-                <div className="px-3 sm:px-4 py-2.5 sm:py-3 text-center text-muted-foreground text-sm">
+                <div className="px-4 py-2.5 text-center text-muted-foreground text-sm">
                   Suche...
                 </div>
               )}
               {aiSearchResult && (
                 <button
                   key={aiSearchResult.barcode}
-                  className="dish-list-item w-full px-3 sm:px-4 py-2.5 sm:py-3 text-left active:bg-accent hover:bg-accent bg-primary/5 border-b border-primary/20 touch-manipulation"
+                  className="dish-list-item w-full px-4 py-2.5 text-left hover:bg-zinc-100 dark:hover:bg-zinc-800 bg-zinc-50 dark:bg-zinc-800/30 border-b border-zinc-200 dark:border-zinc-700 touch-manipulation transition-colors"
                   onClick={() => handleAddAIDish(aiSearchResult)}
                 >
-                  <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       viewBox="0 0 20 20"
                       fill="currentColor"
-                      className="w-4 h-4 text-primary flex-shrink-0"
+                      className="w-4 h-4 text-muted-foreground flex-shrink-0"
                     >
                       <path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.66L18.75 10l-.491 1.34a2.25 2.25 0 01-1.545 1.545L15.25 13.5l-1.34-.491a2.25 2.25 0 01-1.545-1.545L12 11.25l.491-1.34a2.25 2.25 0 011.545-1.545L15.25 8.5l1.34.491a2.25 2.25 0 011.545 1.545zM16.894 20.405L17.25 21.5l-.356-1.095a2.25 2.25 0 00-1.545-1.545L14.25 18.5l-1.095-.356a2.25 2.25 0 00-1.545-1.545L11.25 16.5l.356-1.095a2.25 2.25 0 001.545-1.545L14.25 13.5l1.095.356a2.25 2.25 0 001.545 1.545L18.25 15.5l-.356 1.095a2.25 2.25 0 00-1.545 1.545L16.25 18.5l-1.095.356a2.25 2.25 0 00-1.545 1.545z" />
                     </svg>
-                    <span className="font-medium text-sm sm:text-sm break-words">
+                    <span className="font-medium text-sm break-words">
                       {aiSearchResult.name}
                     </span>
-                    <span className="px-1.5 sm:px-2 py-0.5 text-xs bg-primary/20 text-primary rounded font-medium flex-shrink-0">
+                    <span className="px-1.5 py-0.5 text-xs bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 rounded-full font-medium flex-shrink-0">
                       KI
                     </span>
                   </div>
-                  <div className="text-xs sm:text-xs text-muted-foreground mt-1 break-words">
+                  <div className="text-xs text-muted-foreground mt-1 break-words">
                     {aiSearchResult.nutritionUnit}:{" "}
                     {Math.round(aiSearchResult.caloriesPerUnit)} kcal,{" "}
                     {Math.round(aiSearchResult.proteinPerUnit)}g Protein,{" "}
@@ -376,19 +380,18 @@ export const SnacksAndExtrasSection = ({
                 filteredDishes.map((dish) => (
                   <button
                     key={dish.id}
-                    className="dish-list-item w-full px-3 sm:px-4 py-2.5 sm:py-3 text-left active:bg-accent hover:bg-accent touch-manipulation"
+                    className="dish-list-item w-full px-4 py-2.5 text-left hover:bg-zinc-100 dark:hover:bg-zinc-800 touch-manipulation transition-colors"
                     onClick={() => onAddDish(dish)}
                   >
-                    <div className="font-medium text-sm sm:text-sm">{dish.name}</div>
-                    <div className="text-xs sm:text-xs text-muted-foreground mt-0.5">
-                      {dish.calories} kcal | {dish.protein}g Protein |{" "}
-                      {dish.carbs}g Kohlenhydrate | {dish.fat}g Fett
+                    <div className="font-medium text-sm">{dish.name}</div>
+                    <div className="text-xs text-muted-foreground mt-0.5">
+                      {dish.calories} kcal · {dish.protein}g P · {dish.carbs}g KH · {dish.fat}g F
                     </div>
                   </button>
                 ))
               ) : (
                 !aiSearchResult && (
-                  <div className="px-3 sm:px-4 py-2.5 sm:py-3 text-sm text-muted-foreground">
+                  <div className="px-4 py-2.5 text-sm text-muted-foreground">
                     Keine Gerichte gefunden
                   </div>
                 )
@@ -397,12 +400,20 @@ export const SnacksAndExtrasSection = ({
           )}
         </div>
 
+        {/* Eigene Mahlzeit Toggle */}
+        <button
+          onClick={() => setIsFormVisible(!isFormVisible)}
+          className="w-full text-left text-xs text-muted-foreground hover:text-foreground transition-colors touch-manipulation py-1"
+        >
+          {isFormVisible ? "Eigene Mahlzeit ausblenden ↑" : "Eigene Mahlzeit hinzufügen ↓"}
+        </button>
+
         {/* Formular für eigene Mahlzeiten */}
         {isFormVisible && (
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="bg-zinc-100 dark:bg-zinc-800/50 rounded-xl p-4 space-y-3">
             {hasGeminiAPIKey && (
-              <div className="mb-4">
-                <label className="btn-secondary w-full sm:w-auto cursor-pointer flex items-center justify-center gap-2 text-sm py-2">
+              <label className="block bg-zinc-900 dark:bg-white rounded-xl p-3 text-center cursor-pointer hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors">
+                <div className="flex items-center justify-center gap-2 text-white dark:text-zinc-900 text-sm font-medium">
                   {isAnalyzingImage ? (
                     <>
                       <svg
@@ -451,108 +462,68 @@ export const SnacksAndExtrasSection = ({
                       Foto scannen
                     </>
                   )}
-                  <input
-                    type="file"
-                    accept="image/*"
-                    capture="environment"
-                    onChange={handleImageUpload}
-                    disabled={isAnalyzingImage}
-                    className="hidden"
-                  />
-                </label>
-              </div>
+                </div>
+                <input
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  onChange={handleImageUpload}
+                  disabled={isAnalyzingImage}
+                  className="hidden"
+                />
+              </label>
             )}
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label
-                  htmlFor="description"
-                  className="block text-sm font-medium text-muted-foreground mb-1"
-                >
-                  Beschreibung
-                </label>
-                <input
-                  type="text"
-                  id="description"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  className="input"
-                  placeholder="z.B. Protein Shake nach dem Training"
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="calories"
-                  className="block text-sm font-medium text-muted-foreground mb-1"
-                >
-                  Kalorien
-                </label>
-                <input
-                  type="number"
-                  id="calories"
-                  value={calories}
-                  onChange={(e) => setCalories(e.target.value)}
-                  min="0"
-                  className="input"
-                  placeholder="z.B. 300"
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="protein"
-                  className="block text-sm font-medium text-muted-foreground mb-1"
-                >
-                  Protein (g)
-                </label>
-                <input
-                  type="number"
-                  id="protein"
-                  value={protein}
-                  onChange={(e) => setProtein(e.target.value)}
-                  min="0"
-                  className="input"
-                  placeholder="z.B. 25"
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="carbs"
-                  className="block text-sm font-medium text-muted-foreground mb-1"
-                >
-                  Kohlenhydrate (g)
-                </label>
-                <input
-                  type="number"
-                  id="carbs"
-                  value={carbs}
-                  onChange={(e) => setCarbs(e.target.value)}
-                  min="0"
-                  className="input"
-                  placeholder="z.B. 30"
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="fat"
-                  className="block text-sm font-medium text-muted-foreground mb-1"
-                >
-                  Fett (g)
-                </label>
-                <input
-                  type="number"
-                  id="fat"
-                  value={fat}
-                  onChange={(e) => setFat(e.target.value)}
-                  min="0"
-                  className="input"
-                  placeholder="z.B. 5"
-                />
-              </div>
+            <input
+              type="text"
+              id="description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className="input"
+              placeholder="Beschreibung"
+            />
+            <div className="grid grid-cols-2 gap-2">
+              <input
+                type="number"
+                id="calories"
+                value={calories}
+                onChange={(e) => setCalories(e.target.value)}
+                min="0"
+                className="input text-center font-display font-bold text-lg"
+                placeholder="kcal"
+              />
+              <input
+                type="number"
+                id="protein"
+                value={protein}
+                onChange={(e) => setProtein(e.target.value)}
+                min="0"
+                className="input text-center font-display font-bold text-lg"
+                placeholder="Protein"
+              />
+              <input
+                type="number"
+                id="carbs"
+                value={carbs}
+                onChange={(e) => setCarbs(e.target.value)}
+                min="0"
+                className="input text-center font-display font-bold text-lg"
+                placeholder="Carbs"
+              />
+              <input
+                type="number"
+                id="fat"
+                value={fat}
+                onChange={(e) => setFat(e.target.value)}
+                min="0"
+                className="input text-center font-display font-bold text-lg"
+                placeholder="Fett"
+              />
             </div>
             <button
               type="submit"
               disabled={!description || !calories || parseInt(calories) <= 0}
-              className="btn-primary mt-4 w-full sm:w-auto"
+              className="btn-primary w-full"
             >
               Hinzufügen
             </button>
@@ -560,55 +531,38 @@ export const SnacksAndExtrasSection = ({
         )}
 
         {/* Liste der hinzugefügten Snacks und Mahlzeiten */}
-        <div className="space-y-2 sm:space-y-2">
+        <div className="space-y-2">
           {/* Gespeicherte Snacks */}
           {dishes.map((dish, index) => {
             const dishWithQuantity = dish as { quantity?: number };
             const quantity = dishWithQuantity.quantity ?? 1;
+            const totalCalories = Math.round((dish.calories || 0) * quantity);
             return (
               <div
                 key={`${dish.id}-${index}`}
-                className="bg-muted rounded-lg px-3 sm:px-4 py-2.5 sm:py-3 relative"
+                className="bg-zinc-100 dark:bg-zinc-800/50 rounded-xl px-3 py-2.5"
               >
-                {/* Name and Nutrition - Full Width */}
-                <div className="mb-2 sm:mb-0 pr-0 sm:pr-24">
-                  <div className="font-medium text-base sm:text-base text-foreground mb-1">
-                    {dish.name}
+                <div className="flex items-center gap-3">
+                  <QuantitySelector
+                    value={quantity}
+                    onChange={(newVal) => onUpdateDishQuantity(dish.id, newVal)}
+                  />
+                  <div className="flex-1 min-w-0">
+                    <div className="font-medium text-sm truncate">{dish.name}</div>
+                    <div className="text-xs text-muted-foreground tabular-nums">
+                      {totalCalories} kcal
+                      {dish.protein ? ` · ${Math.round((dish.protein || 0) * quantity * 10) / 10}g P` : ""}
+                    </div>
                   </div>
-                  <div className="text-sm sm:text-sm text-muted-foreground leading-relaxed">
-                    {(dish.calories ?? 0) * quantity} kcal |{" "}
-                    {(dish.protein ?? 0) * quantity}g Protein |{" "}
-                    {(dish.carbs ?? 0) * quantity}g Kohlenhydrate |{" "}
-                    {(dish.fat ?? 0) * quantity}g Fett
-                  </div>
-                </div>
-
-                {/* Actions Row - Below on mobile, inline on desktop */}
-                <div className="flex items-center justify-between sm:absolute sm:top-2 sm:right-3 gap-2">
-                  <div className="flex items-center gap-2">
-                    <QuantitySelector
-                      value={quantity}
-                      onChange={(newVal) => onUpdateDishQuantity(dish.id, newVal)}
-                    />
-                    <button
-                      onClick={() => onRemoveDish(dish.id)}
-                      className="text-muted-foreground hover:text-destructive active:text-destructive p-2 sm:p-1 rounded-lg hover:bg-accent active:bg-accent transition-colors touch-manipulation min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 flex items-center justify-center"
-                    >
-                      <svg
-                        className="w-5 h-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                        />
-                      </svg>
-                    </button>
-                  </div>
+                  <button
+                    onClick={() => onRemoveDish(dish.id)}
+                    className="p-1.5 rounded-full text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors touch-manipulation"
+                    aria-label="Snack entfernen"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
                 </div>
 
                 {/* Recipe Section */}
@@ -616,16 +570,16 @@ export const SnacksAndExtrasSection = ({
                   <>
                     <button
                       onClick={() => onToggleRecipe(dish.id)}
-                      className="w-full text-left text-primary hover:text-primary/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 -mx-1 sm:-mx-2 mt-2 sm:mt-2 rounded-lg px-2 py-1.5 sm:px-2 sm:py-2 hover:bg-primary/10 active:bg-primary/10 transition-colors text-sm sm:text-sm touch-manipulation"
+                      className="mt-2 w-full text-left text-primary text-xs hover:underline transition-colors touch-manipulation"
                     >
                       {expandedRecipes.has(dish.id)
                         ? "Rezept ausblenden ↑"
                         : "Rezept anzeigen ↓"}
                     </button>
                     {expandedRecipes.has(dish.id) && (
-                      <div className="mt-2 text-sm sm:text-sm">
+                      <div className="mt-2 text-xs">
                         {dish.recipe && (
-                          <div className="whitespace-pre-wrap text-foreground mb-2 leading-relaxed">
+                          <div className="mb-2 whitespace-pre-wrap text-foreground leading-relaxed">
                             {dish.recipe}
                           </div>
                         )}
@@ -634,7 +588,7 @@ export const SnacksAndExtrasSection = ({
                             href={dish.recipeUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-primary hover:text-primary/80 inline-block -mx-1 sm:-m-2 rounded-lg px-2 py-1.5 sm:px-2 sm:py-2 hover:bg-primary/10 active:bg-primary/10 transition-colors"
+                            className="text-primary hover:underline"
                           >
                             Zum Online-Rezept →
                           </a>
@@ -651,34 +605,23 @@ export const SnacksAndExtrasSection = ({
           {temporaryMeals.map((meal, index) => (
             <div
               key={index}
-              className="bg-muted rounded-lg px-3 sm:px-4 py-2.5 sm:py-3 relative"
+              className="bg-zinc-100 dark:bg-zinc-800/50 rounded-xl px-3 py-2.5"
             >
-              <div className="mb-2 sm:mb-0 pr-0 sm:pr-16">
-                <div className="font-medium text-base sm:text-base text-foreground mb-1">
-                  {meal.description}
+              <div className="flex items-center gap-3">
+                <div className="flex-1 min-w-0">
+                  <div className="font-medium text-sm truncate">{meal.description}</div>
+                  <div className="text-xs text-muted-foreground tabular-nums">
+                    {meal.calories} kcal
+                    {meal.protein ? ` · ${meal.protein}g P` : ""}
+                  </div>
                 </div>
-                <div className="text-sm sm:text-sm text-muted-foreground leading-relaxed">
-                  {meal.calories} kcal | {meal.protein}g Protein | {meal.carbs}g
-                  Kohlenhydrate | {meal.fat}g Fett
-                </div>
-              </div>
-              <div className="flex items-center justify-end sm:absolute sm:top-2 sm:right-3">
                 <button
                   onClick={() => onRemoveTemporaryMeal(index)}
-                  className="text-muted-foreground hover:text-destructive active:text-destructive p-2 sm:p-1 rounded-lg hover:bg-accent active:bg-accent transition-colors touch-manipulation min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 flex items-center justify-center"
+                  className="p-1.5 rounded-full text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors touch-manipulation"
+                  aria-label="Mahlzeit entfernen"
                 >
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                    />
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </button>
               </div>

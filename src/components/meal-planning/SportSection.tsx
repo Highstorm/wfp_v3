@@ -35,126 +35,103 @@ export const SportSection = ({
     setDescription("");
   };
 
+  const totalBurned = activities.reduce((sum, a) => sum + a.calories, 0);
+
   return (
-    <div className="card p-3 sm:p-4">
-      <div className="mb-3 sm:mb-4">
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-4">
-          <h2 className="text-base sm:text-xl font-semibold">Sport</h2>
-          <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
-            <button
-              onClick={onLoadIntervalsActivities}
-              className="flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 sm:py-2 text-sm sm:text-sm font-medium text-primary hover:bg-primary/10 active:bg-primary/10 transition-colors touch-manipulation min-h-[44px] sm:min-h-0"
-            >
-              <svg
-                className="w-4 h-4 sm:w-4 sm:h-4 flex-shrink-0"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                />
-              </svg>
-              <span>Aktivitäten laden</span>
-            </button>
-            <button
-              onClick={() => setIsFormVisible(!isFormVisible)}
-              className="rounded-lg px-4 py-2.5 sm:py-2 text-sm sm:text-sm font-medium text-primary hover:bg-primary/10 active:bg-primary/10 transition-colors touch-manipulation min-h-[44px] sm:min-h-0"
-            >
-              {isFormVisible ? "Formular ausblenden ↑" : "Formular anzeigen ↓"}
-            </button>
-          </div>
-        </div>
+    <div>
+      {/* Header */}
+      <div className="flex items-baseline justify-between mb-2">
+        <h3 className="font-display font-extrabold text-base">Sport</h3>
+        {totalBurned > 0 && (
+          <span className="text-sm text-muted-foreground tabular-nums">
+            -{totalBurned} kcal
+          </span>
+        )}
       </div>
 
-      {isFormVisible && (
-        <form onSubmit={handleSubmit} className="mb-4 sm:mb-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-            <div>
-              <label
-                htmlFor="calories"
-                className="mb-1.5 sm:mb-1 block text-sm font-medium"
-              >
-                Verbrauchte Kalorien
-              </label>
-              <input
-                type="number"
-                id="calories"
-                value={calories}
-                onChange={(e) => setCalories(e.target.value)}
-                min="0"
-                className="input"
-                placeholder="z.B. 300"
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="description"
-                className="mb-1.5 sm:mb-1 block text-sm font-medium"
-              >
-                Beschreibung (optional)
-              </label>
-              <input
-                type="text"
-                id="description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                className="input"
-                placeholder="z.B. 30 min Joggen"
-              />
-            </div>
-          </div>
-          <button
-            type="submit"
-            disabled={!calories || parseInt(calories) <= 0}
-            className="btn-primary mt-3 sm:mt-4 w-full sm:w-auto"
+      {/* Activities */}
+      <div className="space-y-2">
+        {activities.map((activity, index) => (
+          <div
+            key={index}
+            className="bg-zinc-100 dark:bg-zinc-800/50 rounded-xl px-3 py-2.5"
           >
-            Hinzufügen
-          </button>
-        </form>
-      )}
-
-      {activities.length > 0 && (
-        <div className="space-y-2 sm:space-y-3">
-          {activities.map((activity, index) => (
-            <div
-              key={index}
-              className="flex items-center justify-between bg-muted rounded-lg px-3 sm:px-4 py-2.5 sm:py-3 gap-2"
-            >
+            <div className="flex items-center gap-3">
               <div className="flex-1 min-w-0">
-                <div className="font-medium text-base sm:text-base">{activity.calories} kcal</div>
-                {activity.description && (
-                  <div className="text-sm sm:text-sm text-muted-foreground mt-0.5">
-                    {activity.description}
-                  </div>
-                )}
+                <div className="font-medium text-sm truncate">
+                  {activity.description || "Aktivität"}
+                </div>
+                <div className="text-xs text-muted-foreground tabular-nums">
+                  -{activity.calories} kcal
+                </div>
               </div>
               <button
                 onClick={() => onRemoveActivity(index)}
-                className="text-muted-foreground hover:text-destructive active:text-destructive p-2 sm:p-1 rounded-lg hover:bg-accent active:bg-accent transition-colors touch-manipulation min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 flex items-center justify-center flex-shrink-0"
+                className="p-1.5 rounded-full text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors touch-manipulation"
                 aria-label="Aktivität entfernen"
               >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                  />
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </div>
-          ))}
-        </div>
-      )}
+          </div>
+        ))}
+
+        {/* Add activity - dashed button / form */}
+        {!isFormVisible ? (
+          <div className="space-y-2">
+            <button
+              onClick={() => setIsFormVisible(true)}
+              className="w-full flex items-center justify-center gap-2 border-2 border-dashed border-zinc-300 dark:border-zinc-600 rounded-xl px-4 py-3 text-sm text-muted-foreground hover:border-primary hover:text-foreground transition-colors touch-manipulation"
+            >
+              + Aktivität hinzufügen
+            </button>
+            <button
+              onClick={onLoadIntervalsActivities}
+              className="w-full text-left text-xs text-muted-foreground hover:text-foreground transition-colors touch-manipulation py-1"
+            >
+              Aktivitäten aus Intervals laden
+            </button>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="bg-zinc-100 dark:bg-zinc-800/50 rounded-xl p-4 space-y-3">
+            <input
+              type="text"
+              id="description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className="input"
+              placeholder="Beschreibung (optional)"
+            />
+            <input
+              type="number"
+              id="calories"
+              value={calories}
+              onChange={(e) => setCalories(e.target.value)}
+              min="0"
+              className="input text-center font-display font-bold text-lg"
+              placeholder="Verbrauchte kcal"
+            />
+            <div className="flex gap-2">
+              <button
+                type="submit"
+                disabled={!calories || parseInt(calories) <= 0}
+                className="btn-primary flex-1"
+              >
+                Hinzufügen
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsFormVisible(false)}
+                className="px-4 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
+              >
+                Abbrechen
+              </button>
+            </div>
+          </form>
+        )}
+      </div>
     </div>
   );
 };

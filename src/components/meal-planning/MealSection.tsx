@@ -45,50 +45,25 @@ export const MealSection = ({
     dish.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  // Berechne Gesamt-kcal der Sektion
+  const totalCalories = dishes.reduce((sum, dish) => {
+    const qty = (dish as { quantity?: number }).quantity ?? 1;
+    return sum + Math.round((dish.calories || 0) * qty);
+  }, 0);
+
   return (
-    <div className="card p-3 sm:p-4">
-      <h3 className="mb-2 sm:mb-3 text-base sm:text-lg font-medium">{title}</h3>
-
-      <div className="relative mb-2 sm:mb-3">
-        <input
-          type="text"
-          placeholder={`${title} hinzufügen...`}
-          className="input"
-          value={selectedMeal === sectionKey ? searchTerm : ""}
-          onChange={(e) => {
-            onSearchTermChange(e.target.value);
-          }}
-          onFocus={() => onInputFocus(sectionKey)}
-          onBlur={onInputBlur}
-        />
-
-        {showDishList && selectedMeal === sectionKey && (
-          <div className="absolute z-[9999] mt-1 w-full max-h-60 overflow-y-auto rounded-lg border border-border bg-background shadow-glass">
-            {filteredDishes.length > 0 ? (
-              filteredDishes.map((dish) => (
-                <button
-                  key={dish.id}
-                  className="w-full text-left px-4 py-2 hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dish-list-item"
-                  onClick={() => {
-                    onAddDish(dish);
-                  }}
-                >
-                  <div className="font-medium">{dish.name}</div>
-                  <div className="text-sm text-muted-foreground">
-                    {dish.calories} kcal | {dish.protein}g Protein |{" "}
-                    {dish.carbs}g Kohlenhydrate | {dish.fat}g Fett
-                  </div>
-                </button>
-              ))
-            ) : (
-              <div className="px-4 py-2 text-sm text-muted-foreground">
-                Keine Gerichte gefunden
-              </div>
-            )}
-          </div>
+    <div>
+      {/* Header */}
+      <div className="flex items-baseline justify-between mb-2">
+        <h3 className="font-display font-extrabold text-base">{title}</h3>
+        {totalCalories > 0 && (
+          <span className="text-sm text-muted-foreground tabular-nums">
+            {totalCalories} kcal
+          </span>
         )}
       </div>
 
+      {/* Dishes */}
       <div className="space-y-2">
         {dishes.map((dish, index) => {
           const dishWithQuantity = dish as { quantity?: number };
@@ -107,6 +82,46 @@ export const MealSection = ({
             />
           );
         })}
+      </div>
+
+      {/* Add dish - dashed button / search */}
+      <div className="relative mt-2">
+        <input
+          type="text"
+          placeholder={`+ ${title} hinzufügen`}
+          className="w-full border-2 border-dashed border-zinc-300 dark:border-zinc-600 rounded-xl px-4 py-3 bg-transparent text-sm placeholder:text-muted-foreground focus:border-primary focus:border-solid focus:outline-none focus:ring-0 transition-colors"
+          value={selectedMeal === sectionKey ? searchTerm : ""}
+          onChange={(e) => {
+            onSearchTermChange(e.target.value);
+          }}
+          onFocus={() => onInputFocus(sectionKey)}
+          onBlur={onInputBlur}
+        />
+
+        {showDishList && selectedMeal === sectionKey && (
+          <div className="absolute z-[9999] mt-1 w-full max-h-60 overflow-y-auto rounded-xl border border-border bg-background shadow-glass">
+            {filteredDishes.length > 0 ? (
+              filteredDishes.map((dish) => (
+                <button
+                  key={dish.id}
+                  className="w-full text-left px-4 py-2.5 hover:bg-zinc-100 dark:hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring dish-list-item transition-colors"
+                  onClick={() => {
+                    onAddDish(dish);
+                  }}
+                >
+                  <div className="font-medium text-sm">{dish.name}</div>
+                  <div className="text-xs text-muted-foreground">
+                    {dish.calories} kcal · {dish.protein}g P · {dish.carbs}g KH · {dish.fat}g F
+                  </div>
+                </button>
+              ))
+            ) : (
+              <div className="px-4 py-2.5 text-sm text-muted-foreground">
+                Keine Gerichte gefunden
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

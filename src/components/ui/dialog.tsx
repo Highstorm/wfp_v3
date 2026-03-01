@@ -91,7 +91,7 @@ function DialogTitleComponent({
 }: React.ComponentPropsWithoutRef<typeof DialogTitle>) {
   return (
     <DialogTitle
-      className={cn("text-lg font-semibold font-heading", className)}
+      className={cn("text-lg font-semibold font-display", className)}
       {...props}
     >
       {children}

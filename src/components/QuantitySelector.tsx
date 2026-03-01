@@ -87,13 +87,13 @@ export function QuantitySelector({
   };
 
   return (
-    <div className="flex items-stretch h-10">
+    <div className="flex items-center gap-0.5">
       <button
         type="button"
-        onClick={handleIncrease}
-        className="bg-secondary text-secondary-foreground px-4 rounded-l hover:opacity-95 transition-colors flex items-center justify-center text-lg font-medium min-w-[44px]"
+        onClick={handleDecrease}
+        className="w-7 h-7 rounded-full bg-zinc-200 dark:bg-zinc-700 flex items-center justify-center text-sm font-medium transition-colors hover:bg-zinc-300 dark:hover:bg-zinc-600 touch-manipulation"
       >
-        +
+        −
       </button>
       <input
         type="text"
@@ -101,15 +101,15 @@ export function QuantitySelector({
         onChange={handleInputChange}
         onFocus={handleInputFocus}
         onBlur={handleInputBlur}
-        className="w-16 text-center text-base outline-none border-y border-input bg-background text-foreground placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background"
+        className="w-9 h-7 text-center text-xs font-bold rounded-full bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 outline-none focus-visible:ring-2 focus-visible:ring-ring"
         placeholder="1"
       />
       <button
         type="button"
-        onClick={handleDecrease}
-        className="bg-secondary text-secondary-foreground px-4 rounded-r hover:opacity-95 transition-colors flex items-center justify-center text-lg font-medium min-w-[44px]"
+        onClick={handleIncrease}
+        className="w-7 h-7 rounded-full bg-zinc-200 dark:bg-zinc-700 flex items-center justify-center text-sm font-medium transition-colors hover:bg-zinc-300 dark:hover:bg-zinc-600 touch-manipulation"
       >
-        -
+        +
       </button>
     </div>
   );

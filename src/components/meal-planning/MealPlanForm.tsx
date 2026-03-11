@@ -70,7 +70,7 @@ export const MealPlanForm = () => {
 
   if (isDishesLoading || isMealPlanLoading) {
     return (
-      <div className="container mx-auto p-2 sm:p-4">
+      <div className="mx-auto p-2 sm:p-4">
         <div className="card p-8">
           <p className="text-center text-muted-foreground">Lade Daten...</p>
         </div>
@@ -79,7 +79,7 @@ export const MealPlanForm = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-2 pb-20 md:pb-4 max-w-lg md:max-w-none">
+    <div className="mx-auto py-2 pb-20 md:pb-4 max-w-lg md:max-w-none">
       {/* Week Calendar */}
       <div className="py-2">
         <WeekCalendar selectedDate={date} onDateSelect={handleDateChange} />

@@ -7,7 +7,7 @@ export const ProtectedLayout = () => {
   return (
     <div className="flex min-h-screen">
       <Sidebar />
-      <div className="flex flex-1 flex-col">
+      <div className="flex flex-1 flex-col overflow-x-hidden">
         <Header />
         <main className="container flex-1 pb-20 pt-4 md:pb-6">
           <Outlet />

@@ -315,7 +315,11 @@ export const SnacksAndExtrasSection = ({
             <input
               type="text"
               placeholder="+ Snack hinzufügen"
-              className={`w-full border-2 border-dashed border-zinc-300 dark:border-zinc-600 rounded-xl px-4 py-3 bg-transparent text-sm placeholder:text-muted-foreground focus:border-primary focus:border-solid focus:outline-none focus:ring-0 transition-colors ${hasGeminiAPIKey ? "pl-10" : ""}`}
+              className={`w-full border-2 rounded-2xl px-4 py-3 bg-transparent text-base placeholder:text-muted-foreground focus:outline-none focus:ring-0 transition-colors ${hasGeminiAPIKey ? "pl-10" : ""} ${
+                showDishList || aiSearchResult || isAISearching
+                  ? "border-violet-500 border-solid rounded-b-none"
+                  : "border-dashed border-zinc-300 dark:border-zinc-600"
+              }`}
               value={searchTerm}
               onChange={(e) => onSearchTermChange(e.target.value)}
               onFocus={onInputFocus}
@@ -325,7 +329,7 @@ export const SnacksAndExtrasSection = ({
 
           {(showDishList || aiSearchResult || isAISearching) && (
             <div
-              className="absolute z-[9998] mt-1 w-full max-h-60 overflow-y-auto rounded-xl border border-border bg-background shadow-glass"
+              className="absolute z-[9998] w-full max-h-60 overflow-y-auto rounded-b-2xl border border-t-0 border-border bg-background shadow-lg"
               style={{
                 WebkitOverflowScrolling: "touch",
               }}
@@ -347,43 +351,37 @@ export const SnacksAndExtrasSection = ({
               {aiSearchResult && (
                 <button
                   key={aiSearchResult.barcode}
-                  className="dish-list-item w-full px-4 py-2.5 text-left hover:bg-zinc-100 dark:hover:bg-zinc-800 bg-zinc-50 dark:bg-zinc-800/30 border-b border-zinc-200 dark:border-zinc-700 touch-manipulation transition-colors"
+                  className="dish-list-item w-full px-4 py-3 text-left bg-violet-50 dark:bg-violet-950/30 hover:bg-violet-100 dark:hover:bg-violet-900/30 border-b border-zinc-200 dark:border-zinc-700 touch-manipulation transition-colors"
                   onClick={() => handleAddAIDish(aiSearchResult)}
                 >
                   <div className="flex items-center gap-2 flex-wrap">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                      className="w-4 h-4 text-muted-foreground flex-shrink-0"
-                    >
-                      <path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.66L18.75 10l-.491 1.34a2.25 2.25 0 01-1.545 1.545L15.25 13.5l-1.34-.491a2.25 2.25 0 01-1.545-1.545L12 11.25l.491-1.34a2.25 2.25 0 011.545-1.545L15.25 8.5l1.34.491a2.25 2.25 0 011.545 1.545zM16.894 20.405L17.25 21.5l-.356-1.095a2.25 2.25 0 00-1.545-1.545L14.25 18.5l-1.095-.356a2.25 2.25 0 00-1.545-1.545L11.25 16.5l.356-1.095a2.25 2.25 0 001.545-1.545L14.25 13.5l1.095.356a2.25 2.25 0 001.545 1.545L18.25 15.5l-.356 1.095a2.25 2.25 0 00-1.545 1.545L16.25 18.5l-1.095.356a2.25 2.25 0 00-1.545 1.545z" />
-                    </svg>
-                    <span className="font-medium text-sm break-words">
+                    <span className="font-display font-semibold text-[15px] break-words">
                       {aiSearchResult.name}
                     </span>
-                    <span className="px-1.5 py-0.5 text-xs bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 rounded-full font-medium flex-shrink-0">
+                    <span className="px-1.5 py-0.5 text-[10px] bg-violet-500 text-white rounded font-bold flex-shrink-0">
                       KI
                     </span>
                   </div>
                   <div className="text-xs text-muted-foreground mt-1 break-words">
-                    {aiSearchResult.nutritionUnit}:{" "}
-                    {Math.round(aiSearchResult.caloriesPerUnit)} kcal,{" "}
-                    {Math.round(aiSearchResult.proteinPerUnit)}g Protein,{" "}
-                    {Math.round(aiSearchResult.carbsPerUnit)}g Carbs,{" "}
-                    {Math.round(aiSearchResult.fatPerUnit)}g Fett
+                    {Math.round(aiSearchResult.caloriesPerUnit)} kcal · {Math.round(aiSearchResult.proteinPerUnit)}g P · {Math.round(aiSearchResult.carbsPerUnit)}g K · {Math.round(aiSearchResult.fatPerUnit)}g F
                   </div>
                 </button>
+              )}
+              {/* Gespeicherte Snacks Label */}
+              {aiSearchResult && filteredDishes.length > 0 && (
+                <div className="px-4 py-1.5 text-[11px] font-semibold text-muted-foreground tracking-wide">
+                  Gespeicherte Snacks
+                </div>
               )}
               {/* Normale Gerichte */}
               {filteredDishes.length > 0 ? (
                 filteredDishes.map((dish) => (
                   <button
                     key={dish.id}
-                    className="dish-list-item w-full px-4 py-2.5 text-left hover:bg-zinc-100 dark:hover:bg-zinc-800 touch-manipulation transition-colors"
+                    className="dish-list-item w-full px-4 py-3 text-left hover:bg-zinc-100 dark:hover:bg-zinc-800 touch-manipulation transition-colors"
                     onClick={() => onAddDish(dish)}
                   >
-                    <div className="font-medium text-sm">{dish.name}</div>
+                    <div className="font-display font-semibold text-[15px]">{dish.name}</div>
                     <div className="text-xs text-muted-foreground mt-0.5">
                       {dish.calories} kcal · {dish.protein}g P · {dish.carbs}g KH · {dish.fat}g F
                     </div>
@@ -391,7 +389,7 @@ export const SnacksAndExtrasSection = ({
                 ))
               ) : (
                 !aiSearchResult && (
-                  <div className="px-4 py-2.5 text-sm text-muted-foreground">
+                  <div className="px-4 py-3 text-sm text-muted-foreground">
                     Keine Gerichte gefunden
                   </div>
                 )

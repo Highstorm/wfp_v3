@@ -5,7 +5,7 @@ import { UserSettingsForm } from "./UserSettingsForm";
 export const ProfilePage = () => {
   if (!auth.currentUser) {
     return (
-      <div className="container mx-auto px-4 py-6 pb-20 md:pb-6">
+      <div className="py-6 pb-20 md:pb-6">
         <div className="text-center text-muted-foreground">
           Bitte melde dich an, um dein Profil zu bearbeiten.
         </div>
@@ -23,7 +23,7 @@ export const ProfilePage = () => {
     .slice(0, 2);
 
   return (
-    <div className="container mx-auto px-4 py-4 pb-20 md:pb-6 max-w-lg md:max-w-none">
+    <div className="mx-auto py-4 pb-20 md:pb-6 max-w-lg md:max-w-none">
       {/* Avatar Section */}
       <div className="text-center mb-8">
         <div className="w-20 h-20 rounded-full bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 flex items-center justify-center mx-auto mb-3">

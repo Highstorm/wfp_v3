@@ -200,7 +200,7 @@ export const CreateDishWithIngredients = () => {
   };
 
   return (
-    <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6 pb-20 md:pb-6">
+    <div className="py-4 sm:py-6 pb-20 md:pb-6">
       <div className="card p-4 sm:p-6 md:p-8">
         <div className="mb-6 sm:mb-8">
           <h1 className="text-center text-2xl sm:text-3xl font-semibold tracking-tight">

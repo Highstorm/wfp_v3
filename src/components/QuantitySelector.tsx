@@ -101,7 +101,7 @@ export function QuantitySelector({
         onChange={handleInputChange}
         onFocus={handleInputFocus}
         onBlur={handleInputBlur}
-        className="w-9 h-7 text-center text-xs font-bold rounded-full bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="w-9 h-7 text-center text-base font-bold rounded-full bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 outline-none focus-visible:ring-2 focus-visible:ring-ring"
         placeholder="1"
       />
       <button

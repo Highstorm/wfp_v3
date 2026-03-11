@@ -74,7 +74,7 @@ export const ImportDishPage: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-6 pb-20 md:pb-6">
+    <div className="py-6 pb-20 md:pb-6">
       <div className="max-w-3xl mx-auto">
         <div className="card p-6">
           <h1 className="text-2xl font-bold mb-6">Gericht importieren</h1>

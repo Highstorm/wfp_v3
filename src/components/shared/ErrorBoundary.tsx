@@ -36,7 +36,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
       }
 
       return (
-        <div className="container mx-auto p-4">
+        <div className="p-4">
           <div className="card p-8 text-center">
             <h2 className="text-xl font-semibold text-destructive mb-2">
               Etwas ist schiefgelaufen

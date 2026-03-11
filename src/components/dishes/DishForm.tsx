@@ -188,7 +188,7 @@ export const DishForm = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-4 pb-20 md:pb-6 max-w-lg">
+    <div className="mx-auto py-4 pb-20 md:pb-6 max-w-lg">
       {/* Back + Title */}
       <div className="flex items-center gap-3 mb-6">
         <Link

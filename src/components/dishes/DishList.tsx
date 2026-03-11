@@ -203,7 +203,7 @@ export const DishList = () => {
         }
       />
 
-      <div className="container mx-auto px-4 pb-20 md:pb-4 max-w-lg md:max-w-none">
+      <div className="mx-auto pb-20 md:pb-4 max-w-lg md:max-w-none">
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <h1 className="font-display font-extrabold text-2xl">Gerichte</h1>

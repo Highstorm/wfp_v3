@@ -28,7 +28,10 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. Days with no MealPlan document are represented as `hasData: false` entries and produce no contribution to averages or deficit totals
   3. The calorie goal resolves via WeeklyNutritionGoals first, falling back to UserProfile — readable in a unit test without touching Firestore
   4. The deficit for any logged day equals (targetCalories + sportCalories) − eatenCalories, verifiable by inspecting hook output in React Query DevTools
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 01-01-PLAN.md — TDD: Types, goal resolution, and weekly aggregation pure functions with unit tests
+- [ ] 01-02-PLAN.md — Firestore range query (getMealPlansByWeek) and useWeeklyStats React Query hook
 
 ### Phase 2: Design
 **Goal**: Ein visuelles Design der Statistik-Seite existiert in wfp_v3.pen, das als Referenz für die UI-Implementierung dient
@@ -47,7 +50,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Depends on**: Phase 1 (data), Phase 2 (design)
 **Requirements**: VIS-01, VIS-02, VIS-03, SUM-01, SUM-02, SUM-03, MAC-01, NAV-01
 **Success Criteria** (what must be TRUE):
-  1. The bar chart shows one bar per day (Mon–Sun), a horizontal reference line at the calorie goal, and visually distinct (grayed) bars for days with no data
+  1. The bar chart shows one bar per day (Mon-Sun), a horizontal reference line at the calorie goal, and visually distinct (grayed) bars for days with no data
   2. The three summary cards display total calories consumed, cumulative deficit/surplus, and total sport calories with session count — all matching the hook output
   3. The macro section shows Protein, Carbs, and Fat each as a percentage of daily goal, averaged over logged days only
   4. The week navigation shows the current ISO week label and prev/next buttons that shift the displayed week
@@ -73,7 +76,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Data Foundation | 0/? | Not started | - |
+| 1. Data Foundation | 0/2 | Planning complete | - |
 | 2. Design | 0/? | Not started | - |
 | 3. Statistics UI | 0/? | Not started | - |
 | 4. Integration | 0/? | Not started | - |

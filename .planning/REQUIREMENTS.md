@@ -10,9 +10,9 @@ Requirements for the weekly statistics page. Each maps to roadmap phases.
 ### Data Layer
 
 - [ ] **DATA-01**: App kann MealPlans für eine ganze Woche (Mo–So) per Range-Query aus Firestore laden
-- [ ] **DATA-02**: Wochendaten werden zu Tagessummen aggregiert (Kalorien gegessen, Sportkalorien, Defizit/Überschuss)
-- [ ] **DATA-03**: Kalorienziel wird korrekt aufgelöst (WeeklyNutritionGoals → Fallback UserProfile)
-- [ ] **DATA-04**: Nicht geloggte Tage werden als "keine Daten" markiert und aus Durchschnittswerten ausgeschlossen
+- [x] **DATA-02**: Wochendaten werden zu Tagessummen aggregiert (Kalorien gegessen, Sportkalorien, Defizit/Überschuss)
+- [x] **DATA-03**: Kalorienziel wird korrekt aufgelöst (WeeklyNutritionGoals → Fallback UserProfile)
+- [x] **DATA-04**: Nicht geloggte Tage werden als "keine Daten" markiert und aus Durchschnittswerten ausgeschlossen
 
 ### Visualization
 
@@ -65,9 +65,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | DATA-01 | Phase 1 | Pending |
-| DATA-02 | Phase 1 | Pending |
-| DATA-03 | Phase 1 | Pending |
-| DATA-04 | Phase 1 | Pending |
+| DATA-02 | Phase 1 | Complete (01-01) |
+| DATA-03 | Phase 1 | Complete (01-01) |
+| DATA-04 | Phase 1 | Complete (01-01) |
 | VIS-01 | Phase 2 | Pending |
 | VIS-02 | Phase 2 | Pending |
 | VIS-03 | Phase 2 | Pending |
@@ -85,4 +85,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-03-12*
-*Last updated: 2026-03-12 after roadmap creation*
+*Last updated: 2026-03-12 after plan 01-01 completion (DATA-02, DATA-03, DATA-04 complete)*

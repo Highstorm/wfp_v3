@@ -64,25 +64,25 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DATA-01 | — | Pending |
-| DATA-02 | — | Pending |
-| DATA-03 | — | Pending |
-| DATA-04 | — | Pending |
-| VIS-01 | — | Pending |
-| VIS-02 | — | Pending |
-| VIS-03 | — | Pending |
-| SUM-01 | — | Pending |
-| SUM-02 | — | Pending |
-| SUM-03 | — | Pending |
-| MAC-01 | — | Pending |
-| NAV-01 | — | Pending |
-| NAV-02 | — | Pending |
+| DATA-01 | Phase 1 | Pending |
+| DATA-02 | Phase 1 | Pending |
+| DATA-03 | Phase 1 | Pending |
+| DATA-04 | Phase 1 | Pending |
+| VIS-01 | Phase 2 | Pending |
+| VIS-02 | Phase 2 | Pending |
+| VIS-03 | Phase 2 | Pending |
+| SUM-01 | Phase 2 | Pending |
+| SUM-02 | Phase 2 | Pending |
+| SUM-03 | Phase 2 | Pending |
+| MAC-01 | Phase 2 | Pending |
+| NAV-01 | Phase 2 | Pending |
+| NAV-02 | Phase 3 | Pending |
 
 **Coverage:**
 - v1 requirements: 13 total
-- Mapped to phases: 0
-- Unmapped: 13 ⚠️
+- Mapped to phases: 13
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-03-12*
-*Last updated: 2026-03-12 after initial definition*
+*Last updated: 2026-03-12 after roadmap creation*

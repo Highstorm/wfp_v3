@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { resolveGoals, aggregateWeeklyStats } from "../weekly-stats.utils";
-import type { MealPlan } from "../../types";
+import type { Dish, MealPlan } from "../../types";
 import type { WeeklyNutritionGoals } from "../../types";
 import type { NutritionGoals } from "../../types";
 import type { ResolvedGoals } from "../../types";
@@ -35,6 +35,15 @@ const fullWeeklyGoals: WeeklyNutritionGoals = {
   createdAt: new Date("2026-03-09"),
   updatedAt: new Date("2026-03-09"),
 };
+
+/** Build a minimal Dish fixture. */
+function buildDish(overrides: Partial<Dish> & Pick<Dish, "id" | "name" | "calories">): Dish {
+  return {
+    createdBy: "user1",
+    quantity: 1,
+    ...overrides,
+  };
+}
 
 /** Build a minimal MealPlan for a given date. */
 function buildMealPlan(
@@ -178,17 +187,7 @@ describe("aggregateWeeklyStats", () => {
   it("a day with at least 1 dish has hasData: true", () => {
     const planWithDish = buildMealPlan("2026-03-09", {
       breakfast: [
-        {
-          id: "d1",
-          name: "Oats",
-          calories: 300,
-          protein: 10,
-          carbs: 50,
-          fat: 5,
-          quantity: 1,
-          ingredients: [],
-          sharedDishId: undefined,
-        },
+        buildDish({ id: "d1", name: "Oats", calories: 300, protein: 10, carbs: 50, fat: 5, quantity: 1 }),
       ],
     });
     const result = aggregateWeeklyStats(weekStartDate, [planWithDish], noGoals);
@@ -215,17 +214,7 @@ describe("aggregateWeeklyStats", () => {
   it("eatenCalories equals sum of dish + temporaryMeal calories for logged day", () => {
     const plan = buildMealPlan("2026-03-09", {
       breakfast: [
-        {
-          id: "d1",
-          name: "Oats",
-          calories: 300,
-          protein: 10,
-          carbs: 50,
-          fat: 5,
-          quantity: 2,
-          ingredients: [],
-          sharedDishId: undefined,
-        },
+        buildDish({ id: "d1", name: "Oats", calories: 300, protein: 10, carbs: 50, fat: 5, quantity: 2 }),
       ],
       temporaryMeals: [
         { description: "Banana", calories: 90, protein: 1, carbs: 23, fat: 0 },
@@ -263,17 +252,7 @@ describe("aggregateWeeklyStats", () => {
   it("deficit is null for logged days when no calorie goal", () => {
     const plan = buildMealPlan("2026-03-09", {
       breakfast: [
-        {
-          id: "d1",
-          name: "Oats",
-          calories: 300,
-          protein: 10,
-          carbs: 50,
-          fat: 5,
-          quantity: 1,
-          ingredients: [],
-          sharedDishId: undefined,
-        },
+        buildDish({ id: "d1", name: "Oats", calories: 300, protein: 10, carbs: 50, fat: 5, quantity: 1 }),
       ],
     });
     const result = aggregateWeeklyStats(weekStartDate, [plan], noGoals);
@@ -283,17 +262,7 @@ describe("aggregateWeeklyStats", () => {
   it("deficit for a logged day with a goal = (targetCalories + sportCalories) - eatenCalories", () => {
     const plan = buildMealPlan("2026-03-09", {
       breakfast: [
-        {
-          id: "d1",
-          name: "Chicken",
-          calories: 500,
-          protein: 40,
-          carbs: 10,
-          fat: 15,
-          quantity: 1,
-          ingredients: [],
-          sharedDishId: undefined,
-        },
+        buildDish({ id: "d1", name: "Chicken", calories: 500, protein: 40, carbs: 10, fat: 15, quantity: 1 }),
       ],
       sports: [{ calories: 300, description: "Cycling" }],
     });
@@ -305,17 +274,7 @@ describe("aggregateWeeklyStats", () => {
   it("totalSportCalories sums sport from ALL days including unlogged days", () => {
     const loggedPlan = buildMealPlan("2026-03-09", {
       breakfast: [
-        {
-          id: "d1",
-          name: "Oats",
-          calories: 300,
-          protein: 10,
-          carbs: 50,
-          fat: 5,
-          quantity: 1,
-          ingredients: [],
-          sharedDishId: undefined,
-        },
+        buildDish({ id: "d1", name: "Oats", calories: 300, protein: 10, carbs: 50, fat: 5, quantity: 1 }),
       ],
       sports: [{ calories: 200, description: "Run" }],
     });
@@ -330,32 +289,12 @@ describe("aggregateWeeklyStats", () => {
   it("avgEatenCalories divides by loggedDayCount only (not 7)", () => {
     const plan1 = buildMealPlan("2026-03-09", {
       breakfast: [
-        {
-          id: "d1",
-          name: "Meal",
-          calories: 1000,
-          protein: 50,
-          carbs: 100,
-          fat: 40,
-          quantity: 1,
-          ingredients: [],
-          sharedDishId: undefined,
-        },
+        buildDish({ id: "d1", name: "Meal", calories: 1000, protein: 50, carbs: 100, fat: 40, quantity: 1 }),
       ],
     });
     const plan2 = buildMealPlan("2026-03-10", {
       breakfast: [
-        {
-          id: "d2",
-          name: "Meal",
-          calories: 2000,
-          protein: 80,
-          carbs: 200,
-          fat: 60,
-          quantity: 1,
-          ingredients: [],
-          sharedDishId: undefined,
-        },
+        buildDish({ id: "d2", name: "Meal", calories: 2000, protein: 80, carbs: 200, fat: 60, quantity: 1 }),
       ],
     });
     const result = aggregateWeeklyStats(weekStartDate, [plan1, plan2], noGoals);
@@ -385,17 +324,7 @@ describe("aggregateWeeklyStats", () => {
   it("totalDeficit is null when no calorie goal", () => {
     const plan = buildMealPlan("2026-03-09", {
       breakfast: [
-        {
-          id: "d1",
-          name: "Meal",
-          calories: 500,
-          protein: 20,
-          carbs: 50,
-          fat: 20,
-          quantity: 1,
-          ingredients: [],
-          sharedDishId: undefined,
-        },
+        buildDish({ id: "d1", name: "Meal", calories: 500, protein: 20, carbs: 50, fat: 20, quantity: 1 }),
       ],
     });
     const result = aggregateWeeklyStats(weekStartDate, [plan], noGoals);
@@ -405,32 +334,12 @@ describe("aggregateWeeklyStats", () => {
   it("totalDeficit sums deficits from logged days only", () => {
     const plan1 = buildMealPlan("2026-03-09", {
       breakfast: [
-        {
-          id: "d1",
-          name: "Meal",
-          calories: 1500,
-          protein: 50,
-          carbs: 150,
-          fat: 50,
-          quantity: 1,
-          ingredients: [],
-          sharedDishId: undefined,
-        },
+        buildDish({ id: "d1", name: "Meal", calories: 1500, protein: 50, carbs: 150, fat: 50, quantity: 1 }),
       ],
     });
     const plan2 = buildMealPlan("2026-03-10", {
       breakfast: [
-        {
-          id: "d2",
-          name: "Meal",
-          calories: 1800,
-          protein: 80,
-          carbs: 180,
-          fat: 60,
-          quantity: 1,
-          ingredients: [],
-          sharedDishId: undefined,
-        },
+        buildDish({ id: "d2", name: "Meal", calories: 1800, protein: 80, carbs: 180, fat: 60, quantity: 1 }),
       ],
       sports: [{ calories: 200, description: "Run" }],
     });
@@ -463,17 +372,7 @@ describe("aggregateWeeklyStats", () => {
   it("protein/carbs/fat reflect actual nutrition for logged days", () => {
     const plan = buildMealPlan("2026-03-09", {
       breakfast: [
-        {
-          id: "d1",
-          name: "Chicken",
-          calories: 200,
-          protein: 30,
-          carbs: 5,
-          fat: 8,
-          quantity: 1,
-          ingredients: [],
-          sharedDishId: undefined,
-        },
+        buildDish({ id: "d1", name: "Chicken", calories: 200, protein: 30, carbs: 5, fat: 8, quantity: 1 }),
       ],
       temporaryMeals: [
         { description: "Shake", calories: 100, protein: 20, carbs: 10, fat: 2 },

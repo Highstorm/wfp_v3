@@ -12,7 +12,7 @@ Adding a weekly statistics page to an existing React/Firebase nutrition tracker.
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Data Foundation** - Types, utilities, Firestore range query, goal resolution, and the useWeeklyStats hook
+- [x] **Phase 1: Data Foundation** - Types, utilities, Firestore range query, goal resolution, and the useWeeklyStats hook (completed 2026-03-12)
 - [ ] **Phase 2: Design** - Visual design der Statistik-Seite in wfp_v3.pen anhand Requirements und bestehendem Styleguide
 - [ ] **Phase 3: Statistics UI** - Bar chart, summary cards, macro averages, and week navigation components — nach Design
 - [ ] **Phase 4: Integration** - Page assembly, lazy-loaded route, and nav wiring
@@ -28,7 +28,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. Days with no MealPlan document are represented as `hasData: false` entries and produce no contribution to averages or deficit totals
   3. The calorie goal resolves via WeeklyNutritionGoals first, falling back to UserProfile — readable in a unit test without touching Firestore
   4. The deficit for any logged day equals (targetCalories + sportCalories) − eatenCalories, verifiable by inspecting hook output in React Query DevTools
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 Plans:
 - [x] 01-01-PLAN.md — TDD: Types, goal resolution, and weekly aggregation pure functions with unit tests
 - [ ] 01-02-PLAN.md — Firestore range query (getMealPlansByWeek) and useWeeklyStats React Query hook
@@ -76,7 +76,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Data Foundation | 1/2 | In progress | - |
+| 1. Data Foundation | 2/2 | Complete   | 2026-03-12 |
 | 2. Design | 0/? | Not started | - |
 | 3. Statistics UI | 0/? | Not started | - |
 | 4. Integration | 0/? | Not started | - |

@@ -32,3 +32,5 @@ export {
 } from "./useSharedDishes";
 
 export { useFeatureAccess } from "./useFeatureAccess";
+
+export { useWeeklyStats } from "./useWeeklyStats";

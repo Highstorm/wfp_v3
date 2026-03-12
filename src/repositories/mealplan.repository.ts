@@ -9,6 +9,7 @@ import {
   updateDoc,
   deleteDoc,
 } from "firebase/firestore";
+import { endOfISOWeek, format, parseISO } from "date-fns";
 import { db, auth } from "../lib/firebase";
 import type { MealPlan } from "../types";
 
@@ -62,6 +63,35 @@ export const getMealPlanByDate = async (
   }
 
   return null;
+};
+
+export const getMealPlansByWeek = async (
+  weekStartDate: string
+): Promise<MealPlan[]> => {
+  if (!auth.currentUser) throw new Error("Not authenticated");
+
+  const weekStart = parseISO(weekStartDate);
+  const weekEnd = endOfISOWeek(weekStart);
+  const weekEndStr = format(weekEnd, "yyyy-MM-dd");
+
+  const q = query(
+    collection(db, "mealPlans"),
+    where("createdBy", "==", auth.currentUser.uid),
+    where("date", ">=", weekStartDate),
+    where("date", "<=", weekEndStr)
+  );
+
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map((d) => ({
+    id: d.id,
+    ...d.data(),
+    sports: Array.isArray(d.data().sports) ? d.data().sports : [],
+    temporaryMeals: Array.isArray(d.data().temporaryMeals)
+      ? d.data().temporaryMeals
+      : [],
+    createdAt: d.data().createdAt?.toDate() || new Date(),
+    updatedAt: d.data().updatedAt?.toDate() || new Date(),
+  })) as MealPlan[];
 };
 
 export const createMealPlan = async (

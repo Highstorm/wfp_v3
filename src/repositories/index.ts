@@ -11,6 +11,7 @@ export {
   getMealPlans,
   getMealPlan,
   getMealPlanByDate,
+  getMealPlansByWeek,
   createMealPlan,
   updateMealPlan,
   deleteMealPlan,

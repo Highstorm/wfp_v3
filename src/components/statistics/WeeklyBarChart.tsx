@@ -28,10 +28,10 @@ function isDarkMode(): boolean {
   );
 }
 
-function getBarColor(point: ChartDataPoint, targetCalories: number | null): string {
+function getBarColor(point: ChartDataPoint): string {
   const colors = isDarkMode() ? "dark" : "light";
   if (point.isStub) return CHART_COLORS.muted[colors];
-  if (targetCalories !== null && point.eatenCalories > targetCalories) {
+  if (point.deficit !== null && point.deficit < 0) {
     return CHART_COLORS.destructive[colors];
   }
   return CHART_COLORS.success[colors];
@@ -84,19 +84,20 @@ export function WeeklyBarChart({ days, goals, loggedDayCount }: WeeklyBarChartPr
               strokeDasharray="4 4"
             />
           )}
-          <Tooltip content={<WeeklyChartTooltip />} />
+          <Tooltip content={<WeeklyChartTooltip />} cursor={false} />
           <Bar
             dataKey="eatenCalories"
             radius={[4, 4, 0, 0]}
             maxBarSize={40}
             cursor="pointer"
+            background={false}
             animationBegin={0}
             onClick={(entry: ChartDataPoint) => handleBarClick(entry)}
           >
             {chartData.map((point, index) => (
               <Cell
                 key={index}
-                fill={getBarColor(point, goals.targetCalories)}
+                fill={getBarColor(point)}
               />
             ))}
           </Bar>

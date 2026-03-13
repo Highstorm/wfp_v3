@@ -75,11 +75,11 @@ describe("CHART_COLORS", () => {
   });
 
   it("destructive light matches index.css value", () => {
-    expect(CHART_COLORS.destructive.light).toBe("hsl(0, 72%, 51%)");
+    expect(CHART_COLORS.destructive.light).toBe("hsl(0, 84%, 60%)");
   });
 
   it("destructive dark matches index.css value", () => {
-    expect(CHART_COLORS.destructive.dark).toBe("hsl(0, 63%, 31%)");
+    expect(CHART_COLORS.destructive.dark).toBe("hsl(0, 91%, 71%)");
   });
 
   it("muted light matches index.css value", () => {

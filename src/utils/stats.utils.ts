@@ -20,8 +20,8 @@ export const CHART_COLORS = {
     dark: "hsl(142, 70%, 45%)",
   },
   destructive: {
-    light: "hsl(0, 72%, 51%)",
-    dark: "hsl(0, 63%, 31%)",
+    light: "hsl(0, 84%, 60%)",
+    dark: "hsl(0, 91%, 71%)",
   },
   muted: {
     light: "hsl(210, 40%, 96%)",

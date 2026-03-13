@@ -34,8 +34,8 @@ const ImportDishPage = lazy(() =>
 const ProfilePage = lazy(() =>
   import("./components/auth/ProfilePage").then((m) => ({ default: m.ProfilePage }))
 );
-const Dashboard = lazy(() =>
-  import("./components/layout/Dashboard").then((m) => ({ default: m.Dashboard }))
+const StatisticsPage = lazy(() =>
+  import("./components/statistics/StatisticsPage")
 );
 const PorridgeCalculator = lazy(() =>
   import("./components/porridge/PorridgeCalculator").then((m) => ({
@@ -68,11 +68,13 @@ function App() {
               }
             />
             <Route
-              path="/dashboard"
+              path="/statistics"
               element={
-                <Suspense fallback={<LoadingSpinner />}>
-                  <Dashboard />
-                </Suspense>
+                <ErrorBoundary>
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <StatisticsPage />
+                  </Suspense>
+                </ErrorBoundary>
               }
             />
             <Route

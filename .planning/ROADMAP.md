@@ -58,7 +58,10 @@ Plans:
   4. The week navigation shows the current ISO week label and prev/next buttons that shift the displayed week
   5. All components are legible and non-overflowing on a 375px wide screen
   6. UI matches the Phase 2 design from wfp_v3.pen (Farben, Layout, Spacing)
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 03-01-PLAN.md — TDD: Install recharts + stats utility helpers (formatWeekLabel, calcMacroPercent, toChartData)
+- [ ] 03-02-PLAN.md — All statistics components (WeekNav, SummaryCards, MacroAverages, BarChart) + StatisticsPage shell
 
 ### Phase 4: Integration
 **Goal**: The statistics page is live at its own route, accessible from every navigation entry point, and does not regress existing app performance
@@ -80,5 +83,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 |-------|----------------|--------|-----------|
 | 1. Data Foundation | 2/2 | Complete   | 2026-03-12 |
 | 2. Design | 1/1 | Complete   | 2026-03-13 |
-| 3. Statistics UI | 0/? | Not started | - |
+| 3. Statistics UI | 0/2 | Not started | - |
 | 4. Integration | 0/? | Not started | - |

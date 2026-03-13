@@ -43,7 +43,9 @@ Plans:
   2. Design enthält: Wochennavigation, Summary-Cards (Kalorien, Defizit, Sport), Balkendiagramm mit Ziel-Linie, Makro-%-Anzeige
   3. Nicht geloggte Tage sind visuell als ausgegraut erkennbar
   4. Design nutzt den bestehenden Styleguide aus wfp_v3.pen (Farben, Typografie, Spacing)
-**Plans**: TBD
+**Plans:** 1 plan
+Plans:
+- [ ] 02-01-PLAN.md — Design specification and Penpot screen creation
 
 ### Phase 3: Statistics UI
 **Goal**: Every statistics component renders correct, readable data from the Phase 1 hook — matching the Phase 2 design
@@ -77,6 +79,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Data Foundation | 2/2 | Complete   | 2026-03-12 |
-| 2. Design | 0/? | Not started | - |
+| 2. Design | 0/1 | In progress | - |
 | 3. Statistics UI | 0/? | Not started | - |
 | 4. Integration | 0/? | Not started | - |

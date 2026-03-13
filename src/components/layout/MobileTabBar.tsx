@@ -3,8 +3,8 @@ import { useFeatureAccess } from "../../hooks/useFeatureAccess";
 import { cn } from "../../lib/utils";
 import {
   CalendarDays,
+  BarChart2,
   ChefHat,
-  UtensilsCrossed,
   User,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -23,15 +23,14 @@ const tabs: Tab[] = [
     icon: CalendarDays,
   },
   {
+    to: "/statistics",
+    label: "Stats",
+    icon: BarChart2,
+  },
+  {
     to: "/dishes",
     label: "Gerichte",
     icon: ChefHat,
-  },
-  {
-    to: "/porridge",
-    label: "Porridge",
-    requiresFeature: "porridgeCalculator",
-    icon: UtensilsCrossed,
   },
   {
     to: "/profile",

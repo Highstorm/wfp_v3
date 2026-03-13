@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 2 design created in wfp_v3.pen
-last_updated: "2026-03-13T07:28:45.872Z"
+stopped_at: "Checkpoint: Task 2 in 02-01 — Sebastian must build Penpot screen from spec"
+last_updated: "2026-03-13T07:59:16.592Z"
 last_activity: 2026-03-12 — Plan 01-01 completed (weekly stats types + aggregation)
 progress:
   total_phases: 4
-  completed_phases: 1
-  total_plans: 2
-  completed_plans: 2
+  completed_phases: 2
+  total_plans: 3
+  completed_plans: 3
   percent: 5
 ---
 
@@ -51,6 +51,7 @@ Progress: [█░░░░░░░░░] 5%
 
 *Updated after each plan completion*
 | Phase 01-data-foundation P02 | 4 | 1 tasks | 4 files |
+| Phase 02-design P01 | 4 | 1 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -66,6 +67,9 @@ Decisions logged in PROJECT.md Key Decisions table.
 - 01-01: Use ?? (nullish coalescing) in resolveGoals — 0 is a valid set value, not a fallback trigger
 - [Phase 01-02]: Array.isArray guard added to both sports and temporaryMeals in getMealPlansByWeek — getMealPlanByDate gap closed
 - [Phase 01-02]: useWeeklyStats staleTime: 2 minutes — reasonable for stats before Phase 3 wires mutation invalidation
+- [Phase 02-design]: Bar chart: no value labels on bars, color-coded green/red/gray-stub only
+- [Phase 02-design]: Gray stub bars at fixed 24px for unlogged days — distinct from 0-kcal logged days
+- [Phase 02-design]: Heute button: ghost text between center label and right arrow, hidden on current week
 
 ### Pending Todos
 
@@ -78,6 +82,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-13T07:28:45.870Z
-Stopped at: Phase 2 design created in wfp_v3.pen
-Resume file: .planning/phases/02-design/02-CONTEXT.md
+Last session: 2026-03-13T07:59:16.590Z
+Stopped at: Checkpoint: Task 2 in 02-01 — Sebastian must build Penpot screen from spec
+Resume file: None

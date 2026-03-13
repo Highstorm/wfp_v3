@@ -16,23 +16,23 @@ Requirements for the weekly statistics page. Each maps to roadmap phases.
 
 ### Visualization
 
-- [ ] **VIS-01**: Balkendiagramm zeigt Kalorien pro Tag (Mo–So) mit Tagesziel als Referenzlinie
-- [ ] **VIS-02**: Nicht geloggte Tage sind im Chart ausgegraut dargestellt
-- [ ] **VIS-03**: Chart ist responsive und mobile-optimiert
+- [x] **VIS-01**: Balkendiagramm zeigt Kalorien pro Tag (Mo–So) mit Tagesziel als Referenzlinie
+- [x] **VIS-02**: Nicht geloggte Tage sind im Chart ausgegraut dargestellt
+- [x] **VIS-03**: Chart ist responsive und mobile-optimiert
 
 ### Summary Cards
 
-- [ ] **SUM-01**: Karte zeigt Gesamtkalorien der Woche
-- [ ] **SUM-02**: Karte zeigt kumuliertes Defizit/Überschuss (Formel: Σ(Ziel + Sport − Gegessen))
-- [ ] **SUM-03**: Karte zeigt Sportkalorien gesamt (Anzahl Sessions + kcal)
+- [x] **SUM-01**: Karte zeigt Gesamtkalorien der Woche
+- [x] **SUM-02**: Karte zeigt kumuliertes Defizit/Überschuss (Formel: Σ(Ziel + Sport − Gegessen))
+- [x] **SUM-03**: Karte zeigt Sportkalorien gesamt (Anzahl Sessions + kcal)
 
 ### Macros
 
-- [ ] **MAC-01**: Durchschnittliche Makro-Zielerreichung in % (Protein, KH, Fett) — nur geloggte Tage
+- [x] **MAC-01**: Durchschnittliche Makro-Zielerreichung in % (Protein, KH, Fett) — nur geloggte Tage
 
 ### Navigation
 
-- [ ] **NAV-01**: Wochennavigation zum Blättern zwischen Kalenderwochen
+- [x] **NAV-01**: Wochennavigation zum Blättern zwischen Kalenderwochen
 - [ ] **NAV-02**: Statistik-Seite ersetzt /dashboard Route und bestehenden Nav-Eintrag (Sidebar + MobileTabBar)
 
 ## v2 Requirements
@@ -68,14 +68,14 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DATA-02 | Phase 1 | Complete (01-01) |
 | DATA-03 | Phase 1 | Complete (01-01) |
 | DATA-04 | Phase 1 | Complete (01-01) |
-| VIS-01 | Phase 2 | Pending |
-| VIS-02 | Phase 2 | Pending |
-| VIS-03 | Phase 2 | Pending |
-| SUM-01 | Phase 2 | Pending |
-| SUM-02 | Phase 2 | Pending |
-| SUM-03 | Phase 2 | Pending |
-| MAC-01 | Phase 2 | Pending |
-| NAV-01 | Phase 2 | Pending |
+| VIS-01 | Phase 2 | Complete |
+| VIS-02 | Phase 2 | Complete |
+| VIS-03 | Phase 2 | Complete |
+| SUM-01 | Phase 2 | Complete |
+| SUM-02 | Phase 2 | Complete |
+| SUM-03 | Phase 2 | Complete |
+| MAC-01 | Phase 2 | Complete |
+| NAV-01 | Phase 2 | Complete |
 | NAV-02 | Phase 3 | Pending |
 
 **Coverage:**

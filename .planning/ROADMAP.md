@@ -13,7 +13,7 @@ Adding a weekly statistics page to an existing React/Firebase nutrition tracker.
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Data Foundation** - Types, utilities, Firestore range query, goal resolution, and the useWeeklyStats hook (completed 2026-03-12)
-- [ ] **Phase 2: Design** - Visual design der Statistik-Seite in wfp_v3.pen anhand Requirements und bestehendem Styleguide
+- [x] **Phase 2: Design** - Visual design der Statistik-Seite in wfp_v3.pen anhand Requirements und bestehendem Styleguide (completed 2026-03-13)
 - [ ] **Phase 3: Statistics UI** - Bar chart, summary cards, macro averages, and week navigation components — nach Design
 - [ ] **Phase 4: Integration** - Page assembly, lazy-loaded route, and nav wiring
 
@@ -43,7 +43,7 @@ Plans:
   2. Design enthält: Wochennavigation, Summary-Cards (Kalorien, Defizit, Sport), Balkendiagramm mit Ziel-Linie, Makro-%-Anzeige
   3. Nicht geloggte Tage sind visuell als ausgegraut erkennbar
   4. Design nutzt den bestehenden Styleguide aus wfp_v3.pen (Farben, Typografie, Spacing)
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 Plans:
 - [ ] 02-01-PLAN.md — Design specification and Penpot screen creation
 
@@ -79,6 +79,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Data Foundation | 2/2 | Complete   | 2026-03-12 |
-| 2. Design | 0/1 | In progress | - |
+| 2. Design | 1/1 | Complete   | 2026-03-13 |
 | 3. Statistics UI | 0/? | Not started | - |
 | 4. Integration | 0/? | Not started | - |

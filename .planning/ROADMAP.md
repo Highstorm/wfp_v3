@@ -72,7 +72,9 @@ Plans:
   2. The existing /dashboard route and its nav entry in both Sidebar and MobileTabBar are replaced by the statistics entry — no duplicate nav items
   3. The Recharts library does not appear in the main bundle (vite build output shows it only in the statistics route chunk)
   4. Navigating away from the statistics page and back to the meal planner works without errors or stale state
-**Plans**: TBD
+**Plans:** 1 plan
+Plans:
+- [ ] 04-01-PLAN.md — Wire /statistics route, update Sidebar + MobileTabBar nav entries, remove Dashboard
 
 ## Progress
 
@@ -84,4 +86,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | 1. Data Foundation | 2/2 | Complete   | 2026-03-12 |
 | 2. Design | 1/1 | Complete   | 2026-03-13 |
 | 3. Statistics UI | 1/2 | In Progress|  |
-| 4. Integration | 0/? | Not started | - |
+| 4. Integration | 0/1 | Not started | - |

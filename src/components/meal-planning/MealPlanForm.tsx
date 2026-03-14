@@ -96,7 +96,7 @@ export const MealPlanForm = () => {
       <NutritionSummary
         currentNutrition={calculateTotalNutrition()}
         nutritionGoals={combinedNutritionGoals}
-        burnedCalories={calculateTotalBurnedCalories(mealPlan.sports || [])}
+        burnedCalories={calculateTotalBurnedCalories(mealPlan.sports || [], combinedNutritionGoals.baseCalories)}
       />
 
       {/* Meals */}

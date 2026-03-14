@@ -73,7 +73,40 @@ export function calculateTotalMealPlanNutrition(mealPlan: MealPlan): NutritionVa
   };
 }
 
-/** Sum burned calories from sport activities. */
-export function calculateTotalBurnedCalories(activities: SportActivity[]): number {
-  return activities.reduce((total, activity) => total + activity.calories, 0);
+export interface CalorieCorrection {
+  calories: number;
+  originalCalories: number;
+  restingDeduction: number;
+  wasCorrected: boolean;
+}
+
+/** Correct Garmin activity calories by subtracting resting metabolic component. */
+export function correctActivityCalories(
+  activity: SportActivity,
+  baseCalories: number | null
+): CalorieCorrection {
+  const original = activity.calories;
+  const source = activity.source?.toLowerCase() ?? "";
+  const movingTime = activity.movingTime ?? 0;
+
+  if (!source.includes("garmin") || !baseCalories || baseCalories <= 0 || movingTime <= 0) {
+    return { calories: original, originalCalories: original, restingDeduction: 0, wasCorrected: false };
+  }
+
+  const restPerHour = baseCalories / 24;
+  const restingDeduction = Math.round(restPerHour * (movingTime / 3600));
+  const corrected = Math.max(0, Math.round(original - restingDeduction));
+
+  return { calories: corrected, originalCalories: original, restingDeduction, wasCorrected: true };
+}
+
+/** Sum burned calories from sport activities, applying Garmin correction when baseCalories is available. */
+export function calculateTotalBurnedCalories(
+  activities: SportActivity[],
+  baseCalories: number | null = null
+): number {
+  return activities.reduce((total, activity) => {
+    const { calories } = correctActivityCalories(activity, baseCalories);
+    return total + calories;
+  }, 0);
 }

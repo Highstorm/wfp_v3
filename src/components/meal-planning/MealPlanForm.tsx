@@ -96,7 +96,7 @@ export const MealPlanForm = () => {
       <NutritionSummary
         currentNutrition={calculateTotalNutrition()}
         nutritionGoals={combinedNutritionGoals}
-        burnedCalories={calculateTotalBurnedCalories(mealPlan.sports || [])}
+        burnedCalories={calculateTotalBurnedCalories(mealPlan.sports || [], combinedNutritionGoals.baseCalories)}
       />
 
       {/* Meals */}
@@ -170,6 +170,7 @@ export const MealPlanForm = () => {
           <div className="relative z-30">
             <SportSection
               activities={mealPlan.sports || []}
+              baseCalories={combinedNutritionGoals.baseCalories}
               onAddActivity={handleAddSportActivity}
               onRemoveActivity={handleRemoveSportActivity}
               onLoadIntervalsActivities={handleLoadIntervalsActivities}

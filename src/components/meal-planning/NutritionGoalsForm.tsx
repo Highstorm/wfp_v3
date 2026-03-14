@@ -169,6 +169,16 @@ export const NutritionGoalsForm = () => {
             min="0"
             placeholder="1800"
           />
+          {goals.baseCalories !== null && goals.baseCalories > 0 && (
+            <div className="mt-2 pt-2 border-t border-zinc-200 dark:border-zinc-700">
+              <span className="text-xs text-muted-foreground">
+                Ruheverbrauch pro Stunde:{" "}
+                <span className="font-medium tabular-nums">
+                  {Math.round(goals.baseCalories / 24)} kcal/h
+                </span>
+              </span>
+            </div>
+          )}
         </div>
 
         <button

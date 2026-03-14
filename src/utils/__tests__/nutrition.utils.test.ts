@@ -4,6 +4,7 @@ import {
   calculateIngredientNutrition,
   calculateTemporaryMealNutrition,
   calculateTotalBurnedCalories,
+  correctActivityCalories,
 } from "../nutrition.utils";
 import type { DishIngredient, TemporaryMeal, SportActivity } from "../../types";
 
@@ -210,5 +211,123 @@ describe("calculateTotalBurnedCalories", () => {
       { calories: 200 },
     ];
     expect(calculateTotalBurnedCalories(activities)).toBe(650);
+  });
+
+  it("applies Garmin correction when baseCalories is provided", () => {
+    const activities: SportActivity[] = [
+      { calories: 450, description: "Garmin Run", source: "GARMIN", movingTime: 3600 },
+      { calories: 300, description: "Zwift Ride", source: "ZWIFT", movingTime: 3600 },
+    ];
+    // Garmin: 450 - 75 = 375, Zwift: 300 (no correction)
+    expect(calculateTotalBurnedCalories(activities, 1800)).toBe(675);
+  });
+});
+
+describe("correctActivityCalories", () => {
+  it("corrects Garmin activity: subtracts resting calories for duration", () => {
+    const result = correctActivityCalories(
+      { calories: 450, source: "GARMIN", movingTime: 3600 },
+      1800
+    );
+    // restPerHour = 1800/24 = 75, deduction = 75 * 1 = 75
+    expect(result).toEqual({
+      calories: 375,
+      originalCalories: 450,
+      restingDeduction: 75,
+      wasCorrected: true,
+    });
+  });
+
+  it("handles case-insensitive garmin source", () => {
+    const result = correctActivityCalories(
+      { calories: 300, source: "garmin", movingTime: 1800 },
+      2400
+    );
+    // restPerHour = 2400/24 = 100, deduction = 100 * 0.5 = 50
+    expect(result).toEqual({
+      calories: 250,
+      originalCalories: 300,
+      restingDeduction: 50,
+      wasCorrected: true,
+    });
+  });
+
+  it("handles source containing garmin (e.g. GARMIN_CONNECT)", () => {
+    const result = correctActivityCalories(
+      { calories: 200, source: "GARMIN_CONNECT", movingTime: 3600 },
+      1800
+    );
+    expect(result.wasCorrected).toBe(true);
+    expect(result.calories).toBe(125);
+  });
+
+  it("does not correct non-Garmin activities", () => {
+    const result = correctActivityCalories(
+      { calories: 300, source: "ZWIFT", movingTime: 3600 },
+      1800
+    );
+    expect(result).toEqual({
+      calories: 300,
+      originalCalories: 300,
+      restingDeduction: 0,
+      wasCorrected: false,
+    });
+  });
+
+  it("does not correct when baseCalories is null", () => {
+    const result = correctActivityCalories(
+      { calories: 300, source: "GARMIN", movingTime: 3600 },
+      null
+    );
+    expect(result.wasCorrected).toBe(false);
+    expect(result.calories).toBe(300);
+  });
+
+  it("does not correct when baseCalories is 0", () => {
+    const result = correctActivityCalories(
+      { calories: 300, source: "GARMIN", movingTime: 3600 },
+      0
+    );
+    expect(result.wasCorrected).toBe(false);
+    expect(result.calories).toBe(300);
+  });
+
+  it("does not correct when movingTime is missing", () => {
+    const result = correctActivityCalories(
+      { calories: 300, source: "GARMIN" },
+      1800
+    );
+    expect(result.wasCorrected).toBe(false);
+    expect(result.calories).toBe(300);
+  });
+
+  it("does not correct when source is missing", () => {
+    const result = correctActivityCalories(
+      { calories: 300, movingTime: 3600 },
+      1800
+    );
+    expect(result.wasCorrected).toBe(false);
+    expect(result.calories).toBe(300);
+  });
+
+  it("clamps corrected calories to 0 minimum", () => {
+    const result = correctActivityCalories(
+      { calories: 10, source: "GARMIN", movingTime: 7200 },
+      2400
+    );
+    // restPerHour = 100, deduction = 200, but clamped to 0
+    expect(result.calories).toBe(0);
+    expect(result.restingDeduction).toBe(200);
+    expect(result.wasCorrected).toBe(true);
+  });
+
+  it("rounds corrected calories to nearest integer", () => {
+    const result = correctActivityCalories(
+      { calories: 300, source: "GARMIN", movingTime: 2700 },
+      1800
+    );
+    // restPerHour = 75, deduction = 75 * 0.75 = 56.25 → rounds
+    expect(result.calories).toBe(244);
+    expect(result.restingDeduction).toBe(56);
   });
 });

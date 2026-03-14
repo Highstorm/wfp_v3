@@ -16,6 +16,7 @@ export function resolveGoals(
   profileGoals: NutritionGoals
 ): ResolvedGoals {
   return {
+    baseCalories: profileGoals.baseCalories ?? null,
     targetCalories:
       weeklyGoals?.targetCalories ?? profileGoals.targetCalories ?? null,
     protein: weeklyGoals?.protein ?? profileGoals.protein ?? null,
@@ -61,7 +62,7 @@ function buildDayStats(
   }
 
   const sports = plan.sports ?? [];
-  const sportCalories = calculateTotalBurnedCalories(sports);
+  const sportCalories = calculateTotalBurnedCalories(sports, goals.baseCalories);
   const sportSessions = sports.length;
   const hasData = isLoggedDay(plan);
 

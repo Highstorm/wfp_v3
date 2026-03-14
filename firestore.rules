@@ -43,13 +43,18 @@ service cloud.firestore {
     match /sharedDishes/{sharedDishId} {
       // Jeder authentifizierte Benutzer kann ein geteiltes Gericht erstellen
       allow create: if isAuthenticated();
-      
+
       // Der Ersteller kann sein geteiltes Gericht lesen, aktualisieren oder löschen
       allow read, update, delete: if isAuthenticated() && resource.data.sharedBy == request.auth.uid;
-      
+
       // Jeder authentifizierte Benutzer kann ein geteiltes Gericht lesen, wenn er den Code kennt
       // Dies wird normalerweise über die shareCode-Abfrage geschehen
       allow read: if isAuthenticated();
+    }
+
+    // Garmin OAuth Tokens - nur Admin SDK (Cloud Functions)
+    match /garminTokens/{uid} {
+      allow read, write: if false;
     }
   }
 } 

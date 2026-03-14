@@ -4,6 +4,8 @@ export interface SportActivity {
   calories: number;
   description?: string;
   intervalsId?: string;
+  movingTime?: number;   // duration in seconds from Intervals API
+  source?: string;       // e.g. "GARMIN", "ZWIFT" from Intervals API
 }
 
 export interface TemporaryMeal {

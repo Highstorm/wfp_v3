@@ -1,6 +1,7 @@
 import { parseISO, endOfISOWeek, eachDayOfInterval, format } from "date-fns";
 import type { MealPlan, WeeklyNutritionGoals, NutritionGoals } from "../types";
 import type { DayStats, ResolvedGoals, WeeklyStats } from "../types";
+import type { GarminDailySummary } from "../types/profile.types";
 import {
   calculateTotalMealPlanNutrition,
   calculateTotalBurnedCalories,
@@ -45,7 +46,9 @@ function isLoggedDay(plan: MealPlan): boolean {
 function buildDayStats(
   date: string,
   plan: MealPlan | null,
-  goals: ResolvedGoals
+  goals: ResolvedGoals,
+  useGarminTargetCalories: boolean = false,
+  garminSummary: GarminDailySummary | null = null,
 ): DayStats {
   if (plan === null) {
     return {
@@ -81,10 +84,13 @@ function buildDayStats(
   }
 
   const nutrition = calculateTotalMealPlanNutrition(plan);
-  const deficit =
-    goals.targetCalories !== null
-      ? goals.targetCalories + sportCalories - nutrition.calories
-      : null;
+  let deficit: number | null = null;
+  if (useGarminTargetCalories && garminSummary) {
+    // Garmin TDEE already includes sport — don't add sportCalories
+    deficit = garminSummary.totalCalories - nutrition.calories;
+  } else if (goals.targetCalories !== null) {
+    deficit = goals.targetCalories + sportCalories - nutrition.calories;
+  }
 
   return {
     date,
@@ -108,7 +114,9 @@ function buildDayStats(
 export function aggregateWeeklyStats(
   weekStartDate: string,
   mealPlans: MealPlan[],
-  goals: ResolvedGoals
+  goals: ResolvedGoals,
+  useGarminTargetCalories: boolean = false,
+  garminDailySummaries: Record<string, GarminDailySummary> | null = null,
 ): WeeklyStats {
   const weekStart = parseISO(weekStartDate);
   const weekEnd = endOfISOWeek(weekStart);
@@ -121,7 +129,8 @@ export function aggregateWeeklyStats(
   const days: DayStats[] = weekDays.map((day) => {
     const dateStr = format(day, "yyyy-MM-dd");
     const plan = planByDate.get(dateStr) ?? null;
-    return buildDayStats(dateStr, plan, goals);
+    const garminSummary = garminDailySummaries?.[dateStr] ?? null;
+    return buildDayStats(dateStr, plan, goals, useGarminTargetCalories, garminSummary);
   });
 
   const loggedDays = days.filter((d) => d.hasData);
@@ -137,7 +146,9 @@ export function aggregateWeeklyStats(
     0
   );
 
-  const hasCalorieGoal = goals.targetCalories !== null;
+  const hasGarminData = useGarminTargetCalories && garminDailySummaries !== null
+    && Object.keys(garminDailySummaries).length > 0;
+  const hasCalorieGoal = goals.targetCalories !== null || hasGarminData;
   const totalDeficit = hasCalorieGoal
     ? loggedDays.reduce((sum, d) => sum + (d.deficit ?? 0), 0)
     : null;

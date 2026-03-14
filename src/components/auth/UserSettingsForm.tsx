@@ -12,6 +12,9 @@ import { FirebaseError } from "firebase/app";
 import { hasEarlyAccess } from "../../config/earlyAccessFeatures";
 import { useProfile } from "../../hooks/useProfile";
 import { logger } from "../../utils/logger";
+import { connectGarmin, disconnectGarmin, fetchGarminDailySummary } from "../../services/garmin.service";
+import { useQueryClient } from "@tanstack/react-query";
+import { format } from "date-fns";
 
 interface UserSettings {
   displayName: string;
@@ -25,10 +28,14 @@ interface UserSettings {
   dailyNoteEnabled: boolean;
   sportEnabled: boolean;
   porridgeCalculatorEnabled: boolean;
+  garminEmail: string;
+  garminPassword: string;
+  garminMfaCode: string;
 }
 
 export const UserSettingsForm = () => {
   const { data: profile } = useProfile();
+  const queryClient = useQueryClient();
   const [userSettings, setUserSettings] = useState<UserSettings>({
     displayName: "",
     email: "",
@@ -41,9 +48,17 @@ export const UserSettingsForm = () => {
     dailyNoteEnabled: true,
     sportEnabled: true,
     porridgeCalculatorEnabled: true,
+    garminEmail: "",
+    garminPassword: "",
+    garminMfaCode: "",
   });
   const [isUpdatingUser, setIsUpdatingUser] = useState(false);
   const [userMessage, setUserMessage] = useState("");
+  const [isConnectingGarmin, setIsConnectingGarmin] = useState(false);
+  const [garminMessage, setGarminMessage] = useState("");
+  const [showMfaField, setShowMfaField] = useState(false);
+  const [isSyncingGarmin, setIsSyncingGarmin] = useState(false);
+  const [isDisconnectingGarmin, setIsDisconnectingGarmin] = useState(false);
 
   const hasPorridgeAccess = hasEarlyAccess(
     "porridgeCalculator",
@@ -159,6 +174,83 @@ export const UserSettingsForm = () => {
         [field]: e.target.value,
       }));
     };
+
+  const handleGarminConnect = async () => {
+    setIsConnectingGarmin(true);
+    setGarminMessage("");
+    try {
+      const result = await connectGarmin(
+        userSettings.garminEmail,
+        userSettings.garminPassword,
+        showMfaField ? userSettings.garminMfaCode : undefined
+      );
+      if (result.error === "MFA_REQUIRED") {
+        setShowMfaField(true);
+        setGarminMessage("MFA-Code eingeben (aus Authenticator-App).");
+      } else if (result.error === "INVALID_CREDENTIALS") {
+        setGarminMessage("Ungültige Garmin-Zugangsdaten.");
+        setShowMfaField(false);
+      } else if (result.success) {
+        setGarminMessage("Erfolgreich verbunden!");
+        setShowMfaField(false);
+        setUserSettings((prev) => ({ ...prev, garminEmail: "", garminPassword: "", garminMfaCode: "" }));
+        queryClient.invalidateQueries({ queryKey: ["profile"] });
+      }
+    } catch {
+      setGarminMessage("Verbindung fehlgeschlagen.");
+    } finally {
+      setIsConnectingGarmin(false);
+    }
+  };
+
+  const handleGarminDisconnect = async () => {
+    setIsDisconnectingGarmin(true);
+    setGarminMessage("");
+    try {
+      await disconnectGarmin();
+      setGarminMessage("Garmin getrennt.");
+      queryClient.invalidateQueries({ queryKey: ["profile"] });
+    } catch {
+      setGarminMessage("Fehler beim Trennen.");
+    } finally {
+      setIsDisconnectingGarmin(false);
+    }
+  };
+
+  const handleGarminSync = async () => {
+    setIsSyncingGarmin(true);
+    setGarminMessage("");
+    try {
+      const today = format(new Date(), "yyyy-MM-dd");
+      const result = await fetchGarminDailySummary(today);
+      if (result.error) {
+        const messages: Record<string, string> = {
+          NOT_CONNECTED: "Nicht verbunden.",
+          TOKEN_EXPIRED: "Sitzung abgelaufen. Bitte neu verbinden.",
+          GARMIN_UNAVAILABLE: "Garmin nicht erreichbar.",
+          IMPLAUSIBLE_VALUE: "Wert noch nicht plausibel (< 500 kcal).",
+        };
+        setGarminMessage(messages[result.error] ?? "Fehler beim Sync.");
+      } else {
+        setGarminMessage(`Sync OK: ${result.totalCalories} kcal TDEE`);
+        queryClient.invalidateQueries({ queryKey: ["profile"] });
+      }
+    } catch {
+      setGarminMessage("Sync fehlgeschlagen.");
+    } finally {
+      setIsSyncingGarmin(false);
+    }
+  };
+
+  const handleGarminToggle = async (checked: boolean) => {
+    if (!auth.currentUser?.email) return;
+    await setDoc(
+      doc(db, "profiles", auth.currentUser.email),
+      { useGarminTargetCalories: checked },
+      { merge: true }
+    );
+    queryClient.invalidateQueries({ queryKey: ["profile"] });
+  };
 
   const toggleFeatures: {
     key: keyof UserSettings;
@@ -284,6 +376,125 @@ export const UserSettingsForm = () => {
               />
             </div>
           </div>
+        </div>
+
+        {/* Garmin Connect */}
+        <div className="space-y-3">
+          <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+            Garmin Connect
+          </h3>
+
+          {profile?.garminConnected ? (
+            <div className="space-y-3">
+              <div className="bg-green-50 dark:bg-green-900/20 rounded-xl px-4 py-3">
+                <span className="text-sm font-medium text-green-700 dark:text-green-400">
+                  Verbunden
+                  {!!profile?.garminConnectedAt && (
+                    <span className="font-normal text-xs ml-1">
+                      seit {(profile.garminConnectedAt as { toDate: () => Date }).toDate().toLocaleDateString("de-DE")}
+                    </span>
+                  )}
+                </span>
+              </div>
+
+              {/* Toggle: Use Garmin TDEE */}
+              <label className="flex items-center justify-between bg-zinc-100 dark:bg-zinc-800/50 rounded-xl px-4 py-3 cursor-pointer hover:bg-zinc-200/70 dark:hover:bg-zinc-800/70 transition-colors">
+                <span className="text-sm font-medium">Garmin-TDEE als Tagesziel</span>
+                <div className="relative">
+                  <input
+                    type="checkbox"
+                    checked={profile?.useGarminTargetCalories ?? false}
+                    onChange={(e) => handleGarminToggle(e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-10 h-6 bg-zinc-300 dark:bg-zinc-600 rounded-full peer-checked:bg-primary transition-colors" />
+                  <div className="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-transform peer-checked:translate-x-4" />
+                </div>
+              </label>
+
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={handleGarminSync}
+                  disabled={isSyncingGarmin}
+                  className="btn-primary flex-1 text-sm"
+                >
+                  {isSyncingGarmin ? "Sync..." : "Sync"}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleGarminDisconnect}
+                  disabled={isDisconnectingGarmin}
+                  className="btn-secondary flex-1 text-sm"
+                >
+                  {isDisconnectingGarmin ? "Trennen..." : "Trennen"}
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              <div>
+                <label htmlFor="garminEmail" className="block text-xs text-muted-foreground mb-1">
+                  Garmin E-Mail
+                </label>
+                <input
+                  id="garminEmail"
+                  type="email"
+                  value={userSettings.garminEmail}
+                  onChange={handleChange("garminEmail")}
+                  className="input text-sm"
+                />
+              </div>
+              <div>
+                <label htmlFor="garminPassword" className="block text-xs text-muted-foreground mb-1">
+                  Garmin Passwort
+                </label>
+                <input
+                  id="garminPassword"
+                  type="password"
+                  value={userSettings.garminPassword}
+                  onChange={handleChange("garminPassword")}
+                  className="input text-sm"
+                  placeholder="••••••"
+                />
+              </div>
+              {showMfaField && (
+                <div>
+                  <label htmlFor="garminMfaCode" className="block text-xs text-muted-foreground mb-1">
+                    MFA-Code
+                  </label>
+                  <input
+                    id="garminMfaCode"
+                    type="text"
+                    inputMode="numeric"
+                    value={userSettings.garminMfaCode}
+                    onChange={handleChange("garminMfaCode")}
+                    className="input text-sm"
+                    placeholder="123456"
+                    autoComplete="one-time-code"
+                  />
+                </div>
+              )}
+              <button
+                type="button"
+                onClick={handleGarminConnect}
+                disabled={isConnectingGarmin || !userSettings.garminEmail || !userSettings.garminPassword || (showMfaField && !userSettings.garminMfaCode)}
+                className="btn-primary w-full text-sm"
+              >
+                {isConnectingGarmin ? "Verbinde..." : showMfaField ? "Mit MFA-Code verbinden" : "Mit Garmin verbinden"}
+              </button>
+            </div>
+          )}
+
+          {garminMessage && (
+            <p className={`text-sm text-center ${
+              garminMessage.includes("Fehler") || garminMessage.includes("Ungültig") || garminMessage.includes("abgelaufen") || garminMessage.includes("nicht") || garminMessage.includes("fehlgeschlagen")
+                ? "text-destructive"
+                : "text-green-600"
+            }`}>
+              {garminMessage}
+            </p>
+          )}
         </div>
 
         <button

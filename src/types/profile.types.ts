@@ -20,4 +20,15 @@ export interface UserProfile {
   dishIngredientBuilderEnabled?: boolean;
   "intervals.icu-API-KEY"?: string;
   "intervals.icu-AthleteID"?: string;
+  garminConnected?: boolean;
+  garminConnectedAt?: unknown; // Firestore Timestamp
+  useGarminTargetCalories?: boolean;
+  garminDailySummaries?: Record<string, GarminDailySummary> | null;
+}
+
+export interface GarminDailySummary {
+  totalCalories: number;
+  activeCalories: number;
+  bmrCalories: number;
+  syncedAt: unknown; // Firestore Timestamp from server, unknown to avoid coupling
 }

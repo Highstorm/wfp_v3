@@ -1,3 +1,5 @@
+import { calculateEffectiveTarget } from "../../utils/nutrition.utils";
+
 interface NutritionSummaryProps {
   currentNutrition: {
     calories: number;
@@ -13,23 +15,48 @@ interface NutritionSummaryProps {
     fat: number | null;
   };
   burnedCalories: number;
+  useGarminTargetCalories?: boolean;
+  garminTotalCalories?: number | null;
+  date: string; // YYYY-MM-DD
 }
 
 export const NutritionSummary = ({
   currentNutrition,
   nutritionGoals,
   burnedCalories,
+  useGarminTargetCalories = false,
+  garminTotalCalories = null,
+  date,
 }: NutritionSummaryProps) => {
-  const effectiveTargetCalories = nutritionGoals.targetCalories
-    ? nutritionGoals.targetCalories + burnedCalories
-    : nutritionGoals.baseCalories
-    ? nutritionGoals.baseCalories + burnedCalories
-    : null;
+  const { effectiveTarget: effectiveTargetCalories, isGarminBased } =
+    calculateEffectiveTarget({
+      targetCalories: nutritionGoals.targetCalories,
+      baseCalories: nutritionGoals.baseCalories,
+      burnedCalories,
+      useGarminTargetCalories,
+      garminTotalCalories,
+    });
 
   const deficit =
     effectiveTargetCalories !== null
       ? effectiveTargetCalories - currentNutrition.calories
       : null;
+
+  // Projected end-of-day calories: remaining hours × resting cal/hour
+  const today = new Date().toISOString().slice(0, 10);
+  const isToday = date === today;
+  const baseCalories = nutritionGoals.baseCalories;
+  const projectedRemaining = (() => {
+    if (!isToday || !isGarminBased || effectiveTargetCalories === null || !baseCalories) {
+      return null;
+    }
+    const now = new Date();
+    const remainingHours = (24 - now.getHours()) - now.getMinutes() / 60;
+    if (remainingHours <= 0) return null;
+    const restPerHour = baseCalories / 24;
+    const projectedEndOfDay = effectiveTargetCalories + Math.round(restPerHour * remainingHours);
+    return projectedEndOfDay - currentNutrition.calories;
+  })();
 
   return (
     <div className="text-center py-4">
@@ -41,7 +68,10 @@ export const NutritionSummary = ({
         {effectiveTargetCalories
           ? `von ${effectiveTargetCalories.toFixed(0)} kcal`
           : "kcal"}
-        {burnedCalories > 0 && (
+        {isGarminBased && (
+          <span className="ml-1 text-green-600 dark:text-green-400">(Garmin)</span>
+        )}
+        {!isGarminBased && burnedCalories > 0 && (
           <span className="ml-1">
             (+{burnedCalories.toFixed(0)} Sport)
           </span>
@@ -54,6 +84,15 @@ export const NutritionSummary = ({
           {deficit >= 0
             ? `Noch ${deficit.toFixed(0)} kcal übrig`
             : `${Math.abs(deficit).toFixed(0)} kcal drüber`}
+        </div>
+      )}
+
+      {/* Projected end-of-day deficit (Garmin, today only) */}
+      {projectedRemaining !== null && (
+        <div className="text-xs text-muted-foreground mt-0.5">
+          {projectedRemaining >= 0
+            ? `~${projectedRemaining.toFixed(0)} kcal bis Tagesende`
+            : `~${Math.abs(projectedRemaining).toFixed(0)} kcal drüber bis Tagesende`}
         </div>
       )}
 

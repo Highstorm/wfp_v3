@@ -239,6 +239,7 @@ export function useMealPlanFormState() {
     // Data
     dishes,
     combinedNutritionGoals,
+    profile,
 
     // Loading / mutation states
     isDishesLoading,

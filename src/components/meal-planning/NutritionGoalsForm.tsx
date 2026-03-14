@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db, auth } from "../../lib/firebase";
 import { logger } from "../../utils/logger";
+import { useProfile } from "../../hooks/useProfile";
 
 interface NutritionGoals {
   baseCalories: number | null;
@@ -25,6 +26,8 @@ export const NutritionGoalsForm = () => {
   });
   const [isSaving, setIsSaving] = useState(false);
   const [message, setMessage] = useState("");
+  const { data: profile } = useProfile();
+  const isGarminTargetActive = profile?.useGarminTargetCalories === true;
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -66,7 +69,7 @@ export const NutritionGoalsForm = () => {
       if (goals.carbs !== null) firestoreGoals.carbs = goals.carbs;
       if (goals.fat !== null) firestoreGoals.fat = goals.fat;
 
-      await setDoc(doc(db, "profiles", auth.currentUser.email), firestoreGoals);
+      await setDoc(doc(db, "profiles", auth.currentUser.email), firestoreGoals, { merge: true });
       setMessage("Profil erfolgreich gespeichert!");
     } catch (error) {
       setMessage("Fehler beim Speichern des Profils.");
@@ -97,16 +100,29 @@ export const NutritionGoalsForm = () => {
             <label htmlFor="targetCalories" className="block text-xs text-muted-foreground mb-1">
               Zielkalorien
             </label>
-            <input
-              id="targetCalories"
-              type="number"
-              value={goals.targetCalories ?? ""}
-              onChange={handleChange("targetCalories")}
-              className="w-full bg-transparent font-display font-bold text-lg outline-none placeholder:text-muted-foreground/50"
-              min="0"
-              placeholder="2000"
-            />
-            <span className="text-xs text-muted-foreground">kcal</span>
+            {isGarminTargetActive ? (
+              <div>
+                <div className="font-display font-bold text-lg text-muted-foreground">
+                  Garmin TDEE
+                </div>
+                <span className="text-xs text-green-600 dark:text-green-400">
+                  Wird von Garmin gesteuert
+                </span>
+              </div>
+            ) : (
+              <>
+                <input
+                  id="targetCalories"
+                  type="number"
+                  value={goals.targetCalories ?? ""}
+                  onChange={handleChange("targetCalories")}
+                  className="w-full bg-transparent font-display font-bold text-lg outline-none placeholder:text-muted-foreground/50"
+                  min="0"
+                  placeholder="2000"
+                />
+                <span className="text-xs text-muted-foreground">kcal</span>
+              </>
+            )}
           </div>
           <div className="bg-zinc-100 dark:bg-zinc-800/50 rounded-xl p-3">
             <label htmlFor="protein" className="block text-xs text-muted-foreground mb-1">

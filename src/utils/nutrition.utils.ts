@@ -110,3 +110,42 @@ export function calculateTotalBurnedCalories(
     return total + calories;
   }, 0);
 }
+
+export interface EffectiveTargetInput {
+  targetCalories: number | null;
+  baseCalories: number | null;
+  burnedCalories: number;
+  useGarminTargetCalories: boolean;
+  garminTotalCalories: number | null;
+}
+
+export interface EffectiveTargetResult {
+  effectiveTarget: number | null;
+  isGarminBased: boolean;
+}
+
+/** Calculate effective daily calorie target, considering Garmin TDEE. */
+export function calculateEffectiveTarget(
+  input: EffectiveTargetInput
+): EffectiveTargetResult {
+  const {
+    targetCalories,
+    baseCalories,
+    burnedCalories,
+    useGarminTargetCalories,
+    garminTotalCalories,
+  } = input;
+
+  // Use Garmin TDEE if toggle is on AND data is available
+  if (useGarminTargetCalories && garminTotalCalories !== null) {
+    return { effectiveTarget: garminTotalCalories, isGarminBased: true };
+  }
+
+  // Fallback: static target + sport calories (existing behavior)
+  const base = targetCalories ?? baseCalories;
+  if (base !== null) {
+    return { effectiveTarget: base + burnedCalories, isGarminBased: false };
+  }
+
+  return { effectiveTarget: null, isGarminBased: false };
+}

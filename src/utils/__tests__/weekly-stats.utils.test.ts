@@ -4,6 +4,7 @@ import type { Dish, MealPlan } from "../../types";
 import type { WeeklyNutritionGoals } from "../../types";
 import type { NutritionGoals } from "../../types";
 import type { ResolvedGoals } from "../../types";
+import type { GarminDailySummary } from "../../types/profile.types";
 
 // ---------------------------------------------------------------------------
 // Fixtures
@@ -384,5 +385,89 @@ describe("aggregateWeeklyStats", () => {
     expect(result.days[0].protein).toBe(50);
     expect(result.days[0].carbs).toBe(15);
     expect(result.days[0].fat).toBe(10);
+  });
+});
+
+describe("aggregateWeeklyStats with Garmin TDEE", () => {
+  const baseGoals: ResolvedGoals = {
+    baseCalories: 1800,
+    targetCalories: 2000,
+    protein: 150,
+    carbs: 250,
+    fat: 70,
+  };
+
+  it("uses Garmin TDEE instead of targetCalories + sport when Garmin data is available", () => {
+    const garminSummaries: Record<string, GarminDailySummary> = {
+      "2026-03-09": {
+        totalCalories: 2800,
+        activeCalories: 1000,
+        bmrCalories: 1800,
+        syncedAt: new Date() as unknown,
+      },
+    };
+
+    const mealPlans: MealPlan[] = [
+      {
+        id: "1",
+        date: "2026-03-09",
+        breakfast: [{ id: "d1", name: "Oats", calories: 400, createdBy: "u1" }],
+        lunch: [],
+        dinner: [],
+        snacks: [],
+        sports: [{ calories: 500, source: "GARMIN", movingTime: 3600 }],
+        temporaryMeals: [],
+        createdBy: "u1",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        dailyNote: "",
+      },
+    ];
+
+    const result = aggregateWeeklyStats(
+      "2026-03-09",
+      mealPlans,
+      baseGoals,
+      true,
+      garminSummaries
+    );
+
+    const monday = result.days[0];
+    expect(monday.hasData).toBe(true);
+    expect(monday.eatenCalories).toBe(400);
+    // Garmin TDEE (2800) - NOT targetCalories (2000) + sport
+    expect(monday.deficit).toBe(2800 - 400);
+  });
+
+  it("falls back to targetCalories + sport when no Garmin data for that day", () => {
+    const mealPlans: MealPlan[] = [
+      {
+        id: "1",
+        date: "2026-03-09",
+        breakfast: [{ id: "d1", name: "Oats", calories: 400, createdBy: "u1" }],
+        lunch: [],
+        dinner: [],
+        snacks: [],
+        sports: [{ calories: 500, source: "GARMIN", movingTime: 3600 }],
+        temporaryMeals: [],
+        createdBy: "u1",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        dailyNote: "",
+      },
+    ];
+
+    const result = aggregateWeeklyStats(
+      "2026-03-09",
+      mealPlans,
+      baseGoals,
+      true,
+      {} // No Garmin data
+    );
+
+    const monday = result.days[0];
+    // Corrected sport calories: 500 - round(1800/24 * 1) = 500 - 75 = 425
+    const expectedSport = 425;
+    expect(monday.deficit).toBe(2000 + expectedSport - 400);
   });
 });

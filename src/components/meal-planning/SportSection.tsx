@@ -1,12 +1,11 @@
 import { useState } from "react";
-
-interface SportActivity {
-  calories: number;
-  description?: string;
-}
+import type { SportActivity } from "../../types";
+import { correctActivityCalories } from "../../utils/nutrition.utils";
+import GarminDelta from "../../assets/garmin-delta.svg";
 
 interface SportSectionProps {
   activities: SportActivity[];
+  baseCalories: number | null;
   onAddActivity: (activity: SportActivity) => void;
   onRemoveActivity: (index: number) => void;
   onLoadIntervalsActivities: () => void;
@@ -14,6 +13,7 @@ interface SportSectionProps {
 
 export const SportSection = ({
   activities = [],
+  baseCalories,
   onAddActivity,
   onRemoveActivity,
   onLoadIntervalsActivities,
@@ -35,7 +35,10 @@ export const SportSection = ({
     setDescription("");
   };
 
-  const totalBurned = activities.reduce((sum, a) => sum + a.calories, 0);
+  const totalBurned = activities.reduce((sum, a) => {
+    const { calories: corrected } = correctActivityCalories(a, baseCalories);
+    return sum + corrected;
+  }, 0);
 
   return (
     <div>
@@ -61,9 +64,22 @@ export const SportSection = ({
                 <div className="font-medium text-sm truncate">
                   {activity.description || "Aktivität"}
                 </div>
-                <div className="text-xs text-muted-foreground tabular-nums">
-                  -{activity.calories} kcal
-                </div>
+                {(() => {
+                  const correction = correctActivityCalories(activity, baseCalories);
+                  return (
+                    <div className="flex items-center gap-1.5 text-xs tabular-nums">
+                      <span className="text-muted-foreground">
+                        -{correction.calories} kcal
+                      </span>
+                      {correction.wasCorrected && (
+                        <span className="flex items-center gap-1 text-muted-foreground/60">
+                          <img src={GarminDelta} alt="Garmin" className="w-3 h-3 inline-block" />
+                          ({correction.originalCalories} - {correction.restingDeduction})
+                        </span>
+                      )}
+                    </div>
+                  );
+                })()}
               </div>
               <button
                 onClick={() => onRemoveActivity(index)}

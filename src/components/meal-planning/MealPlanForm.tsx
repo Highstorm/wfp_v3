@@ -170,6 +170,7 @@ export const MealPlanForm = () => {
           <div className="relative z-30">
             <SportSection
               activities={mealPlan.sports || []}
+              baseCalories={combinedNutritionGoals.baseCalories}
               onAddActivity={handleAddSportActivity}
               onRemoveActivity={handleRemoveSportActivity}
               onLoadIntervalsActivities={handleLoadIntervalsActivities}

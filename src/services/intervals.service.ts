@@ -18,6 +18,8 @@ export interface IntervalsActivityDetail {
   id: string;
   name: string;
   calories: number;
+  movingTime: number;  // seconds
+  source: string;
 }
 
 interface IntervalsWellnessResponse {
@@ -87,6 +89,8 @@ export class IntervalsService {
         id: String(activity.id),
         name: activity.name || 'Aktivität',
         calories: activity.calories!,
+        movingTime: (activity as Record<string, unknown>).moving_time as number || 0,
+        source: activity.source || '',
       }));
   }
 

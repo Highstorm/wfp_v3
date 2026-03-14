@@ -43,6 +43,8 @@ export function useIntervalsSync(
             description: activity.name,
             calories: activity.calories,
             intervalsId: String(activity.id),
+            movingTime: activity.movingTime,
+            source: activity.source,
           });
           newActivitiesAdded = true;
         }

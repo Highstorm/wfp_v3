@@ -10,6 +10,7 @@ import { WeeklyNutritionGoalsForm } from "./WeeklyNutritionGoalsForm";
 import { useMealPlanFormState } from "../../hooks/useMealPlanFormState";
 import { useMealPlanActions } from "../../hooks/useMealPlanActions";
 import { useIntervalsSync } from "../../hooks/useIntervalsSync";
+import { useGarminSync } from "../../hooks/useGarminSync";
 import { calculateTotalBurnedCalories } from "../../utils/nutrition.utils";
 
 export const MealPlanForm = () => {
@@ -19,6 +20,7 @@ export const MealPlanForm = () => {
     state,
     actions.handleAddSportActivity
   );
+  useGarminSync(state.date);
 
   const {
     date,

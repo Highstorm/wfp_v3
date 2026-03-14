@@ -1,3 +1,4 @@
+import { useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   BarChart,
@@ -63,13 +64,29 @@ function WeeklyChartTooltip({ active, payload }: TooltipProps<number, string>) {
   );
 }
 
+const isTouchDevice = () => window.matchMedia("(pointer: coarse)").matches;
+
 export function WeeklyBarChart({ days, goals, loggedDayCount }: WeeklyBarChartProps) {
   const navigate = useNavigate();
   const chartData = toChartData(days);
+  const selectedBarRef = useRef<string | null>(null);
 
-  function handleBarClick(entry: ChartDataPoint) {
-    navigate(`/day-planning?date=${entry.date}`);
-  }
+  const handleBarClick = useCallback((entry: ChartDataPoint) => {
+    if (entry.isStub) return;
+
+    if (!isTouchDevice()) {
+      navigate(`/day-planning?date=${entry.date}`);
+      return;
+    }
+
+    // Mobile: first tap shows tooltip, second tap navigates
+    if (selectedBarRef.current === entry.date) {
+      selectedBarRef.current = null;
+      navigate(`/day-planning?date=${entry.date}`);
+    } else {
+      selectedBarRef.current = entry.date;
+    }
+  }, [navigate]);
 
   return (
     <div>

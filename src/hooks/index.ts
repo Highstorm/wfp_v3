@@ -32,3 +32,7 @@ export {
 } from "./useSharedDishes";
 
 export { useFeatureAccess } from "./useFeatureAccess";
+
+export { useWeeklyStats } from "./useWeeklyStats";
+
+export { useWeekParam } from "./useWeekParam";

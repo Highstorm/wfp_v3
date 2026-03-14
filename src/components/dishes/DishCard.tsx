@@ -49,6 +49,15 @@ export const DishCard = ({
     });
   };
 
+  const categoryLabel =
+    dish.category === "breakfast"
+      ? "Frühstück"
+      : dish.category === "mainDish"
+      ? "Hauptgericht"
+      : dish.category === "snack"
+      ? "Snack"
+      : null;
+
   return (
     <>
       <ShareDialog
@@ -61,136 +70,98 @@ export const DishCard = ({
         errorMessage={shareErrorMessage || undefined}
       />
       <div
-        className={`card p-3 sm:p-4 transition-all duration-200 hover:shadow-glass ${
+        className={`bg-zinc-100 dark:bg-zinc-800/50 rounded-2xl p-4 transition-all duration-200 hover:bg-zinc-200/70 dark:hover:bg-zinc-800/70 ${
           isExpanded ? "row-span-2" : ""
         }`}
-        style={{ height: isExpanded ? "auto" : "100%", alignSelf: "start" }}
+        style={{ alignSelf: "start" }}
       >
-        <div className="flex justify-between items-start mb-3 sm:mb-4 gap-2">
-          <h3
-            className="text-base sm:text-lg font-medium flex-1 min-w-0 break-words leading-tight"
-            title={dish.name}
-          >
-            {dish.name}
-          </h3>
+        {/* Header: Name + Actions */}
+        <div className="flex justify-between items-start gap-2 mb-3">
+          <div className="flex-1 min-w-0">
+            <h3 className="font-display font-bold text-base leading-tight break-words" title={dish.name}>
+              {dish.name}
+            </h3>
+            {categoryLabel && (
+              <span className="text-xs text-muted-foreground">{categoryLabel}</span>
+            )}
+          </div>
 
-          <div className="flex space-x-1 sm:space-x-2 flex-shrink-0">
+          <div className="flex gap-1 shrink-0">
             <button
               onClick={() => setShowShareDialog(true)}
-              className="rounded-full p-2 sm:p-2.5 text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors touch-manipulation min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 flex items-center justify-center"
-              title="Gericht teilen"
+              className="p-1.5 rounded-full text-muted-foreground hover:text-foreground hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors touch-manipulation"
+              title="Teilen"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                className="w-5 h-5 sm:w-6 sm:h-6"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M15.75 4.5a3 3 0 11.825 2.066l-8.421 4.679a3.002 3.002 0 010 1.51l8.421 4.679a3 3 0 11-.729 1.31l-8.421-4.678a3 3 0 110-4.132l8.421-4.679a3 3 0 01-.096-.755z"
-                  clipRule="evenodd"
-                />
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
+                <path d="M13 4.5a2.5 2.5 0 11.702 1.737L6.97 9.604a2.518 2.518 0 010 .792l6.733 3.367a2.5 2.5 0 11-.671 1.341l-6.733-3.367a2.5 2.5 0 110-3.474l6.733-3.367A2.52 2.52 0 0113 4.5z" />
               </svg>
             </button>
             <button
               onClick={onEdit}
-              className="rounded-full p-2 sm:p-2.5 text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors touch-manipulation min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 flex items-center justify-center"
+              className="p-1.5 rounded-full text-muted-foreground hover:text-foreground hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors touch-manipulation"
               title="Bearbeiten"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                className="w-5 h-5 sm:w-6 sm:h-6"
-              >
-                <path d="M21.731 2.269a2.625 2.625 0 00-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 000-3.712zM19.513 8.199l-3.712-3.712-8.4 8.4a5.25 5.25 0 00-1.32 2.214l-.8 2.685a.75.75 0 00.933.933l2.685-.8a5.25 5.25 0 002.214-1.32l8.4-8.4z" />
-                <path d="M5.25 5.25a3 3 0 00-3 3v10.5a3 3 0 003 3h10.5a3 3 0 003-3V13.5a.75.75 0 00-1.5 0v5.25a1.5 1.5 0 01-1.5 1.5H5.25a1.5 1.5 0 01-1.5-1.5V8.25a1.5 1.5 0 011.5-1.5h5.25a.75.75 0 000-1.5H5.25z" />
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
+                <path d="M2.695 14.763l-1.262 3.154a.5.5 0 00.65.65l3.155-1.262a4 4 0 001.343-.885L17.5 5.5a2.121 2.121 0 00-3-3L3.58 13.42a4 4 0 00-.885 1.343z" />
               </svg>
             </button>
             <button
               onClick={onDelete}
-              className="rounded-full p-2 sm:p-2.5 text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors touch-manipulation min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 flex items-center justify-center"
+              className="p-1.5 rounded-full text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors touch-manipulation"
               title="Löschen"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                className="w-5 h-5 sm:w-6 sm:h-6"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M16.5 4.478v.227a48.816 48.816 0 013.878.512.75.75 0 11-.256 1.478l-.209-.035-1.005 13.07a3 3 0 01-2.991 2.77H8.084a3 3 0 01-2.991-2.77L4.087 6.66l-.209.035a.75.75 0 01-.256-1.478A48.567 48.567 0 017.5 4.705v-.227c0-1.564 1.213-2.9 2.816-2.951a52.662 52.662 0 013.369 0c1.603.051 2.815 1.387 2.815 2.951zm-6.136-1.452a51.196 51.196 0 013.273 0C14.39 3.05 15 3.684 15 4.478v.113a49.488 49.488 0 00-6 0v-.113c0-.794.609-1.428 1.364-1.452zm-.355 5.945a.75.75 0 10-1.5.058l.347 9a.75.75 0 101.499-.058l-.346-9zm5.48.058a.75.75 0 10-1.498-.058l-.347 9a.75.75 0 001.5.058l.345-9z"
-                  clipRule="evenodd"
-                />
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
+                <path fillRule="evenodd" d="M8.75 1A2.75 2.75 0 006 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 10.23 1.482l.149-.022.841 10.518A2.75 2.75 0 007.596 19h4.807a2.75 2.75 0 002.742-2.53l.841-10.52.149.023a.75.75 0 00.23-1.482A41.03 41.03 0 0014 4.193V3.75A2.75 2.75 0 0011.25 1h-2.5zM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4zM8.58 7.72a.75.75 0 00-1.5.06l.3 7.5a.75.75 0 101.5-.06l-.3-7.5zm4.34.06a.75.75 0 10-1.5-.06l-.3 7.5a.75.75 0 101.5.06l.3-7.5z" clipRule="evenodd" />
               </svg>
             </button>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-x-2 gap-y-1.5 sm:gap-y-2 text-sm sm:text-sm mb-3 sm:mb-4">
-          <div className="text-muted-foreground text-sm sm:text-sm">Kalorien:</div>
-          <div className="font-medium text-sm sm:text-sm whitespace-nowrap">{dish.calories || "-"} kcal</div>
-          <div className="text-muted-foreground text-sm sm:text-sm">Protein:</div>
-          <div className="font-medium text-sm sm:text-sm whitespace-nowrap">{dish.protein || "-"} g</div>
-          <div className="text-muted-foreground text-sm sm:text-sm">Kohlenhydrate:</div>
-          <div className="font-medium text-sm sm:text-sm whitespace-nowrap">{dish.carbs || "-"} g</div>
-          <div className="text-muted-foreground text-sm sm:text-sm">Fett:</div>
-          <div className="font-medium text-sm sm:text-sm whitespace-nowrap">{dish.fat || "-"} g</div>
-          <div className="text-muted-foreground text-sm sm:text-sm">Kategorie:</div>
-          <div className="font-medium text-sm sm:text-sm whitespace-nowrap">
-            {dish.category === "breakfast"
-              ? "Frühstück"
-              : dish.category === "mainDish"
-              ? "Mittag/Abendessen"
-              : dish.category === "snack"
-              ? "Snack/Sonstiges"
-              : "-"}
+        {/* Star Rating */}
+        {isRatable && (
+          <div className="mb-3">
+            <StarRating
+              rating={dish.rating || 0}
+              onChange={(newRating) => {
+                if (onRatingChange) {
+                  onRatingChange(dish.id, newRating);
+                }
+              }}
+              readOnly={!onRatingChange}
+              size="sm"
+            />
           </div>
+        )}
 
-          {/* Bewertung anzeigen, falls es sich um ein Mittag/Abendessen handelt */}
-          {isRatable && (
-            <>
-              <div className="text-muted-foreground text-sm sm:text-sm">Bewertung:</div>
-              <div className="min-w-0 overflow-hidden flex items-center">
-                <div className="flex-shrink-0">
-                  <StarRating
-                    rating={dish.rating || 0}
-                    onChange={(newRating) => {
-                      if (onRatingChange) {
-                        onRatingChange(dish.id, newRating);
-                      }
-                    }}
-                    readOnly={!onRatingChange}
-                    size="sm"
-                  />
-                </div>
-              </div>
-            </>
-          )}
+        {/* Nutrition row */}
+        <div className="flex justify-between text-xs text-muted-foreground tabular-nums">
+          <span><span className="font-semibold text-foreground">{dish.calories || 0}</span> kcal</span>
+          <span><span className="font-semibold text-protein">{dish.protein || 0}</span>g P</span>
+          <span><span className="font-semibold text-carbs">{dish.carbs || 0}</span>g KH</span>
+          <span><span className="font-semibold text-fat">{dish.fat || 0}</span>g F</span>
         </div>
 
+        {/* Recipe */}
         {(dish.recipe || dish.recipeUrl) && (
           <>
             <button
               onClick={onToggleRecipe}
-              className="w-full text-left text-primary p-2.5 sm:p-3 rounded-lg hover:bg-accent transition-colors touch-manipulation min-h-[44px] sm:min-h-0 text-sm sm:text-base font-medium"
+              className="mt-3 w-full text-left text-primary text-xs font-medium hover:underline transition-colors touch-manipulation"
             >
               {isExpanded ? "Rezept ausblenden ↑" : "Rezept anzeigen ↓"}
             </button>
 
             {isExpanded && (
-              <div className="mt-4 text-sm sm:text-base">
+              <div className="mt-2 text-sm">
                 {dish.recipe && (
-                  <div className="whitespace-pre-wrap mb-2">{dish.recipe}</div>
+                  <div className="whitespace-pre-wrap mb-2 text-foreground leading-relaxed">{dish.recipe}</div>
                 )}
                 {dish.recipeUrl && (
                   <a
                     href={dish.recipeUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-block p-2 -m-2 rounded-lg text-primary hover:bg-accent transition-colors"
+                    className="text-primary hover:underline text-xs"
                   >
                     Zum Online-Rezept →
                   </a>

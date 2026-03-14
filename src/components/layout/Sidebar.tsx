@@ -3,6 +3,7 @@ import { cn } from "../../lib/utils";
 import { useFeatureAccess } from "../../hooks/useFeatureAccess";
 import {
     CalendarDays,
+    BarChart2,
     ChefHat,
     UtensilsCrossed,
     User,
@@ -30,6 +31,11 @@ export const Sidebar = () => {
             to: "/day-planning",
             label: "Tagesplanung",
             icon: CalendarDays,
+        },
+        {
+            to: "/statistics",
+            label: "Statistik",
+            icon: BarChart2,
         },
         {
             to: "/dishes",

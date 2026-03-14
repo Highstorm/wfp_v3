@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { signInWithEmailAndPassword } from "firebase/auth";
+import { Utensils } from "lucide-react";
 import { auth } from "../../lib/firebase";
 import { useAuthStore } from "../../stores/auth.store";
 
@@ -31,61 +32,48 @@ export const LoginForm = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4">
-      <div className="card w-full max-w-md p-8">
-        <div className="mb-8 text-center">
-          <h2 className="text-3xl font-semibold tracking-tight">
+    <div className="min-h-screen flex flex-col items-center justify-center px-4">
+      <div className="w-full max-w-sm">
+        <div className="mb-10 text-center">
+          <div className="w-16 h-16 rounded-2xl bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 flex items-center justify-center mx-auto mb-4">
+            <Utensils className="w-8 h-8" />
+          </div>
+          <h1 className="font-display font-extrabold text-2xl tracking-tight">
+            Weekly Food Planner
+          </h1>
+          <p className="mt-1 text-sm text-muted-foreground">
             Willkommen zurück
-          </h2>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Melde dich bei Weekly Food Planner an
           </p>
         </div>
 
-        <form className="space-y-6" onSubmit={handleSubmit}>
+        <form className="space-y-5" onSubmit={handleSubmit}>
           {error && (
-            <div className="rounded-md border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive-foreground">
-              <p className="font-medium">Ups! Ein Fehler ist aufgetreten</p>
-              <p>{error}</p>
+            <div className="rounded-2xl bg-destructive/10 p-3 text-sm text-destructive-foreground text-center">
+              {error}
             </div>
           )}
 
-          <div className="space-y-5">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium">
-                E-Mail
-              </label>
-              <div className="mt-1">
-                <input
-                  id="email"
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="input"
-                  placeholder="max@beispiel.de"
-                  autoComplete="email"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium">
-                Passwort
-              </label>
-              <div className="mt-1">
-                <input
-                  id="password"
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="input"
-                  placeholder="••••••••"
-                  autoComplete="current-password"
-                />
-              </div>
-            </div>
+          <div className="space-y-4">
+            <input
+              id="email"
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="input"
+              placeholder="E-Mail"
+              autoComplete="email"
+            />
+            <input
+              id="password"
+              type="password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="input"
+              placeholder="Passwort"
+              autoComplete="current-password"
+            />
           </div>
 
           <button type="submit" className="btn-primary w-full">
@@ -93,9 +81,9 @@ export const LoginForm = () => {
           </button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-muted-foreground">
+        <p className="mt-8 text-center text-sm text-muted-foreground">
           Noch kein Account?{" "}
-          <Link to="/register" className="font-medium text-primary">
+          <Link to="/register" className="font-medium text-zinc-900 dark:text-white">
             Jetzt registrieren
           </Link>
         </p>

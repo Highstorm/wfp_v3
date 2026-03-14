@@ -1,3 +1,5 @@
+import { cn } from "../../../lib/utils";
+
 interface CalorieCardProps {
   currentCalories: number;
   nutritionGoals: {
@@ -7,67 +9,98 @@ interface CalorieCardProps {
   burnedCalories: number;
 }
 
+function CalorieRing({
+  value,
+  max,
+  size = 80,
+  strokeWidth = 6,
+}: {
+  value: number;
+  max: number;
+  size?: number;
+  strokeWidth?: number;
+}) {
+  const radius = (size - strokeWidth) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const percentage = max > 0 ? Math.min(value / max, 1.5) : 0;
+  const offset = circumference - percentage * circumference;
+  const isOver = value > max * 1.1;
+  const isOnTarget = value >= max * 0.9 && value <= max * 1.1;
+
+  return (
+    <svg width={size} height={size} className="transform -rotate-90">
+      {/* Background ring */}
+      <circle
+        cx={size / 2}
+        cy={size / 2}
+        r={radius}
+        fill="none"
+        stroke="hsl(var(--muted))"
+        strokeWidth={strokeWidth}
+      />
+      {/* Progress ring */}
+      <circle
+        cx={size / 2}
+        cy={size / 2}
+        r={radius}
+        fill="none"
+        stroke={
+          isOver
+            ? "hsl(var(--destructive))"
+            : isOnTarget
+            ? "hsl(var(--success))"
+            : "hsl(var(--color-calories))"
+        }
+        strokeWidth={strokeWidth}
+        strokeLinecap="round"
+        strokeDasharray={circumference}
+        strokeDashoffset={offset}
+        className="transition-all duration-500 ease-out"
+      />
+    </svg>
+  );
+}
+
 export const CalorieCard = ({
   currentCalories,
   nutritionGoals,
   burnedCalories,
 }: CalorieCardProps) => {
-  const getCaloriesColor = (calories: number): string => {
-    // Berechne die Zielkalorien (targetCalories + Sport oder baseCalories + Sport)
-    const effectiveTargetCalories = nutritionGoals.targetCalories
-      ? nutritionGoals.targetCalories + burnedCalories
-      : nutritionGoals.baseCalories
-      ? nutritionGoals.baseCalories + burnedCalories
-      : null;
+  const effectiveTargetCalories = nutritionGoals.targetCalories
+    ? nutritionGoals.targetCalories + burnedCalories
+    : nutritionGoals.baseCalories
+    ? nutritionGoals.baseCalories + burnedCalories
+    : null;
 
-    // Wenn keine Zielkalorien definiert sind, zeige rot
-    if (!effectiveTargetCalories) return "text-red-600";
+  const isOnTarget =
+    effectiveTargetCalories &&
+    currentCalories >= effectiveTargetCalories * 0.9 &&
+    currentCalories <= effectiveTargetCalories * 1.1;
 
-    // Berechne den erlaubten Bereich (±10%)
-    const minAllowedCalories = effectiveTargetCalories * 0.9;
-    const maxAllowedCalories = effectiveTargetCalories * 1.1;
-
-    // Wenn innerhalb des ±10% Bereichs, zeige grün
-    if (calories >= minAllowedCalories && calories <= maxAllowedCalories) {
-      return "text-green-600";
-    }
-
-    // Ansonsten zeige rot
-    return "text-red-600";
-  };
+  const isOver =
+    effectiveTargetCalories && currentCalories > effectiveTargetCalories * 1.1;
 
   const adjustedTargetCalories = nutritionGoals.targetCalories
     ? nutritionGoals.targetCalories + burnedCalories
     : null;
 
   const renderInfoText = () => {
-    // Zeige InfoText nur wenn burnedCalories > 0
     if (!burnedCalories || burnedCalories <= 0) return null;
 
-    // Wenn targetCalories gesetzt sind
     if (nutritionGoals.targetCalories) {
       return (
-        <div className="text-sm text-muted-foreground">
-          Ziel: {nutritionGoals.targetCalories.toFixed(1)} kcal
-          <span className="text-xs">
-            {" "}
-            + {burnedCalories.toFixed(1)} kcal Sport ={" "}
-            {(nutritionGoals.targetCalories + burnedCalories).toFixed(1)} kcal
-          </span>
+        <div className="text-xs text-muted-foreground">
+          Ziel: {nutritionGoals.targetCalories.toFixed(0)} + {burnedCalories.toFixed(0)} Sport ={" "}
+          {(nutritionGoals.targetCalories + burnedCalories).toFixed(0)} kcal
         </div>
       );
     }
 
-    // Wenn nur baseCalories gesetzt sind
     if (nutritionGoals.baseCalories) {
       return (
-        <div className="text-sm text-muted-foreground">
-          Grundbedarf: {nutritionGoals.baseCalories.toFixed(1)} kcal
-          <span className="text-xs">
-            {" "}
-            + {burnedCalories.toFixed(1)} kcal Sport ={" "}
-            {(nutritionGoals.baseCalories + burnedCalories).toFixed(1)} kcal
-          </span>
+        <div className="text-xs text-muted-foreground">
+          Bedarf: {nutritionGoals.baseCalories.toFixed(0)} + {burnedCalories.toFixed(0)} Sport ={" "}
+          {(nutritionGoals.baseCalories + burnedCalories).toFixed(0)} kcal
         </div>
       );
     }
@@ -77,18 +110,48 @@ export const CalorieCard = ({
 
   return (
     <div className="card p-4">
-      <div className="text-sm text-muted-foreground">Kalorien</div>
-      <div
-        className={`text-2xl font-bold ${getCaloriesColor(currentCalories)}`}
-      >
-        {currentCalories.toFixed(1)} kcal
-        {adjustedTargetCalories && (
-          <span className="ml-2 text-sm font-normal text-muted-foreground">
-            / {adjustedTargetCalories.toFixed(1)} kcal
-          </span>
+      <div className="flex items-center gap-4">
+        {effectiveTargetCalories && (
+          <div className="relative shrink-0">
+            <CalorieRing
+              value={currentCalories}
+              max={effectiveTargetCalories}
+            />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="text-xs font-semibold tabular-nums text-foreground">
+                {effectiveTargetCalories > 0
+                  ? Math.round((currentCalories / effectiveTargetCalories) * 100)
+                  : 0}
+                %
+              </span>
+            </div>
+          </div>
         )}
+        <div className="flex-1 min-w-0">
+          <div className="text-sm text-muted-foreground">Kalorien</div>
+          <div
+            className={cn(
+              "text-2xl font-bold tabular-nums",
+              isOver
+                ? "text-destructive"
+                : isOnTarget
+                ? "text-success"
+                : "text-foreground"
+            )}
+          >
+            {currentCalories.toFixed(0)}
+            <span className="text-sm font-normal text-muted-foreground ml-1">
+              kcal
+            </span>
+            {adjustedTargetCalories && (
+              <span className="ml-2 text-sm font-normal text-muted-foreground">
+                / {adjustedTargetCalories.toFixed(0)}
+              </span>
+            )}
+          </div>
+          {renderInfoText()}
+        </div>
       </div>
-      {renderInfoText()}
     </div>
   );
 };

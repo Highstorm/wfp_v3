@@ -5,9 +5,13 @@ export interface IntervalsCredentials {
   apiKey: string;
 }
 
-export interface IntervalsActivity {
+interface IntervalsActivityRaw {
   id: string;
   source?: string;
+  _note?: string;
+  name?: string;
+  calories?: number;
+  [key: string]: unknown;
 }
 
 export interface IntervalsActivityDetail {
@@ -51,33 +55,39 @@ export class IntervalsService {
     date: string,
     credentials: IntervalsCredentials
   ): Promise<IntervalsActivityDetail[]> {
-    try {
-      const activities = await this.fetchFromIntervals(
-        `athlete/${credentials.athleteId}/activities?oldest=${date}&newest=${date}`,
-        credentials
-      ) as IntervalsActivity[];
+    const activities = await this.fetchFromIntervals(
+      `athlete/${credentials.athleteId}/activities?oldest=${date}&newest=${date}`,
+      credentials
+    ) as IntervalsActivityRaw[];
 
-      if (!Array.isArray(activities)) {
-        return [];
-      }
-
-      const detailedActivities = await Promise.all(
-        activities.map((activity) =>
-          this.fetchFromIntervals(`activity/${activity.id}`, credentials)
-        )
-      ) as IntervalsActivityDetail[];
-
-      return detailedActivities
-        .filter((activity) => activity && typeof activity.calories === 'number')
-        .map((activity) => ({
-          id: String(activity.id),
-          name: activity.name || 'Aktivität',
-          calories: activity.calories,
-        }));
-    } catch (error) {
-      logger.error("Intervals.icu: error fetching activities", error);
+    if (!Array.isArray(activities) || activities.length === 0) {
       return [];
     }
+
+    // Strava activities are not available via the intervals.icu API
+    const stravaBlocked = activities.filter(a => a.source === 'STRAVA');
+    if (stravaBlocked.length > 0) {
+      const nonStrava = activities.filter(a => a.source !== 'STRAVA');
+      if (nonStrava.length === 0) {
+        throw new Error('STRAVA_RESTRICTED');
+      }
+    }
+
+    const detailedActivities = await Promise.all(
+      activities
+        .filter(a => a.source !== 'STRAVA')
+        .map((activity) =>
+          this.fetchFromIntervals(`activity/${activity.id}`, credentials)
+        )
+    ) as IntervalsActivityRaw[];
+
+    return detailedActivities
+      .filter((activity) => activity && typeof activity.calories === 'number')
+      .map((activity) => ({
+        id: String(activity.id),
+        name: activity.name || 'Aktivität',
+        calories: activity.calories!,
+      }));
   }
 
   public static async updateWellnessForDate(

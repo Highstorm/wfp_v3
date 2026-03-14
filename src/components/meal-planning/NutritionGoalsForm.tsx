@@ -87,112 +87,103 @@ export const NutritionGoalsForm = () => {
     };
 
   return (
-    <div className="card p-3 sm:p-4 lg:p-8">
-      <div className="mb-4 sm:mb-6 lg:mb-8">
-        <h1 className="text-center text-xl sm:text-2xl lg:text-3xl font-semibold tracking-tight break-words px-2">
-          Meine Ernährungsziele
-        </h1>
-        <p className="mt-1.5 sm:mt-2 text-center text-sm sm:text-base text-muted-foreground">
-          Lege deine täglichen Ernährungsziele fest
-        </p>
-      </div>
+    <div>
+      <h2 className="font-display font-extrabold text-lg mb-4">Nährwertziele</h2>
 
-      <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4 lg:space-y-5">
-          <div>
-            <label htmlFor="baseCalories" className="block text-sm sm:text-sm font-medium mb-1.5">
-              Grundbedarf (kcal)
-            </label>
-            <input
-              id="baseCalories"
-              type="number"
-              value={goals.baseCalories ?? ""}
-              onChange={handleChange("baseCalories")}
-              className="input text-base sm:text-sm"
-              min="0"
-              placeholder="z.B. 1800"
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="targetCalories"
-              className="block text-sm sm:text-sm font-medium mb-1.5"
-            >
-              Zielkalorien (kcal)
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {/* 2x2 Goals Grid */}
+        <div className="grid grid-cols-2 gap-3">
+          <div className="bg-zinc-100 dark:bg-zinc-800/50 rounded-xl p-3">
+            <label htmlFor="targetCalories" className="block text-xs text-muted-foreground mb-1">
+              Zielkalorien
             </label>
             <input
               id="targetCalories"
               type="number"
               value={goals.targetCalories ?? ""}
               onChange={handleChange("targetCalories")}
-              className="input text-base sm:text-sm"
+              className="w-full bg-transparent font-display font-bold text-lg outline-none placeholder:text-muted-foreground/50"
               min="0"
-              placeholder="z.B. 2000"
+              placeholder="2000"
             />
+            <span className="text-xs text-muted-foreground">kcal</span>
           </div>
-
-          <div>
-            <label htmlFor="protein" className="block text-sm sm:text-sm font-medium mb-1.5">
-              Protein (g)
+          <div className="bg-zinc-100 dark:bg-zinc-800/50 rounded-xl p-3">
+            <label htmlFor="protein" className="block text-xs text-muted-foreground mb-1">
+              Protein
             </label>
             <input
               id="protein"
               type="number"
               value={goals.protein ?? ""}
               onChange={handleChange("protein")}
-              className="input text-base sm:text-sm"
+              className="w-full bg-transparent font-display font-bold text-lg outline-none placeholder:text-muted-foreground/50"
               min="0"
-              placeholder="z.B. 150"
+              placeholder="150"
             />
+            <span className="text-xs text-muted-foreground">g</span>
           </div>
-
-          <div>
-            <label htmlFor="fat" className="block text-sm sm:text-sm font-medium mb-1.5">
-              Fette (g)
-            </label>
-            <input
-              id="fat"
-              type="number"
-              value={goals.fat ?? ""}
-              onChange={handleChange("fat")}
-              className="input text-base sm:text-sm"
-              min="0"
-              placeholder="z.B. 70"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="carbs" className="block text-sm sm:text-sm font-medium mb-1.5">
-              Kohlenhydrate (g)
+          <div className="bg-zinc-100 dark:bg-zinc-800/50 rounded-xl p-3">
+            <label htmlFor="carbs" className="block text-xs text-muted-foreground mb-1">
+              Kohlenhydrate
             </label>
             <input
               id="carbs"
               type="number"
               value={goals.carbs ?? ""}
               onChange={handleChange("carbs")}
-              className="input text-base sm:text-sm"
+              className="w-full bg-transparent font-display font-bold text-lg outline-none placeholder:text-muted-foreground/50"
               min="0"
-              placeholder="z.B. 250"
+              placeholder="250"
             />
+            <span className="text-xs text-muted-foreground">g</span>
           </div>
+          <div className="bg-zinc-100 dark:bg-zinc-800/50 rounded-xl p-3">
+            <label htmlFor="fat" className="block text-xs text-muted-foreground mb-1">
+              Fett
+            </label>
+            <input
+              id="fat"
+              type="number"
+              value={goals.fat ?? ""}
+              onChange={handleChange("fat")}
+              className="w-full bg-transparent font-display font-bold text-lg outline-none placeholder:text-muted-foreground/50"
+              min="0"
+              placeholder="70"
+            />
+            <span className="text-xs text-muted-foreground">g</span>
+          </div>
+        </div>
 
-          <button
-            type="submit"
-            disabled={isSaving}
-            className="btn-primary w-full text-base sm:text-sm py-2.5 sm:py-2 min-h-[44px] sm:min-h-0"
-          >
-            {isSaving ? "Wird gespeichert..." : "Ernährungsziele speichern"}
-          </button>
+        {/* Base calories below */}
+        <div className="bg-zinc-50 dark:bg-zinc-800/30 rounded-xl p-3">
+          <label htmlFor="baseCalories" className="block text-xs text-muted-foreground mb-1">
+            Grundumsatz (kcal)
+          </label>
+          <input
+            id="baseCalories"
+            type="number"
+            value={goals.baseCalories ?? ""}
+            onChange={handleChange("baseCalories")}
+            className="w-full bg-transparent font-medium outline-none placeholder:text-muted-foreground/50"
+            min="0"
+            placeholder="1800"
+          />
+        </div>
 
-          {message && (
-            <p
-              className={`mt-2 sm:mt-2 text-sm sm:text-sm text-center leading-relaxed ${
-                message.includes("Fehler") ? "text-destructive" : "text-green-600"
-              }`}
-            >
-              {message}
-            </p>
-          )}
+        <button
+          type="submit"
+          disabled={isSaving}
+          className="btn-primary w-full"
+        >
+          {isSaving ? "Wird gespeichert..." : "Ziele speichern"}
+        </button>
+
+        {message && (
+          <p className={`text-sm text-center ${message.includes("Fehler") ? "text-destructive" : "text-green-600"}`}>
+            {message}
+          </p>
+        )}
       </form>
     </div>
   );

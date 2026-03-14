@@ -46,3 +46,9 @@ lerna-debug.log*
 
 # Firebase cache
 .firebase/
+
+# Playwright MCP artifacts
+.playwright-mcp/
+
+# Debug screenshots
+*.png

@@ -134,7 +134,7 @@ export const WeeklyNutritionGoalsForm = ({
   return (
     <div className="card p-4">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-medium text-gray-900">
+        <h3 className="text-lg font-medium text-foreground">
           Wochenspezifische Ernährungsziele
         </h3>
         <button

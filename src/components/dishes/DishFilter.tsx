@@ -21,168 +21,123 @@ interface DishFilterProps {
   ) => void;
 }
 
+const categories = [
+  { value: "", label: "Alle" },
+  { value: "breakfast", label: "Frühstück" },
+  { value: "mainDish", label: "Hauptgericht" },
+  { value: "snack", label: "Snack" },
+  { value: "uncategorized", label: "Ohne Kat." },
+];
+
 export const DishFilter = ({ filters, onFilterChange }: DishFilterProps) => {
   const [isNutrientsVisible, setIsNutrientsVisible] = useState(false);
 
+  const handleCategoryClick = (value: string) => {
+    const syntheticEvent = {
+      target: { name: "category", value },
+    } as React.ChangeEvent<HTMLSelectElement>;
+    onFilterChange(syntheticEvent);
+  };
+
   return (
-    <div className="card p-3 sm:p-4">
-      {/* Immer sichtbare Filter */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-3 sm:mb-4">
-        <div>
-          <label className="block text-sm sm:text-sm font-medium mb-1.5">
-            Name
-            <input
-              type="text"
-              name="name"
-              value={filters.name}
-              onChange={onFilterChange}
-              className="input mt-1 text-base sm:text-sm"
-              placeholder="Suche nach Namen"
-            />
-          </label>
-        </div>
-        <div>
-          <label className="block text-sm sm:text-sm font-medium mb-1.5">
-            Kategorie
-            <select
-              name="category"
-              value={filters.category}
-              onChange={onFilterChange}
-              className="input mt-1 text-base sm:text-sm"
-            >
-              <option value="">Alle Kategorien</option>
-              <option value="breakfast">Frühstück</option>
-              <option value="mainDish">Mittag/Abendessen</option>
-              <option value="snack">Snack/Sonstiges</option>
-              <option value="uncategorized">Ohne Kategorie</option>
-            </select>
-          </label>
-        </div>
-        <div>
-          <label className="block text-sm sm:text-sm font-medium mb-1.5">
-            Bewertung
-            <select
-              name="minRating"
-              value={filters.minRating}
-              onChange={onFilterChange}
-              className="input mt-1 text-base sm:text-sm"
-            >
-              <option value="">Alle Bewertungen</option>
-              <option value="1">Mindestens 1 Stern</option>
-              <option value="2">Mindestens 2 Sterne</option>
-              <option value="3">Mindestens 3 Sterne</option>
-              <option value="4">Mindestens 4 Sterne</option>
-              <option value="5">5 Sterne</option>
-            </select>
-          </label>
-        </div>
+    <div className="space-y-3 mb-4">
+      {/* Round search bar */}
+      <div className="relative">
+        <svg
+          className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+        <input
+          type="text"
+          name="name"
+          value={filters.name}
+          onChange={onFilterChange}
+          className="w-full pl-11 pr-4 py-3 bg-zinc-100 dark:bg-zinc-800/50 rounded-full text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+          placeholder="Gerichte durchsuchen..."
+        />
       </div>
 
-      {/* Ausklappbare Nährwertfilter */}
-      <div className="border-t border-border pt-3 sm:pt-4">
-        <div className="flex justify-between items-center mb-3 sm:mb-4">
-          <h3 className="text-sm sm:text-sm font-medium">Nährwertfilter</h3>
+      {/* Category pill chips */}
+      <div className="flex gap-2 overflow-x-auto pb-1">
+        {categories.map((cat) => (
           <button
-            onClick={() => setIsNutrientsVisible(!isNutrientsVisible)}
-            className="text-primary p-2 -m-2 rounded-lg hover:bg-accent text-sm sm:text-sm transition-colors touch-manipulation min-h-[44px] sm:min-h-0"
+            key={cat.value}
+            onClick={() => handleCategoryClick(cat.value)}
+            className={`
+              px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors touch-manipulation
+              ${filters.category === cat.value
+                ? "bg-zinc-900 text-white dark:bg-white dark:text-zinc-900"
+                : "bg-zinc-100 dark:bg-zinc-800/50 text-foreground hover:bg-zinc-200 dark:hover:bg-zinc-700"
+              }
+            `}
           >
-            {isNutrientsVisible ? "Filter ausblenden ↑" : "Filter anzeigen ↓"}
+            {cat.label}
           </button>
-        </div>
+        ))}
+      </div>
+
+      {/* Advanced filters toggle */}
+      <div>
+        <button
+          onClick={() => setIsNutrientsVisible(!isNutrientsVisible)}
+          className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+        >
+          {isNutrientsVisible ? "Erweiterte Filter ausblenden ↑" : "Erweiterte Filter ↓"}
+        </button>
 
         {isNutrientsVisible && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-            <div>
-              <label className="block text-sm sm:text-sm font-medium mb-1.5">
-                Kalorien
-                <div className="flex gap-2 mt-1">
-                  <input
-                    type="number"
-                    name="minCalories"
-                    value={filters.minCalories}
-                    onChange={onFilterChange}
-                    className="input text-base sm:text-sm"
-                    placeholder="Min"
-                  />
-                  <input
-                    type="number"
-                    name="maxCalories"
-                    value={filters.maxCalories}
-                    onChange={onFilterChange}
-                    className="input text-base sm:text-sm"
-                    placeholder="Max"
-                  />
-                </div>
-              </label>
+          <div className="mt-3 p-4 bg-zinc-50 dark:bg-zinc-800/30 rounded-xl space-y-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-medium text-muted-foreground mb-1">Bewertung</label>
+                <select
+                  name="minRating"
+                  value={filters.minRating}
+                  onChange={onFilterChange}
+                  className="input text-sm"
+                >
+                  <option value="">Alle</option>
+                  <option value="1">Min. 1 Stern</option>
+                  <option value="2">Min. 2 Sterne</option>
+                  <option value="3">Min. 3 Sterne</option>
+                  <option value="4">Min. 4 Sterne</option>
+                  <option value="5">5 Sterne</option>
+                </select>
+              </div>
             </div>
-            <div>
-              <label className="block text-sm sm:text-sm font-medium mb-1.5">
-                Protein
-                <div className="flex gap-2 mt-1">
-                  <input
-                    type="number"
-                    name="minProtein"
-                    value={filters.minProtein}
-                    onChange={onFilterChange}
-                    className="input text-base sm:text-sm"
-                    placeholder="Min"
-                  />
-                  <input
-                    type="number"
-                    name="maxProtein"
-                    value={filters.maxProtein}
-                    onChange={onFilterChange}
-                    className="input text-base sm:text-sm"
-                    placeholder="Max"
-                  />
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {[
+                { label: "Kalorien", min: "minCalories", max: "maxCalories" },
+                { label: "Protein", min: "minProtein", max: "maxProtein" },
+                { label: "KH", min: "minCarbs", max: "maxCarbs" },
+                { label: "Fett", min: "minFat", max: "maxFat" },
+              ].map((nutrient) => (
+                <div key={nutrient.label}>
+                  <label className="block text-xs font-medium text-muted-foreground mb-1">{nutrient.label}</label>
+                  <div className="flex gap-1">
+                    <input
+                      type="number"
+                      name={nutrient.min}
+                      value={filters[nutrient.min as keyof FilterValues]}
+                      onChange={onFilterChange}
+                      className="input text-xs py-1.5"
+                      placeholder="Min"
+                    />
+                    <input
+                      type="number"
+                      name={nutrient.max}
+                      value={filters[nutrient.max as keyof FilterValues]}
+                      onChange={onFilterChange}
+                      className="input text-xs py-1.5"
+                      placeholder="Max"
+                    />
+                  </div>
                 </div>
-              </label>
-            </div>
-            <div>
-              <label className="block text-sm sm:text-sm font-medium mb-1.5">
-                Fette
-                <div className="flex gap-2 mt-1">
-                  <input
-                    type="number"
-                    name="minFat"
-                    value={filters.minFat}
-                    onChange={onFilterChange}
-                    className="input text-base sm:text-sm"
-                    placeholder="Min"
-                  />
-                  <input
-                    type="number"
-                    name="maxFat"
-                    value={filters.maxFat}
-                    onChange={onFilterChange}
-                    className="input text-base sm:text-sm"
-                    placeholder="Max"
-                  />
-                </div>
-              </label>
-            </div>
-            <div>
-              <label className="block text-sm sm:text-sm font-medium mb-1.5">
-                Kohlenhydrate
-                <div className="flex gap-2 mt-1">
-                  <input
-                    type="number"
-                    name="minCarbs"
-                    value={filters.minCarbs}
-                    onChange={onFilterChange}
-                    className="input text-base sm:text-sm"
-                    placeholder="Min"
-                  />
-                  <input
-                    type="number"
-                    name="maxCarbs"
-                    value={filters.maxCarbs}
-                    onChange={onFilterChange}
-                    className="input text-base sm:text-sm"
-                    placeholder="Max"
-                  />
-                </div>
-              </label>
+              ))}
             </div>
           </div>
         )}

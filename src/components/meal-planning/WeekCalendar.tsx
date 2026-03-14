@@ -47,14 +47,6 @@ export const WeekCalendar = ({
       .filter((d) => d >= firstDayStr && d <= lastDayStr);
   }, [mealPlans, currentWeekStart]);
 
-  const formatDisplayDate = (date: Date) => {
-    return date.toLocaleDateString("de-DE", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    });
-  };
-
   const navigateWeek = (direction: "prev" | "next") => {
     const newDate = new Date(currentWeekStart);
     newDate.setDate(
@@ -65,56 +57,76 @@ export const WeekCalendar = ({
 
   const dayNames = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
 
+  const todayStr = formatDate(new Date());
+  const isSelectedToday = selectedDate === todayStr;
+
+  // Titel: "Heute" wenn heute ausgewählt, sonst Datum
+  const title = isSelectedToday
+    ? "Heute"
+    : new Date(selectedDate).toLocaleDateString("de-DE", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+      });
+
   return (
-    <div className="rounded-lg bg-card">
-      <div className="card p-4">
-        {/* Navigation und Wochenbereich */}
-        <div className="flex items-center justify-between mb-4">
-          <button
-            onClick={() => navigateWeek("prev")}
-            className="btn-secondary"
-          >
-            ←
-          </button>
-          <span className={`text-base text-sm font-medium`}>
-            {formatDisplayDate(weekDays[0])} - {formatDisplayDate(weekDays[6])}
-          </span>
-          <button
-            onClick={() => navigateWeek("next")}
-            className="btn-secondary"
-          >
-            →
-          </button>
-        </div>
+    <div>
+      {/* Title */}
+      <div className="flex items-center justify-between mb-3">
+        <button
+          onClick={() => navigateWeek("prev")}
+          className="p-2 rounded-full text-muted-foreground hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors touch-manipulation"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+        <h1 className="font-display font-extrabold text-2xl">{title}</h1>
+        <button
+          onClick={() => navigateWeek("next")}
+          className="p-2 rounded-full text-muted-foreground hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors touch-manipulation"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+      </div>
 
-        {/* Wochenansicht */}
-        <div className="flex flex-wrap gap-2">
-          {weekDays.map((date, index) => {
-            const dateString = formatDate(date);
-            const hasPlan = daysWithPlan.includes(dateString);
-            const isSelected = dateString === selectedDate;
-            const isToday = dateString === formatDate(new Date());
+      {/* Week days row */}
+      <div className="flex gap-1">
+        {weekDays.map((date, index) => {
+          const dateString = formatDate(date);
+          const hasPlan = daysWithPlan.includes(dateString);
+          const isSelected = dateString === selectedDate;
+          const isToday = dateString === todayStr;
 
-            return (
-              <button
-                key={dateString}
-                onClick={() => onDateSelect(dateString)}
-                className={`
-                  flex-1 min-w-[100px] p-3 rounded-lg flex flex-col items-center justify-center
-                  transition-all transform hover:scale-[1.02]
-                  ${hasPlan ? "bg-primary text-primary-foreground" : "bg-muted"}
-                  ${isSelected ? "ring-2 ring-offset-2 ring-ring" : ""}
-                  ${isToday ? "font-bold" : ""}
-                `}
-              >
-                <span className="text-sm font-medium mb-1">
-                  {dayNames[index]}
-                </span>
-                <span className="text-lg">{date.getDate()}</span>
-              </button>
-            );
-          })}
-        </div>
+          return (
+            <button
+              key={dateString}
+              onClick={() => onDateSelect(dateString)}
+              className={`
+                flex-1 flex flex-col items-center py-2 rounded-xl transition-all touch-manipulation
+                ${isSelected
+                  ? "bg-zinc-900 text-white dark:bg-white dark:text-zinc-900"
+                  : "hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                }
+              `}
+            >
+              <span className={`text-xs ${isSelected ? "text-white/70 dark:text-zinc-500" : "text-muted-foreground"}`}>
+                {dayNames[index]}
+              </span>
+              <span className={`text-lg font-semibold ${isToday && !isSelected ? "text-primary" : ""}`}>
+                {date.getDate()}
+              </span>
+              {hasPlan && !isSelected && (
+                <div className="w-1 h-1 rounded-full bg-primary mt-0.5" />
+              )}
+              {hasPlan && isSelected && (
+                <div className="w-1 h-1 rounded-full bg-white/50 dark:bg-zinc-500 mt-0.5" />
+              )}
+            </button>
+          );
+        })}
       </div>
     </div>
   );

@@ -34,89 +34,81 @@ export const MealPlanActions = ({
   const [isNoteVisible, setIsNoteVisible] = useState(false);
 
   return (
-    <div className="rounded-lg bg-card">
-      <div className="card p-4 sm:p-6">
-        {/* Aktionsschaltflächen - Immer sichtbar */}
-        <div className="flex flex-col sm:flex-row justify-end gap-3 sm:gap-4 mb-4">
-          {mealPlan.id && (
-            <button
-              type="button"
-              onClick={onDelete}
-              disabled={isDeleting}
-              className={`btn-primary w-full py-2.5 text-center text-sm sm:w-auto sm:text-base ${
-                isDeleting ? "cursor-not-allowed opacity-50" : ""
-              }`}
-            >
-              Löschen
-            </button>
+    <div>
+      {/* Bauchweh-Tracker */}
+      <StomachPainTracker
+        stomachPainLevel={mealPlan.stomachPainLevel}
+        onStomachPainChange={onStomachPainChange}
+        isEnabled={stomachPainTrackingEnabled}
+      />
+
+      {/* Tagesnotiz - Ausklappbar */}
+      {dailyNoteEnabled && (
+        <div className="mt-4">
+          <button
+            onClick={() => setIsNoteVisible(!isNoteVisible)}
+            className="w-full text-left text-xs text-muted-foreground hover:text-foreground transition-colors touch-manipulation py-1"
+          >
+            {isNoteVisible ? "Tagesnotiz ausblenden ↑" : "Tagesnotiz anzeigen ↓"}
+          </button>
+          {isNoteVisible && (
+            <textarea
+              id="dailyNote"
+              value={mealPlan.dailyNote || ""}
+              onChange={(e) => onDailyNoteChange(e.target.value)}
+              placeholder="Notizen für diesen Tag..."
+              className="input h-32 w-full resize-none mt-2"
+            />
           )}
+        </div>
+      )}
+
+      {/* Benachrichtigungen */}
+      {message.text && (
+        <div
+          className={`mt-4 rounded-2xl p-3 text-sm text-center ${
+            message.type === "error"
+              ? "bg-destructive/10 text-destructive-foreground"
+              : "bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400"
+          }`}
+        >
+          {message.text}
+        </div>
+      )}
+
+      {/* Aktionsschaltflächen */}
+      <div className="flex gap-3 mt-6">
+        <button
+          onClick={onSave}
+          disabled={isCreating || isUpdating}
+          className={`btn-primary flex-1 ${
+            isCreating || isUpdating ? "cursor-not-allowed opacity-50" : ""
+          }`}
+        >
+          {isCreating || isUpdating ? "Wird gespeichert..." : "Speichern"}
+        </button>
+        {mealPlan.id && (
           <button
             type="button"
-            onClick={onReset}
-            className={`btn-secondary w-full py-2.5 text-center text-sm sm:w-auto sm:text-base`}
-          >
-            Zurücksetzen
-          </button>
-          <button
-            onClick={onSave}
-            disabled={isCreating || isUpdating}
-            className={`btn-primary w-full py-2.5 text-center text-sm sm:w-auto sm:text-base ${
-              isCreating || isUpdating ? "cursor-not-allowed opacity-50" : ""
+            onClick={onDelete}
+            disabled={isDeleting}
+            className={`px-4 py-2 rounded-lg text-sm font-medium bg-red-500 text-white hover:bg-red-600 transition-colors ${
+              isDeleting ? "cursor-not-allowed opacity-50" : ""
             }`}
           >
-            {isCreating || isUpdating ? "Wird gespeichert..." : "Speichern"}
+            Löschen
           </button>
-        </div>
-
-        {/* Bauchweh-Tracker - Dauerhaft sichtbar */}
-        <StomachPainTracker
-          stomachPainLevel={mealPlan.stomachPainLevel}
-          onStomachPainChange={onStomachPainChange}
-          isEnabled={stomachPainTrackingEnabled}
-        />
-
-        {/* Tagesnotiz - Ausklappbar */}
-        {dailyNoteEnabled && (
-          <div className="border-t border-border pt-4">
-            <div className="flex justify-between items-center mb-2">
-              <label
-                htmlFor="dailyNote"
-                className={`block text-base sm:text-lg font-medium`}
-              >
-                Tagesnotiz
-              </label>
-              <button
-                onClick={() => setIsNoteVisible(!isNoteVisible)}
-                className="-m-2 rounded-lg p-2 text-sm text-primary hover:bg-accent"
-              >
-                {isNoteVisible ? "Notiz ausblenden ↑" : "Notiz anzeigen ↓"}
-              </button>
-            </div>
-            {isNoteVisible && (
-              <textarea
-                id="dailyNote"
-                value={mealPlan.dailyNote || ""}
-                onChange={(e) => onDailyNoteChange(e.target.value)}
-                placeholder="Notizen für diesen Tag..."
-                className={`input h-32 w-full resize-none`}
-              />
-            )}
-          </div>
-        )}
-
-        {/* Benachrichtigungen */}
-        {message.text && (
-          <div
-            className={`mt-4 rounded-md p-3 text-sm sm:p-4 sm:text-base ${
-              message.type === "error"
-                ? "bg-destructive/10 text-destructive-foreground"
-                : "bg-success/10 text-success-foreground"
-            }`}
-          >
-            {message.text}
-          </div>
         )}
       </div>
+
+      {/* Zurücksetzen als dezenter Link */}
+      <button
+        type="button"
+        onClick={onReset}
+        className="w-full text-center text-xs text-muted-foreground hover:text-foreground transition-colors touch-manipulation py-3 mt-1"
+      >
+        Zurücksetzen
+      </button>
     </div>
   );
 };

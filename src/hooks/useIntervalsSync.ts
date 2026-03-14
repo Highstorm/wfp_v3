@@ -59,11 +59,18 @@ export function useIntervalsSync(
           type: "info",
         });
       }
-    } catch {
-      setMessage({
-        text: "Fehler beim Laden der Aktivitäten.",
-        type: "error",
-      });
+    } catch (error) {
+      if (error instanceof Error && error.message === 'STRAVA_RESTRICTED') {
+        setMessage({
+          text: "Strava-Aktivitäten sind über die Intervals.icu API nicht verfügbar. Strava erlaubt keinen Zugriff über Drittanbieter-APIs.",
+          type: "error",
+        });
+      } else {
+        setMessage({
+          text: "Fehler beim Laden der Aktivitäten.",
+          type: "error",
+        });
+      }
     }
   };
 

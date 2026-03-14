@@ -30,6 +30,7 @@ interface UserSettings {
   porridgeCalculatorEnabled: boolean;
   garminEmail: string;
   garminPassword: string;
+  garminMfaCode: string;
 }
 
 export const UserSettingsForm = () => {
@@ -49,11 +50,13 @@ export const UserSettingsForm = () => {
     porridgeCalculatorEnabled: true,
     garminEmail: "",
     garminPassword: "",
+    garminMfaCode: "",
   });
   const [isUpdatingUser, setIsUpdatingUser] = useState(false);
   const [userMessage, setUserMessage] = useState("");
   const [isConnectingGarmin, setIsConnectingGarmin] = useState(false);
   const [garminMessage, setGarminMessage] = useState("");
+  const [showMfaField, setShowMfaField] = useState(false);
   const [isSyncingGarmin, setIsSyncingGarmin] = useState(false);
   const [isDisconnectingGarmin, setIsDisconnectingGarmin] = useState(false);
 
@@ -178,13 +181,19 @@ export const UserSettingsForm = () => {
     try {
       const result = await connectGarmin(
         userSettings.garminEmail,
-        userSettings.garminPassword
+        userSettings.garminPassword,
+        showMfaField ? userSettings.garminMfaCode : undefined
       );
-      if (result.error === "INVALID_CREDENTIALS") {
+      if (result.error === "MFA_REQUIRED") {
+        setShowMfaField(true);
+        setGarminMessage("MFA-Code eingeben (aus Authenticator-App).");
+      } else if (result.error === "INVALID_CREDENTIALS") {
         setGarminMessage("Ungültige Garmin-Zugangsdaten.");
+        setShowMfaField(false);
       } else if (result.success) {
         setGarminMessage("Erfolgreich verbunden!");
-        setUserSettings((prev) => ({ ...prev, garminEmail: "", garminPassword: "" }));
+        setShowMfaField(false);
+        setUserSettings((prev) => ({ ...prev, garminEmail: "", garminPassword: "", garminMfaCode: "" }));
         queryClient.invalidateQueries({ queryKey: ["profile"] });
       }
     } catch {
@@ -449,20 +458,37 @@ export const UserSettingsForm = () => {
                   placeholder="••••••"
                 />
               </div>
+              {showMfaField && (
+                <div>
+                  <label htmlFor="garminMfaCode" className="block text-xs text-muted-foreground mb-1">
+                    MFA-Code
+                  </label>
+                  <input
+                    id="garminMfaCode"
+                    type="text"
+                    inputMode="numeric"
+                    value={userSettings.garminMfaCode}
+                    onChange={handleChange("garminMfaCode")}
+                    className="input text-sm"
+                    placeholder="123456"
+                    autoComplete="one-time-code"
+                  />
+                </div>
+              )}
               <button
                 type="button"
                 onClick={handleGarminConnect}
-                disabled={isConnectingGarmin || !userSettings.garminEmail || !userSettings.garminPassword}
+                disabled={isConnectingGarmin || !userSettings.garminEmail || !userSettings.garminPassword || (showMfaField && !userSettings.garminMfaCode)}
                 className="btn-primary w-full text-sm"
               >
-                {isConnectingGarmin ? "Verbinde..." : "Mit Garmin verbinden"}
+                {isConnectingGarmin ? "Verbinde..." : showMfaField ? "Mit MFA-Code verbinden" : "Mit Garmin verbinden"}
               </button>
             </div>
           )}
 
           {garminMessage && (
             <p className={`text-sm text-center ${
-              garminMessage.includes("Fehler") || garminMessage.includes("Ungültig") || garminMessage.includes("abgelaufen") || garminMessage.includes("nicht")
+              garminMessage.includes("Fehler") || garminMessage.includes("Ungültig") || garminMessage.includes("abgelaufen") || garminMessage.includes("nicht") || garminMessage.includes("fehlgeschlagen")
                 ? "text-destructive"
                 : "text-green-600"
             }`}>

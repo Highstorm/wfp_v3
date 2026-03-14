@@ -17,6 +17,7 @@ interface NutritionSummaryProps {
   burnedCalories: number;
   useGarminTargetCalories?: boolean;
   garminTotalCalories?: number | null;
+  date: string; // YYYY-MM-DD
 }
 
 export const NutritionSummary = ({
@@ -25,6 +26,7 @@ export const NutritionSummary = ({
   burnedCalories,
   useGarminTargetCalories = false,
   garminTotalCalories = null,
+  date,
 }: NutritionSummaryProps) => {
   const { effectiveTarget: effectiveTargetCalories, isGarminBased } =
     calculateEffectiveTarget({
@@ -39,6 +41,22 @@ export const NutritionSummary = ({
     effectiveTargetCalories !== null
       ? effectiveTargetCalories - currentNutrition.calories
       : null;
+
+  // Projected end-of-day calories: remaining hours × resting cal/hour
+  const today = new Date().toISOString().slice(0, 10);
+  const isToday = date === today;
+  const baseCalories = nutritionGoals.baseCalories;
+  const projectedRemaining = (() => {
+    if (!isToday || !isGarminBased || effectiveTargetCalories === null || !baseCalories) {
+      return null;
+    }
+    const now = new Date();
+    const remainingHours = (24 - now.getHours()) - now.getMinutes() / 60;
+    if (remainingHours <= 0) return null;
+    const restPerHour = baseCalories / 24;
+    const projectedEndOfDay = effectiveTargetCalories + Math.round(restPerHour * remainingHours);
+    return projectedEndOfDay - currentNutrition.calories;
+  })();
 
   return (
     <div className="text-center py-4">
@@ -66,6 +84,15 @@ export const NutritionSummary = ({
           {deficit >= 0
             ? `Noch ${deficit.toFixed(0)} kcal übrig`
             : `${Math.abs(deficit).toFixed(0)} kcal drüber`}
+        </div>
+      )}
+
+      {/* Projected end-of-day deficit (Garmin, today only) */}
+      {projectedRemaining !== null && (
+        <div className="text-xs text-muted-foreground mt-0.5">
+          {projectedRemaining >= 0
+            ? `~${projectedRemaining.toFixed(0)} kcal bis Tagesende`
+            : `~${Math.abs(projectedRemaining).toFixed(0)} kcal drüber bis Tagesende`}
         </div>
       )}
 

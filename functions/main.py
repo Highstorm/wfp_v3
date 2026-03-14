@@ -1,10 +1,14 @@
 """Garmin Connect Cloud Functions for TDEE integration."""
 
 import json
+import logging
 from firebase_functions import https_fn
 from firebase_admin import initialize_app, auth, firestore
 from garminconnect import Garmin
+from garth.sso import login as garth_login
 from google.cloud.firestore_v1 import SERVER_TIMESTAMP
+
+logger = logging.getLogger(__name__)
 
 initialize_app()
 
@@ -21,6 +25,7 @@ def garmin_connect(req: https_fn.CallableRequest) -> dict:
     uid = req.auth.uid
     garmin_email = req.data.get("garminEmail")
     garmin_password = req.data.get("garminPassword")
+    mfa_code = req.data.get("mfaCode")
 
     if not garmin_email or not garmin_password:
         raise https_fn.HttpsError(
@@ -29,9 +34,24 @@ def garmin_connect(req: https_fn.CallableRequest) -> dict:
         )
 
     try:
-        client = Garmin(garmin_email, garmin_password)
-        client.login()
-    except Exception:
+        if mfa_code:
+            logger.info("garmin_connect: attempting login with MFA code")
+            client = Garmin(garmin_email, garmin_password, prompt_mfa=lambda: mfa_code)
+            client.login()
+            logger.info("garmin_connect: MFA login successful")
+        else:
+            logger.info("garmin_connect: probing login via garth (prompt_mfa=None)")
+            result = garth_login(garmin_email, garmin_password, prompt_mfa=None)
+            logger.info(f"garmin_connect: garth_login returned type={type(result).__name__}, value={result}")
+            if isinstance(result, dict) and result.get("needs_mfa"):
+                logger.info("garmin_connect: MFA required, returning MFA_REQUIRED")
+                return {"error": "MFA_REQUIRED"}
+            # No MFA needed — set tokens on client
+            client = Garmin()
+            client.garth.oauth1_token, client.garth.oauth2_token = result
+            logger.info("garmin_connect: login successful without MFA")
+    except Exception as e:
+        logger.error(f"garmin_connect: exception during login: {type(e).__name__}: {e}")
         return {"error": "INVALID_CREDENTIALS"}
 
     # Serialize OAuth tokens via garth
@@ -89,16 +109,21 @@ def garmin_daily_summary(req: https_fn.CallableRequest) -> dict:
     # Initialize Garmin client with saved tokens
     try:
         client = Garmin()
-        client.garth.loads(token_data)
-        client.login()
-    except Exception:
+        client.login(tokenstore=token_data)
+    except Exception as e:
+        logger.error(f"garmin_daily_summary: token error: {type(e).__name__}: {e}")
         return {"error": "TOKEN_EXPIRED"}
 
     # Fetch daily summary
     try:
         summary = client.get_user_summary(date_str)
-    except Exception:
+    except Exception as e:
+        logger.error(f"garmin_daily_summary: API error: {type(e).__name__}: {e}")
         return {"error": "GARMIN_UNAVAILABLE"}
+
+    # Log all calorie-related fields for debugging
+    calorie_fields = {k: v for k, v in summary.items() if "alori" in k.lower()}
+    logger.info(f"garmin_daily_summary: calorie fields: {calorie_fields}")
 
     total_calories = summary.get("totalKilocalories", 0)
     active_calories = summary.get("activeKilocalories", 0)
@@ -119,14 +144,14 @@ def garmin_daily_summary(req: https_fn.CallableRequest) -> dict:
     user_record = auth.get_user(uid)
     email = user_record.email
 
-    db.collection("profiles").document(email).set({
+    db.collection("profiles").document(email).update({
         f"garminDailySummaries.{date_str}": {
             "totalCalories": total_calories,
             "activeCalories": active_calories,
             "bmrCalories": bmr_calories,
             "syncedAt": SERVER_TIMESTAMP,
         },
-    }, merge=True)
+    })
 
     return {
         "totalCalories": total_calories,

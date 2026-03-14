@@ -17,13 +17,14 @@ export interface GarminDailySummaryResponse {
 
 export async function connectGarmin(
   garminEmail: string,
-  garminPassword: string
+  garminPassword: string,
+  mfaCode?: string
 ): Promise<GarminConnectResponse> {
   const callable = httpsCallable<
-    { garminEmail: string; garminPassword: string },
+    { garminEmail: string; garminPassword: string; mfaCode?: string },
     GarminConnectResponse
   >(functions, "garmin_connect");
-  const result = await callable({ garminEmail, garminPassword });
+  const result = await callable({ garminEmail, garminPassword, ...(mfaCode && { mfaCode }) });
   return result.data;
 }
 

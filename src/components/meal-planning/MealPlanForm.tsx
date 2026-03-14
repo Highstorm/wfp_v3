@@ -42,6 +42,7 @@ export const MealPlanForm = () => {
     isUpdating,
     isDeleting,
     combinedNutritionGoals,
+    profile,
     setDeleteConfirmDialog,
     setResetConfirmDialog,
     calculateTotalNutrition,
@@ -97,6 +98,8 @@ export const MealPlanForm = () => {
         currentNutrition={calculateTotalNutrition()}
         nutritionGoals={combinedNutritionGoals}
         burnedCalories={calculateTotalBurnedCalories(mealPlan.sports || [], combinedNutritionGoals.baseCalories)}
+        useGarminTargetCalories={profile?.useGarminTargetCalories ?? false}
+        garminTotalCalories={profile?.garminDailySummaries?.[date]?.totalCalories ?? null}
       />
 
       {/* Meals */}

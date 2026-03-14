@@ -11,6 +11,7 @@ export interface DayStats {
 }
 
 export interface ResolvedGoals {
+  baseCalories: number | null;
   targetCalories: number | null;
   protein: number | null;
   carbs: number | null;

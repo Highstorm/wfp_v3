@@ -148,12 +148,14 @@ describe("resolveGoals", () => {
 
 describe("aggregateWeeklyStats", () => {
   const noGoals: ResolvedGoals = {
+    baseCalories: null,
     targetCalories: null,
     protein: null,
     carbs: null,
     fat: null,
   };
   const goals: ResolvedGoals = {
+    baseCalories: 1800,
     targetCalories: 2000,
     protein: 150,
     carbs: 200,

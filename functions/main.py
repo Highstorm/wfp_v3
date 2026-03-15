@@ -161,6 +161,77 @@ def garmin_daily_summary(req: https_fn.CallableRequest) -> dict:
 
 
 @https_fn.on_call()
+def garmin_activities(req: https_fn.CallableRequest) -> dict:
+    """Fetch activities for a given date from Garmin Connect."""
+    if req.auth is None:
+        raise https_fn.HttpsError(
+            code=https_fn.FunctionsErrorCode.UNAUTHENTICATED,
+            message="Authentication required.",
+        )
+
+    uid = req.auth.uid
+    date_str = req.data.get("date")
+
+    if not date_str:
+        raise https_fn.HttpsError(
+            code=https_fn.FunctionsErrorCode.INVALID_ARGUMENT,
+            message="date is required (YYYY-MM-DD).",
+        )
+
+    db = firestore.client()
+
+    # Read tokens
+    token_doc = db.collection("garminTokens").document(uid).get()
+    if not token_doc.exists:
+        return {"error": "NOT_CONNECTED"}
+
+    token_data = token_doc.to_dict()["oauthTokens"]
+
+    # Initialize Garmin client with saved tokens
+    try:
+        client = Garmin()
+        client.login(tokenstore=token_data)
+    except Exception as e:
+        logger.error(f"garmin_activities: token error: {type(e).__name__}: {e}")
+        return {"error": "TOKEN_EXPIRED"}
+
+    # Fetch activities for the given date
+    try:
+        raw_activities = client.get_activities_by_date(
+            startdate=date_str,
+            enddate=date_str,
+        )
+    except Exception as e:
+        logger.error(f"garmin_activities: API error: {type(e).__name__}: {e}")
+        return {"error": "GARMIN_UNAVAILABLE"}
+
+    # Update tokens (may have been refreshed)
+    updated_token_data = client.garth.dumps()
+    db.collection("garminTokens").document(uid).update({
+        "oauthTokens": updated_token_data,
+        "lastSyncAt": SERVER_TIMESTAMP,
+    })
+
+    activities = []
+    if raw_activities:
+        for activity in raw_activities:
+            activity_id = activity.get("activityId")
+            if not activity_id:
+                continue
+            activities.append({
+                "activityId": str(activity_id),
+                "activityName": activity.get("activityName", "Aktivität"),
+                "calories": int(activity.get("calories") or 0),
+                "movingDuration": int(activity.get("duration") or 0),
+                "manufacturer": activity.get("manufacturer", ""),
+            })
+
+    logger.info(f"garmin_activities: found {len(activities)} activities for {date_str}")
+
+    return {"activities": activities}
+
+
+@https_fn.on_call()
 def garmin_disconnect(req: https_fn.CallableRequest) -> dict:
     """Disconnect Garmin Connect and delete stored tokens."""
     if req.auth is None:
@@ -184,6 +255,7 @@ def garmin_disconnect(req: https_fn.CallableRequest) -> dict:
         "garminConnectedAt": firestore.DELETE_FIELD,
         "useGarminTargetCalories": False,
         "garminDailySummaries": firestore.DELETE_FIELD,
+        "sportSyncSource": firestore.DELETE_FIELD,
     }, merge=True)
 
     return {"success": True}

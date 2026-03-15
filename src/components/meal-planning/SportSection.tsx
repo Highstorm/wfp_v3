@@ -8,7 +8,7 @@ interface SportSectionProps {
   baseCalories: number | null;
   onAddActivity: (activity: SportActivity) => void;
   onRemoveActivity: (index: number) => void;
-  onLoadIntervalsActivities: () => void;
+  onSyncActivities?: () => void;
 }
 
 export const SportSection = ({
@@ -16,7 +16,7 @@ export const SportSection = ({
   baseCalories,
   onAddActivity,
   onRemoveActivity,
-  onLoadIntervalsActivities,
+  onSyncActivities,
 }: SportSectionProps) => {
   const [calories, setCalories] = useState<string>("");
   const [description, setDescription] = useState<string>("");
@@ -61,7 +61,10 @@ export const SportSection = ({
           >
             <div className="flex items-center gap-3">
               <div className="flex-1 min-w-0">
-                <div className="font-medium text-sm truncate">
+                <div className="font-medium text-sm truncate flex items-center gap-1.5">
+                  {activity.garminActivityId && (
+                    <img src={GarminDelta} alt="Garmin" className="w-3 h-3 inline-block shrink-0" />
+                  )}
                   {activity.description || "Aktivität"}
                 </div>
                 {(() => {
@@ -103,12 +106,14 @@ export const SportSection = ({
             >
               + Aktivität hinzufügen
             </button>
-            <button
-              onClick={onLoadIntervalsActivities}
-              className="w-full text-left text-xs text-muted-foreground hover:text-foreground transition-colors touch-manipulation py-1"
-            >
-              Aktivitäten aus Intervals laden
-            </button>
+            {onSyncActivities && (
+              <button
+                onClick={onSyncActivities}
+                className="w-full text-left text-xs text-muted-foreground hover:text-foreground transition-colors touch-manipulation py-1"
+              >
+                Aktivitäten synchronisieren
+              </button>
+            )}
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="bg-zinc-100 dark:bg-zinc-800/50 rounded-xl p-4 space-y-3">

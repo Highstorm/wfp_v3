@@ -23,6 +23,7 @@ export interface UserProfile {
   garminConnected?: boolean;
   garminConnectedAt?: unknown; // Firestore Timestamp
   useGarminTargetCalories?: boolean;
+  sportSyncSource?: "garmin" | "intervals" | null;
   garminDailySummaries?: Record<string, GarminDailySummary> | null;
 }
 

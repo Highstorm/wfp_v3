@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import {
   updateProfile,
   updateEmail,
@@ -252,6 +253,32 @@ export const UserSettingsForm = () => {
     queryClient.invalidateQueries({ queryKey: ["profile"] });
   };
 
+  const [sportSyncConfirmDialog, setSportSyncConfirmDialog] = useState<{
+    isOpen: boolean;
+    newSource: "garmin" | "intervals" | null;
+  }>({ isOpen: false, newSource: null });
+
+  const currentSportSyncSource = profile?.sportSyncSource ?? null;
+
+  const handleSportSyncSourceChange = async (newSource: "garmin" | "intervals" | null) => {
+    if (currentSportSyncSource && newSource && currentSportSyncSource !== newSource) {
+      setSportSyncConfirmDialog({ isOpen: true, newSource });
+      return;
+    }
+    await saveSportSyncSource(newSource);
+  };
+
+  const saveSportSyncSource = async (newSource: "garmin" | "intervals" | null) => {
+    if (!auth.currentUser?.email) return;
+    await setDoc(
+      doc(db, "profiles", auth.currentUser.email),
+      { sportSyncSource: newSource },
+      { merge: true }
+    );
+    queryClient.invalidateQueries({ queryKey: ["profile"] });
+    setSportSyncConfirmDialog({ isOpen: false, newSource: null });
+  };
+
   const toggleFeatures: {
     key: keyof UserSettings;
     label: string;
@@ -376,6 +403,40 @@ export const UserSettingsForm = () => {
               />
             </div>
           </div>
+        </div>
+
+        {/* Sport Sync Source */}
+        <div className="space-y-2">
+          <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Sport-Synchronisation</h3>
+          {(([
+            { value: null, label: "Aus", disabled: false },
+            { value: "intervals", label: "Intervals.icu", disabled: !profile?.["intervals.icu-API-KEY"] || !profile?.["intervals.icu-AthleteID"] },
+            { value: "garmin", label: "Garmin Connect", disabled: !profile?.garminConnected },
+          ] as { value: "garmin" | "intervals" | null; label: string; disabled: boolean }[])).map((option) => (
+            <label
+              key={option.label}
+              className={`flex items-center justify-between bg-zinc-100 dark:bg-zinc-800/50 rounded-xl px-4 py-3 transition-colors ${
+                option.disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:bg-zinc-200/70 dark:hover:bg-zinc-800/70"
+              }`}
+            >
+              <span className="text-sm font-medium">{option.label}</span>
+              <div className="relative flex items-center justify-center">
+                <input
+                  type="radio"
+                  name="sportSyncSource"
+                  checked={currentSportSyncSource === option.value}
+                  onChange={() => !option.disabled && handleSportSyncSourceChange(option.value)}
+                  disabled={option.disabled}
+                  className="sr-only peer"
+                />
+                <div className="w-5 h-5 border-2 border-zinc-300 dark:border-zinc-600 rounded-full peer-checked:border-primary transition-colors flex items-center justify-center">
+                  {currentSportSyncSource === option.value && (
+                    <div className="w-2.5 h-2.5 bg-primary rounded-full" />
+                  )}
+                </div>
+              </div>
+            </label>
+          ))}
         </div>
 
         {/* Garmin Connect */}
@@ -513,6 +574,36 @@ export const UserSettingsForm = () => {
           }`}>
             {userMessage}
           </p>
+        )}
+
+        {sportSyncConfirmDialog.isOpen && createPortal(
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 p-4">
+            <div className="card w-full max-w-md p-6">
+              <h3 className="mb-4 text-lg font-medium">Sport-Sync wechseln?</h3>
+              <p className="mb-6 text-sm text-muted-foreground">
+                Sport-Sync über <strong>{currentSportSyncSource === "garmin" ? "Garmin" : "Intervals.icu"}</strong> wird
+                deaktiviert und <strong>{sportSyncConfirmDialog.newSource === "garmin" ? "Garmin" : "Intervals.icu"}</strong> aktiviert.
+                Fortfahren?
+              </p>
+              <div className="flex justify-end gap-4">
+                <button
+                  type="button"
+                  onClick={() => setSportSyncConfirmDialog({ isOpen: false, newSource: null })}
+                  className="btn-secondary"
+                >
+                  Abbrechen
+                </button>
+                <button
+                  type="button"
+                  onClick={() => saveSportSyncSource(sportSyncConfirmDialog.newSource)}
+                  className="btn-primary"
+                >
+                  Wechseln
+                </button>
+              </div>
+            </div>
+          </div>,
+          document.body
         )}
       </form>
     </div>

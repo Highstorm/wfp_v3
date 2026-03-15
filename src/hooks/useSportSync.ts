@@ -1,19 +1,59 @@
 import { useEffect, useRef } from "react";
 import { IntervalsService } from "../services/intervals.service";
-import { fetchGarminActivities } from "../services/garmin.service";
+import { fetchGarminActivities, type GarminActivity } from "../services/garmin.service";
 import type { SportActivity } from "../types";
 import type { MealPlanFormState } from "./useMealPlanFormState";
 
 export function useSportSync(
   state: Pick<
     MealPlanFormState,
-    "date" | "mealPlan" | "setMessage" | "intervalsCredentials" | "profile" | "isMealPlanLoading"
+    "date" | "setMealPlan" | "setMessage" | "intervalsCredentials" | "profile" | "isMealPlanLoading"
   >,
-  handleAddSportActivity: (activity: SportActivity) => void
+  _handleAddSportActivity?: (activity: SportActivity) => void
 ) {
-  const { date, mealPlan, setMessage, intervalsCredentials, profile, isMealPlanLoading } = state;
+  const { date, setMealPlan, setMessage, intervalsCredentials, profile, isMealPlanLoading } = state;
   const sportSyncSource = profile?.sportSyncSource ?? null;
   const syncedDates = useRef(new Set<string>());
+
+  /**
+   * Add activities atomically via setMealPlan functional updater.
+   * This always reads the LATEST state, avoiding stale closure issues
+   * that cause duplicates on auto-sync after page refresh.
+   */
+  const addGarminActivitiesIfNew = (activities: GarminActivity[]): boolean => {
+    let added = false;
+    setMealPlan((prev) => {
+      const existingSports = prev.sports || [];
+      const newSports = activities.filter((activity) => {
+        return !existingSports.some((sport) => {
+          const sameById =
+            sport.garminActivityId &&
+            sport.garminActivityId === activity.activityId;
+          const sameByData =
+            !sport.garminActivityId &&
+            sport.description === activity.activityName &&
+            sport.calories === activity.calories;
+          return Boolean(sameById || sameByData);
+        });
+      });
+      if (newSports.length === 0) return prev;
+      added = true;
+      return {
+        ...prev,
+        sports: [
+          ...existingSports,
+          ...newSports.map((a) => ({
+            description: a.activityName,
+            calories: a.calories,
+            garminActivityId: a.activityId,
+            movingTime: a.movingDuration,
+            source: a.manufacturer || "GARMIN",
+          })),
+        ],
+      };
+    });
+    return added;
+  };
 
   const syncGarminActivities = async (isAutoSync: boolean) => {
     try {
@@ -35,44 +75,15 @@ export function useSportSync(
       }
 
       const activities = response.activities ?? [];
-      let newActivitiesAdded = false;
-
-      for (const activity of activities) {
-        const exists = mealPlan?.sports?.some((sport) => {
-          const sameById =
-            sport.garminActivityId &&
-            sport.garminActivityId === activity.activityId;
-          const sameByData =
-            !sport.garminActivityId &&
-            sport.description === activity.activityName &&
-            sport.calories === activity.calories;
-          return Boolean(sameById || sameByData);
-        });
-
-        if (!exists) {
-          handleAddSportActivity({
-            description: activity.activityName,
-            calories: activity.calories,
-            garminActivityId: activity.activityId,
-            movingTime: activity.movingDuration,
-            source: activity.manufacturer || "GARMIN",
-          });
-          newActivitiesAdded = true;
-        }
-      }
+      const newActivitiesAdded = addGarminActivitiesIfNew(activities);
 
       if (!isAutoSync) {
-        if (newActivitiesAdded) {
-          setMessage({
-            text: "Ein Sporteintrag wurde automatisch erzeugt.",
-            type: "success",
-          });
-        } else {
-          setMessage({
-            text: "Keine neuen Aktivitäten gefunden.",
-            type: "info",
-          });
-        }
+        setMessage({
+          text: newActivitiesAdded
+            ? "Garmin-Aktivitäten synchronisiert."
+            : "Keine neuen Aktivitäten gefunden.",
+          type: newActivitiesAdded ? "success" : "info",
+        });
       }
     } catch {
       if (!isAutoSync) {
@@ -103,40 +114,43 @@ export function useSportSync(
       let newActivitiesAdded = false;
 
       for (const activity of activities) {
-        const exists = mealPlan?.sports?.some((sport) => {
-          const sameById =
-            sport.intervalsId && sport.intervalsId === String(activity.id);
-          const sameByData =
-            !sport.intervalsId &&
-            sport.description === activity.name &&
-            sport.calories === activity.calories;
-          return Boolean(sameById || sameByData);
-        });
-
-        if (!exists) {
-          handleAddSportActivity({
-            description: activity.name,
-            calories: activity.calories,
-            intervalsId: String(activity.id),
-            movingTime: activity.movingTime,
-            source: activity.source,
+        // Use handleAddSportActivity for Intervals (manual sync only, no stale closure issue)
+        setMealPlan((prev) => {
+          const existingSports = prev.sports || [];
+          const alreadyExists = existingSports.some((sport) => {
+            const sameById =
+              sport.intervalsId && sport.intervalsId === String(activity.id);
+            const sameByData =
+              !sport.intervalsId &&
+              sport.description === activity.name &&
+              sport.calories === activity.calories;
+            return Boolean(sameById || sameByData);
           });
+          if (alreadyExists) return prev;
           newActivitiesAdded = true;
-        }
+          return {
+            ...prev,
+            sports: [
+              ...existingSports,
+              {
+                description: activity.name,
+                calories: activity.calories,
+                intervalsId: String(activity.id),
+                movingTime: activity.movingTime,
+                source: activity.source,
+              },
+            ],
+          };
+        });
       }
 
       if (!isAutoSync) {
-        if (newActivitiesAdded) {
-          setMessage({
-            text: "Ein Sporteintrag wurde automatisch erzeugt.",
-            type: "success",
-          });
-        } else {
-          setMessage({
-            text: "Keine neuen Aktivitäten gefunden.",
-            type: "info",
-          });
-        }
+        setMessage({
+          text: newActivitiesAdded
+            ? "Aktivitäten synchronisiert."
+            : "Keine neuen Aktivitäten gefunden.",
+          type: newActivitiesAdded ? "success" : "info",
+        });
       }
     } catch (error) {
       if (!isAutoSync) {

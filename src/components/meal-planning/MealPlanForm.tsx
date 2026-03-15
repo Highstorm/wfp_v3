@@ -16,10 +16,7 @@ import { calculateTotalBurnedCalories } from "../../utils/nutrition.utils";
 export const MealPlanForm = () => {
   const state = useMealPlanFormState();
   const actions = useMealPlanActions(state);
-  const { handleSyncActivities, sportSyncSource } = useSportSync(
-    state,
-    actions.handleAddSportActivity
-  );
+  const { handleSyncActivities, sportSyncSource } = useSportSync(state);
   useGarminSync(state.date);
 
   const {

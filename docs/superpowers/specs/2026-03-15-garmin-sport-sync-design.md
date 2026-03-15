@@ -35,8 +35,14 @@ Neue Cloud Function in `functions/main.py`:
 - **Ablauf**:
   1. Liest Garmin OAuth-Tokens aus `garminTokens/{uid}`
   2. Initialisiert Garmin-Client mit gespeicherten Tokens
-  3. Ruft `client.get_activities_fordate(date_str)` auf
-  4. Mappt relevante Felder und gibt Array zurück
+  3. Ruft `client.get_activities_fordate(date_str)` auf (garminconnect-Library — exakte Methode muss gegen installierte Version verifiziert werden, ggf. `get_activities()` mit Datumsfilter)
+  4. Mappt Garmin-API-Felder auf Output-Schema:
+     - `activityId` ← Garmin-Feld `activityId`
+     - `activityName` ← Garmin-Feld `activityName`
+     - `calories` ← Garmin-Feld `calories` (Gesamtkalorien der Aktivität)
+     - `movingDuration` ← Garmin-Feld `movingDuration` (in Sekunden)
+  5. Aktualisierte OAuth-Tokens zurück in `garminTokens/{uid}` schreiben (analog zu `garmin_daily_summary`, da garth Tokens bei Bedarf refresht)
+  6. Gibt Array zurück
 - **Output**:
   ```json
   {
@@ -51,7 +57,7 @@ Neue Cloud Function in `functions/main.py`:
   }
   ```
 - **Fehler**: `TOKEN_EXPIRED`, `GARMIN_UNAVAILABLE`
-- **Kein Firestore-Write** — Aktivitäten werden nur zurückgegeben, das Frontend fügt sie in den MealPlan ein
+- **Kein Firestore-Write für Aktivitäten** — sie werden nur zurückgegeben, das Frontend fügt sie in den MealPlan ein
 
 ## Frontend
 
@@ -79,8 +85,8 @@ Zentraler Hook für Sport-Synchronisation:
 ### SportSection.tsx — Anpassungen
 
 - Der "Aktivitäten aus Intervals laden"-Button wird zu **"Aktivitäten synchronisieren"**
-- Nur sichtbar wenn `sportSyncSource` nicht `null` ist
-- Ruft `handleSyncActivities()` auf (manueller Refresh)
+- Prop-Interface: `onSyncActivities?: () => void` (optional — wird nur übergeben wenn `sportSyncSource !== null`)
+- Button nur gerendert wenn `onSyncActivities` vorhanden
 - "+ Aktivität hinzufügen" bleibt unverändert
 
 ### UserSettingsForm.tsx — Sport-Sync-Toggle
@@ -116,3 +122,4 @@ Die Sync-Logik wandert vollständig in `useSportSync`. Der bestehende `useInterv
 | `src/components/meal-planning/SportSection.tsx` | Generischer Sync-Button |
 | `src/components/meal-planning/MealPlanForm.tsx` | `useSportSync` statt `useIntervalsSync` |
 | `src/components/auth/UserSettingsForm.tsx` | Sport-Sync-Toggle mit Bestätigungsdialog |
+| `functions/main.py` (`garmin_disconnect`) | `sportSyncSource` auf `null` zurücksetzen beim Disconnect |

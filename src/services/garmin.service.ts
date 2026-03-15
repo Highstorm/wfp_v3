@@ -44,6 +44,7 @@ export interface GarminActivity {
   activityName: string;
   calories: number;
   movingDuration: number;
+  manufacturer: string;
 }
 
 export interface GarminActivitiesResponse {

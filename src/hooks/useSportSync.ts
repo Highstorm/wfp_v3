@@ -51,7 +51,7 @@ export function useSportSync(
             calories: activity.calories,
             garminActivityId: activity.activityId,
             movingTime: activity.movingDuration,
-            source: "GARMIN",
+            source: activity.manufacturer || "GARMIN",
           });
           newActivitiesAdded = true;
         }

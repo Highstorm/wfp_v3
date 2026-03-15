@@ -197,7 +197,10 @@ def garmin_activities(req: https_fn.CallableRequest) -> dict:
 
     # Fetch activities for the given date
     try:
-        raw_activities = client.get_activities_fordate(date_str)
+        raw_activities = client.get_activities_by_date(
+            startdate=date_str,
+            enddate=date_str,
+        )
     except Exception as e:
         logger.error(f"garmin_activities: API error: {type(e).__name__}: {e}")
         return {"error": "GARMIN_UNAVAILABLE"}
@@ -210,13 +213,20 @@ def garmin_activities(req: https_fn.CallableRequest) -> dict:
     })
 
     activities = []
-    for activity in raw_activities:
-        activities.append({
-            "activityId": str(activity.get("activityId", "")),
-            "activityName": activity.get("activityName", ""),
-            "calories": int(activity.get("calories") or 0),
-            "movingDuration": int(activity.get("movingDuration") or 0),
-        })
+    if raw_activities:
+        for activity in raw_activities:
+            activity_id = activity.get("activityId")
+            if not activity_id:
+                continue
+            activities.append({
+                "activityId": str(activity_id),
+                "activityName": activity.get("activityName", "Aktivität"),
+                "calories": int(activity.get("calories") or 0),
+                "movingDuration": int(activity.get("duration") or 0),
+                "manufacturer": activity.get("manufacturer", ""),
+            })
+
+    logger.info(f"garmin_activities: found {len(activities)} activities for {date_str}")
 
     return {"activities": activities}
 

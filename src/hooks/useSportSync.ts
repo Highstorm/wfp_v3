@@ -42,7 +42,11 @@ export function useSportSync(
           const sameById =
             sport.garminActivityId &&
             sport.garminActivityId === activity.activityId;
-          return Boolean(sameById);
+          const sameByData =
+            !sport.garminActivityId &&
+            sport.description === activity.activityName &&
+            sport.calories === activity.calories;
+          return Boolean(sameById || sameByData);
         });
 
         if (!exists) {

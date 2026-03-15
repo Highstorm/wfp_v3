@@ -29,13 +29,18 @@ function isDarkMode(): boolean {
   );
 }
 
-function getBarColor(point: ChartDataPoint): string {
+function getBaseColor(point: ChartDataPoint): string {
   const colors = isDarkMode() ? "dark" : "light";
   if (point.isStub) return CHART_COLORS.muted[colors];
-  if (point.deficit !== null && point.deficit < 0) {
-    return CHART_COLORS.destructive[colors];
-  }
-  return CHART_COLORS.success[colors];
+  return CHART_COLORS.base[colors];
+}
+
+function getSuccessColor(): string {
+  return CHART_COLORS.success[isDarkMode() ? "dark" : "light"];
+}
+
+function getDestructiveColor(): string {
+  return CHART_COLORS.destructive[isDarkMode() ? "dark" : "light"];
 }
 
 interface TooltipPayload {
@@ -57,7 +62,7 @@ function WeeklyChartTooltip({ active, payload }: TooltipProps<number, string>) {
       )}
       {data.deficit !== null && (
         <div className={data.deficit >= 0 ? "text-success" : "text-destructive"}>
-          {data.deficit.toFixed(0)} Defizit
+          {data.deficit >= 0 ? "+" : ""}{data.deficit.toFixed(0)} kcal {data.deficit >= 0 ? "Defizit" : "Überschuss"}
         </div>
       )}
     </div>
@@ -102,19 +107,53 @@ export function WeeklyBarChart({ days, goals, loggedDayCount }: WeeklyBarChartPr
             />
           )}
           <Tooltip content={<WeeklyChartTooltip />} cursor={false} />
+
+          {/* Base: eaten calories (up to target) */}
           <Bar
-            dataKey="eatenCalories"
+            dataKey="basePortion"
+            stackId="calories"
+            maxBarSize={40}
+            cursor="pointer"
+            animationBegin={0}
+            onClick={(entry: ChartDataPoint) => handleBarClick(entry)}
+          >
+            {chartData.map((point, index) => (
+              <Cell key={index} fill={getBaseColor(point)} />
+            ))}
+          </Bar>
+
+          {/* Deficit portion: green (stacked on top of base) */}
+          <Bar
+            dataKey="deficitPortion"
+            stackId="calories"
             radius={[4, 4, 0, 0]}
             maxBarSize={40}
             cursor="pointer"
-            background={false}
             animationBegin={0}
             onClick={(entry: ChartDataPoint) => handleBarClick(entry)}
           >
             {chartData.map((point, index) => (
               <Cell
                 key={index}
-                fill={getBarColor(point)}
+                fill={point.deficitPortion > 0 ? getSuccessColor() : "transparent"}
+              />
+            ))}
+          </Bar>
+
+          {/* Surplus portion: red (stacked on top of base) */}
+          <Bar
+            dataKey="surplusPortion"
+            stackId="calories"
+            radius={[4, 4, 0, 0]}
+            maxBarSize={40}
+            cursor="pointer"
+            animationBegin={0}
+            onClick={(entry: ChartDataPoint) => handleBarClick(entry)}
+          >
+            {chartData.map((point, index) => (
+              <Cell
+                key={index}
+                fill={point.surplusPortion > 0 ? getDestructiveColor() : "transparent"}
               />
             ))}
           </Bar>

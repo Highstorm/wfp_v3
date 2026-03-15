@@ -9,14 +9,14 @@ import { MealPlanActions } from "./MealPlanActions";
 import { WeeklyNutritionGoalsForm } from "./WeeklyNutritionGoalsForm";
 import { useMealPlanFormState } from "../../hooks/useMealPlanFormState";
 import { useMealPlanActions } from "../../hooks/useMealPlanActions";
-import { useIntervalsSync } from "../../hooks/useIntervalsSync";
+import { useSportSync } from "../../hooks/useSportSync";
 import { useGarminSync } from "../../hooks/useGarminSync";
 import { calculateTotalBurnedCalories } from "../../utils/nutrition.utils";
 
 export const MealPlanForm = () => {
   const state = useMealPlanFormState();
   const actions = useMealPlanActions(state);
-  const { handleLoadIntervalsActivities } = useIntervalsSync(
+  const { handleSyncActivities, sportSyncSource } = useSportSync(
     state,
     actions.handleAddSportActivity
   );
@@ -179,7 +179,7 @@ export const MealPlanForm = () => {
               baseCalories={combinedNutritionGoals.baseCalories}
               onAddActivity={handleAddSportActivity}
               onRemoveActivity={handleRemoveSportActivity}
-              onLoadIntervalsActivities={handleLoadIntervalsActivities}
+              onSyncActivities={sportSyncSource ? handleSyncActivities : undefined}
             />
           </div>
         )}

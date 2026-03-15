@@ -61,7 +61,10 @@ export const SportSection = ({
           >
             <div className="flex items-center gap-3">
               <div className="flex-1 min-w-0">
-                <div className="font-medium text-sm truncate">
+                <div className="font-medium text-sm truncate flex items-center gap-1.5">
+                  {activity.garminActivityId && (
+                    <img src={GarminDelta} alt="Garmin" className="w-3 h-3 inline-block shrink-0" />
+                  )}
                   {activity.description || "Aktivität"}
                 </div>
                 {(() => {

@@ -15,6 +15,10 @@ export const STUB_HEIGHT = 24;
  * the values from index.css here.
  */
 export const CHART_COLORS = {
+  base: {
+    light: "hsl(215, 16%, 57%)",
+    dark: "hsl(215, 16%, 47%)",
+  },
   success: {
     light: "hsl(142, 72%, 37%)",
     dark: "hsl(142, 70%, 45%)",
@@ -34,7 +38,10 @@ export const CHART_COLORS = {
 export interface ChartDataPoint {
   label: string;     // "Mo", "Di", etc.
   date: string;      // "yyyy-MM-dd"
-  eatenCalories: number; // actual or STUB_HEIGHT
+  eatenCalories: number; // actual eaten (for tooltip)
+  basePortion: number;   // min(eaten, target) — neutral part of bar
+  deficitPortion: number; // green: space below target (0 if surplus)
+  surplusPortion: number; // red: amount above target (0 if deficit)
   isStub: boolean;
   sportCalories: number;
   deficit: number | null;
@@ -82,12 +89,37 @@ export function calcMacroPercent(
  * Unlogged days get a fixed stub height and isStub: true.
  */
 export function toChartData(days: DayStats[]): ChartDataPoint[] {
-  return days.map((day, index) => ({
-    label: DAY_LABELS[index],
-    date: day.date,
-    eatenCalories: day.hasData ? day.eatenCalories : STUB_HEIGHT,
-    isStub: !day.hasData,
-    sportCalories: day.sportCalories,
-    deficit: day.deficit,
-  }));
+  return days.map((day, index) => {
+    const eaten = day.hasData ? day.eatenCalories : STUB_HEIGHT;
+    const isStub = !day.hasData;
+
+    let basePortion = eaten;
+    let deficitPortion = 0;
+    let surplusPortion = 0;
+
+    if (!isStub && day.deficit !== null) {
+      if (day.deficit > 0) {
+        // Under target: eaten + deficit = target
+        basePortion = eaten;
+        deficitPortion = day.deficit;
+      } else {
+        // Over target: base up to target, surplus above
+        const target = eaten + day.deficit; // deficit is negative
+        basePortion = Math.max(0, target);
+        surplusPortion = Math.abs(day.deficit);
+      }
+    }
+
+    return {
+      label: DAY_LABELS[index],
+      date: day.date,
+      eatenCalories: day.hasData ? day.eatenCalories : 0,
+      basePortion,
+      deficitPortion,
+      surplusPortion,
+      isStub,
+      sportCalories: day.sportCalories,
+      deficit: day.deficit,
+    };
+  });
 }

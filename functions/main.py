@@ -214,8 +214,8 @@ def garmin_activities(req: https_fn.CallableRequest) -> dict:
         activities.append({
             "activityId": str(activity.get("activityId", "")),
             "activityName": activity.get("activityName", ""),
-            "calories": int(activity.get("calories", 0)),
-            "movingDuration": int(activity.get("movingDuration", 0)),
+            "calories": int(activity.get("calories") or 0),
+            "movingDuration": int(activity.get("movingDuration") or 0),
         })
 
     return {"activities": activities}

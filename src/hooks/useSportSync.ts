@@ -7,11 +7,11 @@ import type { MealPlanFormState } from "./useMealPlanFormState";
 export function useSportSync(
   state: Pick<
     MealPlanFormState,
-    "date" | "mealPlan" | "setMessage" | "intervalsCredentials" | "profile"
+    "date" | "mealPlan" | "setMessage" | "intervalsCredentials" | "profile" | "isMealPlanLoading"
   >,
   handleAddSportActivity: (activity: SportActivity) => void
 ) {
-  const { date, mealPlan, setMessage, intervalsCredentials, profile } = state;
+  const { date, mealPlan, setMessage, intervalsCredentials, profile, isMealPlanLoading } = state;
   const sportSyncSource = profile?.sportSyncSource ?? null;
   const syncedDates = useRef(new Set<string>());
 
@@ -151,9 +151,9 @@ export function useSportSync(
     }
   };
 
-  // Auto-sync once per date per session
+  // Auto-sync once per date per session (wait until mealPlan is loaded to avoid dupes)
   useEffect(() => {
-    if (!sportSyncSource) return;
+    if (!sportSyncSource || isMealPlanLoading) return;
     if (syncedDates.current.has(date)) return;
     syncedDates.current.add(date);
 
@@ -163,7 +163,7 @@ export function useSportSync(
       syncIntervalsActivities(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [date, sportSyncSource]);
+  }, [date, sportSyncSource, isMealPlanLoading]);
 
   const handleSyncActivities = async () => {
     if (sportSyncSource === "garmin") {

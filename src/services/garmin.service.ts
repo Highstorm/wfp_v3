@@ -39,6 +39,29 @@ export async function fetchGarminDailySummary(
   return result.data;
 }
 
+export interface GarminActivity {
+  activityId: string;
+  activityName: string;
+  calories: number;
+  movingDuration: number;
+}
+
+export interface GarminActivitiesResponse {
+  activities?: GarminActivity[];
+  error?: string;
+}
+
+export async function fetchGarminActivities(
+  date: string
+): Promise<GarminActivitiesResponse> {
+  const callable = httpsCallable<
+    { date: string },
+    GarminActivitiesResponse
+  >(functions, "garmin_activities");
+  const result = await callable({ date });
+  return result.data;
+}
+
 export async function disconnectGarmin(): Promise<GarminConnectResponse> {
   const callable = httpsCallable<void, GarminConnectResponse>(
     functions,

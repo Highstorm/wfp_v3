@@ -17,6 +17,7 @@ interface NutritionSummaryProps {
   burnedCalories: number;
   useGarminTargetCalories?: boolean;
   garminTotalCalories?: number | null;
+  garminSyncedAt?: unknown | null; // Firestore Timestamp
   date: string; // YYYY-MM-DD
 }
 
@@ -26,6 +27,7 @@ export const NutritionSummary = ({
   burnedCalories,
   useGarminTargetCalories = false,
   garminTotalCalories = null,
+  garminSyncedAt = null,
   date,
 }: NutritionSummaryProps) => {
   const { effectiveTarget: effectiveTargetCalories, isGarminBased } =
@@ -68,9 +70,21 @@ export const NutritionSummary = ({
         {effectiveTargetCalories
           ? `von ${effectiveTargetCalories.toFixed(0)} kcal`
           : "kcal"}
-        {isGarminBased && (
-          <span className="ml-1 text-green-600 dark:text-green-400">(Garmin)</span>
-        )}
+        {isGarminBased && (() => {
+          let syncTime = "";
+          if (garminSyncedAt) {
+            const ts = garminSyncedAt as { toDate?: () => Date };
+            if (ts.toDate) {
+              const d = ts.toDate();
+              syncTime = ` · ${d.getHours().toString().padStart(2, "0")}:${d.getMinutes().toString().padStart(2, "0")}`;
+            }
+          }
+          return (
+            <span className="ml-1 text-green-600 dark:text-green-400">
+              (Garmin{syncTime})
+            </span>
+          );
+        })()}
         {!isGarminBased && burnedCalories > 0 && (
           <span className="ml-1">
             (+{burnedCalories.toFixed(0)} Sport)

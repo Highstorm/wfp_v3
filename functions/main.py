@@ -49,13 +49,24 @@ def _load_garmin_client(db, uid: str, function_name: str):
 
 
 def _save_refreshed_tokens(db, uid: str, client):
-    """Save potentially refreshed tokens back to Firestore."""
+    """Save potentially refreshed tokens back to Firestore.
+
+    Validates that serialized tokens are non-empty valid JSON before saving.
+    garth.dumps() can occasionally return an empty string, which would
+    corrupt the stored tokens and break all future sync attempts.
+    """
     try:
         updated_token_data = client.garth.dumps()
+        if not updated_token_data or len(updated_token_data) < 10:
+            logger.warning(f"Refusing to save empty/tiny token data ({len(updated_token_data or '')} bytes)")
+            return
+        json.loads(updated_token_data)  # Round-trip validation
         db.collection("garminTokens").document(uid).update({
             "oauthTokens": updated_token_data,
             "lastSyncAt": SERVER_TIMESTAMP,
         })
+    except (json.JSONDecodeError, ValueError) as e:
+        logger.warning(f"Refusing to save invalid token data: {e}")
     except Exception as e:
         logger.warning(f"Failed to save refreshed tokens: {e}")
 

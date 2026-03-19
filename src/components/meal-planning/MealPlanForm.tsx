@@ -99,6 +99,7 @@ export const MealPlanForm = () => {
         burnedCalories={calculateTotalBurnedCalories(mealPlan.sports || [], combinedNutritionGoals.baseCalories)}
         useGarminTargetCalories={profile?.useGarminTargetCalories ?? false}
         garminTotalCalories={profile?.garminDailySummaries?.[date]?.totalCalories ?? null}
+        garminSyncedAt={profile?.garminDailySummaries?.[date]?.syncedAt ?? null}
         date={date}
       />
 

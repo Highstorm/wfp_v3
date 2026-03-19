@@ -64,6 +64,8 @@ export function useSportSync(
           const errorMessages: Record<string, string> = {
             NOT_CONNECTED: "Garmin ist nicht verbunden.",
             TOKEN_EXPIRED: "Garmin-Verbindung abgelaufen. Bitte erneut verbinden.",
+            TOKEN_INVALID: "Garmin-Token ungültig. Bitte in den Einstellungen neu verbinden.",
+            RATE_LIMITED: "Garmin blockiert Anfragen. Bitte in ca. 1 Stunde erneut versuchen.",
             GARMIN_UNAVAILABLE: "Garmin-Dienst ist derzeit nicht verfügbar.",
           };
           setMessage({

@@ -188,6 +188,9 @@ export const UserSettingsForm = () => {
       if (result.error === "MFA_REQUIRED") {
         setShowMfaField(true);
         setGarminMessage("MFA-Code eingeben (aus Authenticator-App).");
+      } else if (result.error === "RATE_LIMITED") {
+        setGarminMessage("Garmin blockiert Anfragen. Bitte in ca. 1 Stunde erneut versuchen.");
+        setShowMfaField(false);
       } else if (result.error === "INVALID_CREDENTIALS") {
         setGarminMessage("Ungültige Garmin-Zugangsdaten.");
         setShowMfaField(false);
@@ -228,6 +231,8 @@ export const UserSettingsForm = () => {
         const messages: Record<string, string> = {
           NOT_CONNECTED: "Nicht verbunden.",
           TOKEN_EXPIRED: "Sitzung abgelaufen. Bitte neu verbinden.",
+          TOKEN_INVALID: "Token ungültig. Bitte Garmin trennen und neu verbinden.",
+          RATE_LIMITED: "Garmin blockiert Anfragen. Bitte in ca. 1 Stunde erneut versuchen.",
           GARMIN_UNAVAILABLE: "Garmin nicht erreichbar.",
           IMPLAUSIBLE_VALUE: "Wert noch nicht plausibel (< 500 kcal).",
         };

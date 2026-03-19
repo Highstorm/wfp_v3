@@ -13,6 +13,53 @@ logger = logging.getLogger(__name__)
 initialize_app()
 
 
+def _is_rate_limited(error: Exception) -> bool:
+    """Check if the error is a Garmin 429 rate limit."""
+    error_str = str(error).lower()
+    return "429" in error_str or "too many" in error_str
+
+
+def _load_garmin_client(db, uid: str, function_name: str):
+    """Load Garmin client from stored tokens. Returns (client, error_dict)."""
+    token_doc = db.collection("garminTokens").document(uid).get()
+    if not token_doc.exists:
+        return None, {"error": "NOT_CONNECTED"}
+
+    token_data = token_doc.to_dict().get("oauthTokens")
+    if not token_data:
+        logger.error(f"{function_name}: no oauthTokens field in document")
+        db.collection("garminTokens").document(uid).delete()
+        return None, {"error": "TOKEN_INVALID"}
+
+    try:
+        client = Garmin()
+        client.login(tokenstore=token_data)
+        return client, None
+    except (json.JSONDecodeError, ValueError) as e:
+        # Tokens are corrupt/unparseable — delete them so user can re-login cleanly
+        logger.error(f"{function_name}: corrupt tokens (deleting): {type(e).__name__}: {e}")
+        db.collection("garminTokens").document(uid).delete()
+        return None, {"error": "TOKEN_INVALID"}
+    except Exception as e:
+        if _is_rate_limited(e):
+            logger.error(f"{function_name}: rate limited during token refresh: {e}")
+            return None, {"error": "RATE_LIMITED"}
+        logger.error(f"{function_name}: token error: {type(e).__name__}: {e}")
+        return None, {"error": "TOKEN_EXPIRED"}
+
+
+def _save_refreshed_tokens(db, uid: str, client):
+    """Save potentially refreshed tokens back to Firestore."""
+    try:
+        updated_token_data = client.garth.dumps()
+        db.collection("garminTokens").document(uid).update({
+            "oauthTokens": updated_token_data,
+            "lastSyncAt": SERVER_TIMESTAMP,
+        })
+    except Exception as e:
+        logger.warning(f"Failed to save refreshed tokens: {e}")
+
+
 @https_fn.on_call()
 def garmin_connect(req: https_fn.CallableRequest) -> dict:
     """Authenticate with Garmin Connect and store OAuth tokens."""
@@ -52,10 +99,19 @@ def garmin_connect(req: https_fn.CallableRequest) -> dict:
             logger.info("garmin_connect: login successful without MFA")
     except Exception as e:
         logger.error(f"garmin_connect: exception during login: {type(e).__name__}: {e}")
+        if _is_rate_limited(e):
+            return {"error": "RATE_LIMITED"}
         return {"error": "INVALID_CREDENTIALS"}
 
     # Serialize OAuth tokens via garth
     token_data = client.garth.dumps()
+
+    # Verify tokens are valid JSON (round-trip check)
+    try:
+        json.loads(token_data)
+    except (json.JSONDecodeError, TypeError) as e:
+        logger.error(f"garmin_connect: token serialization failed: {e}")
+        return {"error": "INVALID_CREDENTIALS"}
 
     db = firestore.client()
 
@@ -98,32 +154,18 @@ def garmin_daily_summary(req: https_fn.CallableRequest) -> dict:
         )
 
     db = firestore.client()
-
-    # Read tokens
-    token_doc = db.collection("garminTokens").document(uid).get()
-    if not token_doc.exists:
-        return {"error": "NOT_CONNECTED"}
-
-    token_data = token_doc.to_dict()["oauthTokens"]
-
-    # Initialize Garmin client with saved tokens
-    try:
-        client = Garmin()
-        client.login(tokenstore=token_data)
-    except Exception as e:
-        logger.error(f"garmin_daily_summary: token error: {type(e).__name__}: {e}")
-        return {"error": "TOKEN_EXPIRED"}
+    client, error = _load_garmin_client(db, uid, "garmin_daily_summary")
+    if error:
+        return error
 
     # Fetch daily summary
     try:
         summary = client.get_user_summary(date_str)
     except Exception as e:
+        if _is_rate_limited(e):
+            return {"error": "RATE_LIMITED"}
         logger.error(f"garmin_daily_summary: API error: {type(e).__name__}: {e}")
         return {"error": "GARMIN_UNAVAILABLE"}
-
-    # Log all calorie-related fields for debugging
-    calorie_fields = {k: v for k, v in summary.items() if "alori" in k.lower()}
-    logger.info(f"garmin_daily_summary: calorie fields: {calorie_fields}")
 
     total_calories = summary.get("totalKilocalories", 0)
     active_calories = summary.get("activeKilocalories", 0)
@@ -133,12 +175,7 @@ def garmin_daily_summary(req: https_fn.CallableRequest) -> dict:
     if total_calories < 500:
         return {"error": "IMPLAUSIBLE_VALUE"}
 
-    # Update tokens (may have been refreshed)
-    updated_token_data = client.garth.dumps()
-    db.collection("garminTokens").document(uid).update({
-        "oauthTokens": updated_token_data,
-        "lastSyncAt": SERVER_TIMESTAMP,
-    })
+    _save_refreshed_tokens(db, uid, client)
 
     # Resolve email and update profile
     user_record = auth.get_user(uid)
@@ -179,21 +216,9 @@ def garmin_activities(req: https_fn.CallableRequest) -> dict:
         )
 
     db = firestore.client()
-
-    # Read tokens
-    token_doc = db.collection("garminTokens").document(uid).get()
-    if not token_doc.exists:
-        return {"error": "NOT_CONNECTED"}
-
-    token_data = token_doc.to_dict()["oauthTokens"]
-
-    # Initialize Garmin client with saved tokens
-    try:
-        client = Garmin()
-        client.login(tokenstore=token_data)
-    except Exception as e:
-        logger.error(f"garmin_activities: token error: {type(e).__name__}: {e}")
-        return {"error": "TOKEN_EXPIRED"}
+    client, error = _load_garmin_client(db, uid, "garmin_activities")
+    if error:
+        return error
 
     # Fetch activities for the given date
     try:
@@ -202,15 +227,12 @@ def garmin_activities(req: https_fn.CallableRequest) -> dict:
             enddate=date_str,
         )
     except Exception as e:
+        if _is_rate_limited(e):
+            return {"error": "RATE_LIMITED"}
         logger.error(f"garmin_activities: API error: {type(e).__name__}: {e}")
         return {"error": "GARMIN_UNAVAILABLE"}
 
-    # Update tokens (may have been refreshed)
-    updated_token_data = client.garth.dumps()
-    db.collection("garminTokens").document(uid).update({
-        "oauthTokens": updated_token_data,
-        "lastSyncAt": SERVER_TIMESTAMP,
-    })
+    _save_refreshed_tokens(db, uid, client)
 
     activities = []
     if raw_activities:

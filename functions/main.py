@@ -1,5 +1,6 @@
 """Garmin Connect Cloud Functions for TDEE integration."""
 
+import base64
 import json
 import logging
 from firebase_functions import https_fn
@@ -20,7 +21,13 @@ def _is_rate_limited(error: Exception) -> bool:
 
 
 def _load_garmin_client(db, uid: str, function_name: str):
-    """Load Garmin client from stored tokens. Returns (client, error_dict)."""
+    """Load Garmin client from stored tokens. Returns (client, error_dict).
+
+    IMPORTANT: Never delete tokens here — only garmin_disconnect should delete.
+    garth.dumps() is unreliable after login(tokenstore=...), so tokens can't
+    be refreshed. Deleting them forces re-authentication which is painful
+    (MFA, rate limits). Instead, keep the original tokens and return an error.
+    """
     token_doc = db.collection("garminTokens").document(uid).get()
     if not token_doc.exists:
         return None, {"error": "NOT_CONNECTED"}
@@ -28,45 +35,55 @@ def _load_garmin_client(db, uid: str, function_name: str):
     token_data = token_doc.to_dict().get("oauthTokens")
     if not token_data:
         logger.error(f"{function_name}: no oauthTokens field in document")
-        db.collection("garminTokens").document(uid).delete()
+        return None, {"error": "TOKEN_INVALID"}
+
+    # Pre-validate: ensure stored tokens are valid base64-encoded JSON
+    if not _validate_token_data(token_data):
+        logger.error(f"{function_name}: stored tokens are invalid ({len(token_data)} bytes, preview: {repr(token_data[:80])})")
         return None, {"error": "TOKEN_INVALID"}
 
     try:
         client = Garmin()
         client.login(tokenstore=token_data)
         return client, None
-    except (json.JSONDecodeError, ValueError) as e:
-        # Tokens are corrupt/unparseable — delete them so user can re-login cleanly
-        logger.error(f"{function_name}: corrupt tokens (deleting): {type(e).__name__}: {e}")
-        db.collection("garminTokens").document(uid).delete()
-        return None, {"error": "TOKEN_INVALID"}
     except Exception as e:
         if _is_rate_limited(e):
             logger.error(f"{function_name}: rate limited during token refresh: {e}")
             return None, {"error": "RATE_LIMITED"}
-        logger.error(f"{function_name}: token error: {type(e).__name__}: {e}")
+        logger.error(f"{function_name}: login failed (tokens preserved): {type(e).__name__}: {e}")
         return None, {"error": "TOKEN_EXPIRED"}
+
+
+def _validate_token_data(token_data: str) -> bool:
+    """Validate that token data from garth.dumps() is a valid base64-encoded JSON array.
+
+    garth.dumps() returns base64(json([oauth1_dict, oauth2_dict])), NOT raw JSON.
+    """
+    if not token_data or len(token_data) < 10:
+        return False
+    try:
+        decoded = base64.b64decode(token_data)
+        parsed = json.loads(decoded)
+        return isinstance(parsed, list) and len(parsed) == 2
+    except Exception:
+        return False
 
 
 def _save_refreshed_tokens(db, uid: str, client):
     """Save potentially refreshed tokens back to Firestore.
 
-    Validates that serialized tokens are non-empty valid JSON before saving.
-    garth.dumps() can occasionally return an empty string, which would
-    corrupt the stored tokens and break all future sync attempts.
+    garth.dumps() returns base64-encoded JSON (not raw JSON).
+    We validate by decoding base64 → parsing JSON before saving.
     """
     try:
         updated_token_data = client.garth.dumps()
-        if not updated_token_data or len(updated_token_data) < 10:
-            logger.warning(f"Refusing to save empty/tiny token data ({len(updated_token_data or '')} bytes)")
+        if not _validate_token_data(updated_token_data):
+            logger.warning(f"garth.dumps() returned invalid data ({len(updated_token_data or '')} bytes) — skipping token save")
             return
-        json.loads(updated_token_data)  # Round-trip validation
         db.collection("garminTokens").document(uid).update({
             "oauthTokens": updated_token_data,
             "lastSyncAt": SERVER_TIMESTAMP,
         })
-    except (json.JSONDecodeError, ValueError) as e:
-        logger.warning(f"Refusing to save invalid token data: {e}")
     except Exception as e:
         logger.warning(f"Failed to save refreshed tokens: {e}")
 
@@ -114,14 +131,11 @@ def garmin_connect(req: https_fn.CallableRequest) -> dict:
             return {"error": "RATE_LIMITED"}
         return {"error": "INVALID_CREDENTIALS"}
 
-    # Serialize OAuth tokens via garth
+    # Serialize OAuth tokens via garth (base64-encoded JSON)
     token_data = client.garth.dumps()
 
-    # Verify tokens are valid JSON (round-trip check)
-    try:
-        json.loads(token_data)
-    except (json.JSONDecodeError, TypeError) as e:
-        logger.error(f"garmin_connect: token serialization failed: {e}")
+    if not _validate_token_data(token_data):
+        logger.error(f"garmin_connect: token serialization failed ({len(token_data or '')} bytes)")
         return {"error": "INVALID_CREDENTIALS"}
 
     db = firestore.client()

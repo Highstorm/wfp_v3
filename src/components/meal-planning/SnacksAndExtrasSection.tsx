@@ -329,7 +329,7 @@ export const SnacksAndExtrasSection = ({
 
           {(showDishList || aiSearchResult || isAISearching) && (
             <div
-              className="absolute z-[9998] w-full max-h-60 overflow-y-auto rounded-b-2xl border border-t-0 border-border bg-background shadow-lg"
+              className="absolute z-40 w-full max-h-60 overflow-y-auto rounded-b-2xl border border-t-0 border-border bg-background shadow-lg"
               style={{
                 WebkitOverflowScrolling: "touch",
               }}

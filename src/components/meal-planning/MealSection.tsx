@@ -103,7 +103,7 @@ export const MealSection = ({
         />
 
         {showDishList && selectedMeal === sectionKey && (
-          <div className="absolute z-[9999] w-full max-h-60 overflow-y-auto rounded-b-2xl border border-t-0 border-border bg-background shadow-lg">
+          <div className="absolute z-40 w-full max-h-60 overflow-y-auto rounded-b-2xl border border-t-0 border-border bg-background shadow-lg">
             {filteredDishes.length > 0 ? (
               filteredDishes.map((dish, i) => (
                 <button

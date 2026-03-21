@@ -307,7 +307,7 @@ export const CreateDishWithIngredients = () => {
               (aiSearchResult ||
                 isAISearching) && (
                 <div
-                  className="absolute z-[100] w-full mt-1 bg-background border border-border rounded-lg shadow-lg max-h-60 sm:max-h-60 overflow-y-auto"
+                  className="absolute z-40 w-full mt-1 bg-background border border-border rounded-lg shadow-lg max-h-60 sm:max-h-60 overflow-y-auto"
                   style={{
                     WebkitOverflowScrolling: "touch", // Smooth scrolling auf iOS
                     position: "absolute", // Explizit für iOS

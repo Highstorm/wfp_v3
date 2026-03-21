@@ -111,10 +111,10 @@ export const MealPlanForm = () => {
               key={section.key}
               className={
                 index === 0
-                  ? "relative z-[60]"
+                  ? "relative z-30"
                   : index === 1
-                  ? "relative z-[59]"
-                  : "relative z-[58]"
+                  ? "relative z-20"
+                  : "relative z-10"
               }
             >
               <MealSection
@@ -145,7 +145,7 @@ export const MealPlanForm = () => {
         </div>
 
         {/* Snacks & Extras */}
-        <div className="relative z-40">
+        <div className="relative z-[5]">
           <SnacksAndExtrasSection
             dishes={mealPlan.snacks || []}
             temporaryMeals={mealPlan.temporaryMeals || []}
@@ -171,7 +171,7 @@ export const MealPlanForm = () => {
 
         {/* Sport */}
         {sportEnabled && (
-          <div className="relative z-30">
+          <div className="relative z-[1]">
             <SportSection
               activities={mealPlan.sports || []}
               baseCalories={combinedNutritionGoals.baseCalories}

@@ -11,7 +11,7 @@ export function useSportSync(
   >,
   _handleAddSportActivity?: (activity: SportActivity) => void
 ) {
-  const { date, setMealPlan, setMessage, intervalsCredentials, profile, isMealPlanLoading } = state;
+  const { date, setMealPlan, intervalsCredentials, profile, isMealPlanLoading } = state;
   const sportSyncSource = profile?.sportSyncSource ?? null;
   const syncedDates = useRef(new Set<string>());
 
@@ -60,19 +60,18 @@ export function useSportSync(
       const response = await fetchGarminActivities(date);
 
       if (response.error) {
-        if (!isAutoSync) {
-          const errorMessages: Record<string, string> = {
-            NOT_CONNECTED: "Garmin ist nicht verbunden.",
-            TOKEN_EXPIRED: "Garmin-Verbindung abgelaufen. Bitte erneut verbinden.",
-            TOKEN_INVALID: "Garmin-Token ungültig. Bitte in den Einstellungen neu verbinden.",
-            RATE_LIMITED: "Garmin blockiert Anfragen. Bitte in ca. 1 Stunde erneut versuchen.",
-            GARMIN_UNAVAILABLE: "Garmin-Dienst ist derzeit nicht verfügbar.",
-          };
-          setMessage({
-            text: errorMessages[response.error] ?? "Fehler beim Laden der Garmin-Aktivitäten.",
-            type: "error",
-          });
-        }
+        const errorMessages: Record<string, string> = {
+          NOT_CONNECTED: "Garmin ist nicht verbunden.",
+          TOKEN_EXPIRED: "Garmin-Verbindung abgelaufen. Bitte erneut verbinden.",
+          TOKEN_INVALID: "Garmin-Token ungültig. Bitte in den Einstellungen neu verbinden.",
+          RATE_LIMITED: "Garmin blockiert Anfragen. Bitte in ca. 1 Stunde erneut versuchen.",
+          GARMIN_UNAVAILABLE: "Garmin-Dienst ist derzeit nicht verfügbar.",
+        };
+        const feedback = {
+          text: errorMessages[response.error] ?? "Fehler beim Laden der Garmin-Aktivitäten.",
+          type: "error" as const,
+        };
+        if (!isAutoSync) return feedback;
         return;
       }
 
@@ -80,19 +79,18 @@ export function useSportSync(
       const newActivitiesAdded = addGarminActivitiesIfNew(activities);
 
       if (!isAutoSync) {
-        setMessage({
-          text: newActivitiesAdded
-            ? "Garmin-Aktivitäten synchronisiert."
-            : "Keine neuen Aktivitäten gefunden.",
-          type: newActivitiesAdded ? "success" : "info",
-        });
+        const count = activities.length;
+        if (newActivitiesAdded) {
+          return { text: `${count} Aktivität${count !== 1 ? "en" : ""} synchronisiert.`, type: "success" as const };
+        }
+        if (count === 0) {
+          return { text: "Keine Aktivitäten für heute gefunden.", type: "info" as const };
+        }
+        return { text: "Keine neuen Aktivitäten gefunden.", type: "info" as const };
       }
     } catch {
       if (!isAutoSync) {
-        setMessage({
-          text: "Fehler beim Laden der Garmin-Aktivitäten.",
-          type: "error",
-        });
+        return { text: "Fehler beim Laden der Garmin-Aktivitäten.", type: "error" as const };
       }
     }
   };
@@ -100,10 +98,7 @@ export function useSportSync(
   const syncIntervalsActivities = async (isAutoSync: boolean) => {
     if (!intervalsCredentials) {
       if (!isAutoSync) {
-        setMessage({
-          text: "Keine Intervals.icu Credentials gefunden.",
-          type: "error",
-        });
+        return { text: "Keine Intervals.icu Credentials gefunden.", type: "error" as const };
       }
       return;
     }
@@ -116,7 +111,6 @@ export function useSportSync(
       let newActivitiesAdded = false;
 
       for (const activity of activities) {
-        // Use handleAddSportActivity for Intervals (manual sync only, no stale closure issue)
         setMealPlan((prev) => {
           const existingSports = prev.sports || [];
           const alreadyExists = existingSports.some((sport) => {
@@ -147,26 +141,21 @@ export function useSportSync(
       }
 
       if (!isAutoSync) {
-        setMessage({
-          text: newActivitiesAdded
-            ? "Aktivitäten synchronisiert."
-            : "Keine neuen Aktivitäten gefunden.",
-          type: newActivitiesAdded ? "success" : "info",
-        });
+        const count = activities.length;
+        if (newActivitiesAdded) {
+          return { text: `${count} Aktivität${count !== 1 ? "en" : ""} synchronisiert.`, type: "success" as const };
+        }
+        if (count === 0) {
+          return { text: "Keine Aktivitäten für heute gefunden.", type: "info" as const };
+        }
+        return { text: "Keine neuen Aktivitäten gefunden.", type: "info" as const };
       }
     } catch (error) {
       if (!isAutoSync) {
         if (error instanceof Error && error.message === "STRAVA_RESTRICTED") {
-          setMessage({
-            text: "Strava-Aktivitäten sind über die Intervals.icu API nicht verfügbar. Strava erlaubt keinen Zugriff über Drittanbieter-APIs.",
-            type: "error",
-          });
-        } else {
-          setMessage({
-            text: "Fehler beim Laden der Aktivitäten.",
-            type: "error",
-          });
+          return { text: "Strava-Aktivitäten sind über die Intervals.icu API nicht verfügbar.", type: "error" as const };
         }
+        return { text: "Fehler beim Laden der Aktivitäten.", type: "error" as const };
       }
     }
   };
@@ -187,15 +176,11 @@ export function useSportSync(
 
   const handleSyncActivities = async () => {
     if (sportSyncSource === "garmin") {
-      await syncGarminActivities(false);
+      return await syncGarminActivities(false);
     } else if (sportSyncSource === "intervals") {
-      await syncIntervalsActivities(false);
-    } else {
-      setMessage({
-        text: "Keine Sport-Sync-Quelle konfiguriert.",
-        type: "info",
-      });
+      return await syncIntervalsActivities(false);
     }
+    return { text: "Keine Sport-Sync-Quelle konfiguriert.", type: "info" as const };
   };
 
   return { handleSyncActivities, sportSyncSource } as const;

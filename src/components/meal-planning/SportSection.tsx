@@ -3,12 +3,17 @@ import type { SportActivity } from "../../types";
 import { correctActivityCalories } from "../../utils/nutrition.utils";
 import GarminDelta from "../../assets/garmin-delta.svg";
 
+interface SyncFeedback {
+  text: string;
+  type: "success" | "error" | "info";
+}
+
 interface SportSectionProps {
   activities: SportActivity[];
   baseCalories: number | null;
   onAddActivity: (activity: SportActivity) => void;
   onRemoveActivity: (index: number) => void;
-  onSyncActivities?: () => void;
+  onSyncActivities?: () => Promise<SyncFeedback | void>;
 }
 
 export const SportSection = ({
@@ -21,6 +26,8 @@ export const SportSection = ({
   const [calories, setCalories] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [isFormVisible, setIsFormVisible] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [syncFeedback, setSyncFeedback] = useState<SyncFeedback | null>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -97,6 +104,21 @@ export const SportSection = ({
           </div>
         ))}
 
+        {/* Sync feedback */}
+        {syncFeedback && (
+          <div
+            className={`rounded-xl px-3 py-2 text-sm font-medium ${
+              syncFeedback.type === "success"
+                ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400"
+                : syncFeedback.type === "error"
+                ? "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"
+                : "bg-zinc-100 text-zinc-600 dark:bg-zinc-800/50 dark:text-zinc-400"
+            }`}
+          >
+            {syncFeedback.text}
+          </div>
+        )}
+
         {/* Add activity - dashed button / form */}
         {!isFormVisible ? (
           <div className="space-y-2">
@@ -108,10 +130,20 @@ export const SportSection = ({
             </button>
             {onSyncActivities && (
               <button
-                onClick={onSyncActivities}
+                onClick={async () => {
+                  setIsSyncing(true);
+                  setSyncFeedback(null);
+                  const result = await onSyncActivities();
+                  if (result) setSyncFeedback(result);
+                  setIsSyncing(false);
+                  if (result) {
+                    setTimeout(() => setSyncFeedback(null), 5000);
+                  }
+                }}
+                disabled={isSyncing}
                 className="w-full text-left text-xs text-muted-foreground hover:text-foreground transition-colors touch-manipulation py-1"
               >
-                Aktivitäten synchronisieren
+                {isSyncing ? "Synchronisiere..." : "Aktivitäten synchronisieren ↓"}
               </button>
             )}
           </div>

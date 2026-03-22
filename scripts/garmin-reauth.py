@@ -17,7 +17,7 @@ import os
 # Add functions dir to path for firebase_admin
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'functions'))
 
-from garminconnect import Garmin
+import garth
 import firebase_admin
 from firebase_admin import firestore, auth as fb_auth
 
@@ -34,17 +34,18 @@ def main():
 
     try:
         if mfa_code:
-            client = Garmin(email, password, prompt_mfa=lambda: mfa_code)
+            garth.login(email, password, prompt_mfa=lambda: mfa_code)
         else:
-            client = Garmin(email, password)
-        client.login()
+            garth.login(email, password)
         print("Login erfolgreich!")
     except Exception as e:
         print(f"Login fehlgeschlagen: {type(e).__name__}: {e}")
+        if "MFA" in str(e) or "mfa" in str(e):
+            print("MFA erforderlich — bitte Code als dritten Parameter übergeben.")
         sys.exit(1)
 
     # Serialize and validate tokens (garth.dumps() returns base64-encoded JSON)
-    tokens = client.garth.dumps()
+    tokens = garth.client.dumps()
     decoded = json.loads(base64.b64decode(tokens))
     assert isinstance(decoded, list) and len(decoded) == 2, "Token format invalid"
     print(f"Tokens generiert ({len(tokens)} Bytes)")
@@ -56,33 +57,15 @@ def main():
 
     db = firestore.client()
 
-    # Find uid by email - look in profiles collection
-    profiles = db.collection("profiles").limit(10).get()
-    print("\nVerfügbare Profile:")
-    for p in profiles:
-        print(f"  - {p.id}")
-
-    # Find garminTokens
-    garmin_tokens = db.collection("garminTokens").limit(10).get()
-    print("\nVorhandene garminTokens:")
-    for t in garmin_tokens:
-        print(f"  - {t.id}")
-        data = t.to_dict()
-        if "oauthTokens" in data:
-            try:
-                decoded = json.loads(base64.b64decode(data["oauthTokens"]))
-                assert isinstance(decoded, list) and len(decoded) == 2
-                print("    Token: gültig (base64+JSON parseable)")
-            except Exception:
-                print("    Token: KORRUPT (nicht parseable)")
-
     # Find UID from Firebase Auth by email
     try:
         user = fb_auth.get_user_by_email(email)
         uid = user.uid
-        print(f"\nFirebase UID für {email}: {uid}")
+        print(f"Firebase UID für {email}: {uid}")
     except Exception as e:
-        print(f"\nKonnte UID nicht finden: {e}")
+        print(f"Konnte UID nicht finden: {e}")
+        # Fallback: check existing garminTokens
+        garmin_tokens = list(db.collection("garminTokens").limit(10).get())
         if garmin_tokens:
             uid = garmin_tokens[0].id
             print(f"Fallback: verwende vorhandenen Token-Eintrag {uid}")

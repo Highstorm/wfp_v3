@@ -3,7 +3,7 @@
 import base64
 import json
 import logging
-from firebase_functions import https_fn
+from firebase_functions import https_fn, scheduler_fn
 from firebase_admin import initialize_app, auth, firestore
 from garminconnect import Garmin
 from garth.sso import login as garth_login
@@ -306,3 +306,27 @@ def garmin_disconnect(req: https_fn.CallableRequest) -> dict:
     }, merge=True)
 
     return {"success": True}
+
+
+@scheduler_fn.on_schedule(schedule="every 6 hours")
+def garmin_refresh_tokens(event: scheduler_fn.ScheduledEvent) -> None:
+    """Proactively refresh Garmin OAuth tokens to prevent overnight expiration.
+
+    Runs every 6 hours. Loads each user's tokens, logs in (which triggers
+    garth's automatic token refresh), and saves the refreshed tokens back.
+    """
+    db = firestore.client()
+    token_docs = db.collection("garminTokens").stream()
+
+    for doc in token_docs:
+        uid = doc.id
+        try:
+            client, error = _load_garmin_client(db, uid, "garmin_refresh_tokens")
+            if error:
+                logger.warning(f"garmin_refresh_tokens: uid={uid} — {error}")
+                continue
+
+            _save_refreshed_tokens(db, uid, client)
+            logger.info(f"garmin_refresh_tokens: uid={uid} — tokens refreshed")
+        except Exception as e:
+            logger.error(f"garmin_refresh_tokens: uid={uid} — {type(e).__name__}: {e}")
